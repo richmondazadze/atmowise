@@ -54,7 +54,7 @@ export function TimelineChart({
   };
 
   const chartData = generateChartData();
-  const maxValue = Math.max(...chartData.map(d => d[selectedMetric as keyof typeof d] as number || 0));
+  const maxValue = chartData.length > 0 ? Math.max(...chartData.map(d => d[selectedMetric as keyof typeof d] as number || 0)) : 100;
 
   const getAQIColor = (aqi: number) => {
     if (aqi <= 50) return '#71E07E';
@@ -96,6 +96,20 @@ export function TimelineChart({
     a.click();
     window.URL.revokeObjectURL(url);
   };
+
+  // Safety check for empty data
+  if (chartData.length === 0) {
+    return (
+      <Card className="card-solid rounded-xl lg:rounded-2xl p-4 lg:p-6 hover:shadow-xl transition-all duration-300">
+        <CardContent className="flex items-center justify-center h-64">
+          <div className="text-center text-gray-500">
+            <TrendingUp className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+            <p>No data available</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="card-solid rounded-xl lg:rounded-2xl p-4 lg:p-6 hover:shadow-xl transition-all duration-300">
@@ -154,18 +168,20 @@ export function TimelineChart({
               stroke="#6200D9"
               strokeWidth="2"
               points={chartData.map((d, i) => {
-                const x = 40 + (i / (chartData.length - 1)) * 340;
+                // Safe calculation to prevent NaN when chartData.length is 1
+                const x = chartData.length === 1 ? 40 + 170 : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
                 const value = d[selectedMetric as keyof typeof d] as number || 0;
-                const y = 170 - (value / maxValue) * 120;
+                const y = 170 - ((value / Math.max(maxValue, 1)) * 120);
                 return `${x},${y}`;
               }).join(' ')}
             />
             
             {/* Data points */}
             {chartData.map((d, i) => {
-              const x = 40 + (i / (chartData.length - 1)) * 340;
+              // Safe calculation to prevent NaN when chartData.length is 1
+              const x = chartData.length === 1 ? 40 + 170 : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
               const value = d[selectedMetric as keyof typeof d] as number || 0;
-              const y = 170 - (value / maxValue) * 120;
+              const y = 170 - ((value / Math.max(maxValue, 1)) * 120);
               
               return (
                 <g key={i}>

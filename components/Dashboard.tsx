@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/queryClient";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const { user: supabaseUser, signOut } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   // Location state
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number; label: string } | null>(null);
@@ -478,7 +480,7 @@ export default function Dashboard() {
                   variant="outline"
                   onClick={() => {
                     // Navigate to profile page
-                    window.location.href = '/profile';
+                    router.push('/profile');
                   }}
                   className="flex flex-col items-center gap-2 h-20 p-4 border-gray-200 hover:bg-gray-50 rounded-xl touch-target"
                 >
@@ -489,7 +491,7 @@ export default function Dashboard() {
                   variant="outline"
                   onClick={() => {
                     // Navigate to timeline page
-                    window.location.href = '/timeline';
+                    router.push('/timeline');
                   }}
                   className="flex flex-col items-center gap-2 h-20 p-4 border-gray-200 hover:bg-gray-50 rounded-xl touch-target"
                 >
