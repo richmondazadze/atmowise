@@ -1,13 +1,39 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ChevronDown, ChevronUp, Lightbulb, Heart, Shield, Activity, User, Search, Filter, Calendar, Clock, ThumbsUp, ThumbsDown, X } from 'lucide-react';
+import { useState, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  ChevronDown,
+  ChevronUp,
+  Lightbulb,
+  Heart,
+  Shield,
+  Activity,
+  User,
+  Search,
+  Filter,
+  Calendar,
+  Clock,
+  ThumbsUp,
+  ThumbsDown,
+  X,
+} from "lucide-react";
 
 interface Tip {
   id: string;
@@ -19,28 +45,32 @@ interface Tip {
 interface TipsCardProps {
   tips: Tip[];
   className?: string;
-  onTipInteraction?: (tipId: string, type: 'helpful' | 'not_helpful') => void;
+  onTipInteraction?: (tipId: string, type: "helpful" | "not_helpful") => void;
 }
 
 const getCategoryFromTag = (tag?: string) => {
-  if (!tag) return 'general';
+  if (!tag) return "general";
   const lowerTag = tag.toLowerCase();
-  if (lowerTag.includes('immediate') || lowerTag.includes('urgent')) return 'immediate';
-  if (lowerTag.includes('prevention') || lowerTag.includes('prevent')) return 'prevention';
-  if (lowerTag.includes('lifestyle') || lowerTag.includes('daily')) return 'lifestyle';
-  if (lowerTag.includes('medical') || lowerTag.includes('health')) return 'medical';
-  return 'general';
+  if (lowerTag.includes("immediate") || lowerTag.includes("urgent"))
+    return "immediate";
+  if (lowerTag.includes("prevention") || lowerTag.includes("prevent"))
+    return "prevention";
+  if (lowerTag.includes("lifestyle") || lowerTag.includes("daily"))
+    return "lifestyle";
+  if (lowerTag.includes("medical") || lowerTag.includes("health"))
+    return "medical";
+  return "general";
 };
 
 const getTimeCategory = (createdAt: string) => {
   const now = new Date();
   const tipDate = new Date(createdAt);
   const diffInHours = (now.getTime() - tipDate.getTime()) / (1000 * 60 * 60);
-  
-  if (diffInHours < 24) return 'today';
-  if (diffInHours < 168) return 'week'; // 7 days
-  if (diffInHours < 720) return 'month'; // 30 days
-  return 'older';
+
+  if (diffInHours < 24) return "today";
+  if (diffInHours < 168) return "week"; // 7 days
+  if (diffInHours < 720) return "month"; // 30 days
+  return "older";
 };
 
 const categoryIcons = {
@@ -52,66 +82,81 @@ const categoryIcons = {
 };
 
 const categoryColors = {
-  immediate: 'bg-red-50 text-red-700 border-red-200',
-  prevention: 'bg-blue-50 text-blue-700 border-blue-200',
-  lifestyle: 'bg-green-50 text-green-700 border-green-200',
-  medical: 'bg-purple-50 text-purple-700 border-purple-200',
-  general: 'bg-gray-50 text-gray-700 border-gray-200',
+  immediate: "bg-red-50 text-red-700 border-red-200",
+  prevention: "bg-blue-50 text-blue-700 border-blue-200",
+  lifestyle: "bg-green-50 text-green-700 border-green-200",
+  medical: "bg-purple-50 text-purple-700 border-purple-200",
+  general: "bg-gray-50 text-gray-700 border-gray-200",
 };
 
 const categoryIconsBg = {
-  immediate: 'bg-red-100',
-  prevention: 'bg-blue-100',
-  lifestyle: 'bg-green-100',
-  medical: 'bg-purple-100',
-  general: 'bg-gray-100',
+  immediate: "bg-red-100",
+  prevention: "bg-blue-100",
+  lifestyle: "bg-green-100",
+  medical: "bg-purple-100",
+  general: "bg-gray-100",
 };
 
-export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [timeFilter, setTimeFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'category'>('newest');
+export function TipsCard({
+  tips,
+  className = "",
+  onTipInteraction,
+}: TipsCardProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [timeFilter, setTimeFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "category">(
+    "newest"
+  );
   const [selectedTip, setSelectedTip] = useState<Tip | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   // Enhanced filtering and sorting logic
   const filteredAndSortedTips = useMemo(() => {
-    let filtered = tips.filter(tip => {
+    let filtered = tips.filter((tip) => {
       // Search filter
-      if (searchQuery && !tip.content.toLowerCase().includes(searchQuery.toLowerCase())) {
+      if (
+        searchQuery &&
+        !tip.content.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
         return false;
       }
-      
+
       // Category filter
-      if (categoryFilter !== 'all') {
+      if (categoryFilter !== "all") {
         const category = getCategoryFromTag(tip.tag);
         if (category !== categoryFilter) return false;
       }
-      
+
       // Time filter
-      if (timeFilter !== 'all') {
+      if (timeFilter !== "all") {
         const timeCategory = getTimeCategory(tip.createdAt);
         if (timeCategory !== timeFilter) return false;
       }
-      
+
       return true;
     });
 
     // Sort tips
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'newest':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case 'category':
+        case "newest":
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        case "oldest":
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        case "category":
           const categoryA = getCategoryFromTag(a.tag);
           const categoryB = getCategoryFromTag(b.tag);
           if (categoryA !== categoryB) {
             return categoryA.localeCompare(categoryB);
           }
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         default:
           return 0;
       }
@@ -137,8 +182,13 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
           <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lightbulb className="h-8 w-8 text-blue-400" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Tips Available</h3>
-          <p className="text-gray-500 text-sm">Log a symptom to get personalized health tips based on your air quality and health profile.</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No Tips Available
+          </h3>
+          <p className="text-gray-500 text-sm">
+            Log a symptom to get personalized health tips based on your air
+            quality and health profile.
+          </p>
         </CardContent>
       </Card>
     );
@@ -155,11 +205,14 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
               </div>
               <span>Health Tips</span>
             </div>
-            <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-medium">
+            <Badge
+              variant="secondary"
+              className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-medium"
+            >
               {filteredAndSortedTips.length}
             </Badge>
           </CardTitle>
-          
+
           {/* Mobile-Optimized Filtering UI */}
           <div className="space-y-3 mt-4">
             {/* Search Bar */}
@@ -172,15 +225,17 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                 className="pl-10 h-10 text-sm border-gray-200 focus:border-blue-300 focus:ring-blue-200"
               />
             </div>
-            
+
             {/* Filter Controls - Mobile Stack */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="h-10 text-sm border-gray-200 focus:border-blue-300">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full">
                     <Filter className="h-4 w-4 text-gray-500" />
-                    <span className="truncate">
-                      {categoryFilter === 'all' ? 'All Categories' : categoryFilter}
+                    <span className="truncate overflow-hidden whitespace-nowrap flex-1">
+                      {categoryFilter === "all"
+                        ? "All Categories"
+                        : categoryFilter}
                     </span>
                   </div>
                 </SelectTrigger>
@@ -193,13 +248,13 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                   <SelectItem value="general">General</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={timeFilter} onValueChange={setTimeFilter}>
                 <SelectTrigger className="h-10 text-sm border-gray-200 focus:border-blue-300">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-gray-500" />
                     <span className="truncate">
-                      {timeFilter === 'all' ? 'All Time' : timeFilter}
+                      {timeFilter === "all" ? "All Time" : timeFilter}
                     </span>
                   </div>
                 </SelectTrigger>
@@ -211,8 +266,11 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                   <SelectItem value="older">Older</SelectItem>
                 </SelectContent>
               </Select>
-              
-              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+
+              <Select
+                value={sortBy}
+                onValueChange={(value: any) => setSortBy(value)}
+              >
                 <SelectTrigger className="h-10 text-sm border-gray-200 focus:border-blue-300">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-gray-500" />
@@ -235,7 +293,9 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
             {filteredAndSortedTips.length === 0 ? (
               <div className="text-center py-8 px-6">
                 <Search className="h-8 w-8 mx-auto mb-3 text-gray-300" />
-                <p className="text-gray-500 text-sm">No tips found matching your criteria</p>
+                <p className="text-gray-500 text-sm">
+                  No tips found matching your criteria
+                </p>
               </div>
             ) : (
               <div className="space-y-1">
@@ -245,11 +305,12 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                   const IconComponent = categoryIcons[category];
                   const categoryColor = categoryColors[category];
                   const iconBg = categoryIconsBg[category];
-                  
+
                   // Extract title from content (first line) and description (rest)
-                  const contentLines = tip.content.split('\n');
-                  const title = contentLines[0] || 'Health Tip';
-                  const description = contentLines.slice(1).join('\n').trim() || tip.content;
+                  const contentLines = tip.content.split("\n");
+                  const title = contentLines[0] || "Health Tip";
+                  const description =
+                    contentLines.slice(1).join("\n").trim() || tip.content;
 
                   return (
                     <div
@@ -260,10 +321,12 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                       <div className="p-4">
                         <div className="flex items-start gap-3">
                           {/* Icon */}
-                          <div className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                          <div
+                            className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}
+                          >
                             <IconComponent className="h-5 w-5 text-gray-600" />
                           </div>
-                          
+
                           {/* Content */}
                           <div className="flex-1 min-w-0">
                             {/* Header with title and badges */}
@@ -279,7 +342,7 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                                       size="sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        onTipInteraction(tip.id, 'helpful');
+                                        onTipInteraction(tip.id, "helpful");
                                       }}
                                       className="h-6 w-6 p-0 text-green-500 hover:text-green-600 hover:bg-green-50 opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
@@ -290,7 +353,7 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                                       size="sm"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        onTipInteraction(tip.id, 'not_helpful');
+                                        onTipInteraction(tip.id, "not_helpful");
                                       }}
                                       className="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
                                     >
@@ -300,25 +363,32 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                                 )}
                               </div>
                             </div>
-                            
+
                             {/* Badges and date */}
                             <div className="flex items-center gap-2 mb-2 flex-wrap">
-                              <Badge 
-                                variant="outline" 
+                              <Badge
+                                variant="outline"
                                 className={`text-xs px-2 py-1 ${categoryColor} border-current font-medium`}
                               >
                                 {category}
                               </Badge>
-                              <Badge variant="outline" className="text-xs px-2 py-1 text-gray-600 border-gray-300">
-                                {timeCategory === 'today' ? 'Today' : 
-                                 timeCategory === 'week' ? 'This Week' :
-                                 timeCategory === 'month' ? 'This Month' : 'Older'}
+                              <Badge
+                                variant="outline"
+                                className="text-xs px-2 py-1 text-gray-600 border-gray-300"
+                              >
+                                {timeCategory === "today"
+                                  ? "Today"
+                                  : timeCategory === "week"
+                                  ? "This Week"
+                                  : timeCategory === "month"
+                                  ? "This Month"
+                                  : "Older"}
                               </Badge>
                               <span className="text-xs text-gray-500">
                                 {new Date(tip.createdAt).toLocaleDateString()}
                               </span>
                             </div>
-                            
+
                             {/* Description */}
                             <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
                               {description}
@@ -347,7 +417,9 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                     const IconComponent = categoryIcons[category];
                     const iconBg = categoryIconsBg[category];
                     return (
-                      <div className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center`}>
+                      <div
+                        className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center`}
+                      >
                         <IconComponent className="h-5 w-5 text-gray-600" />
                       </div>
                     );
@@ -357,22 +429,31 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
               )}
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedTip && (
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="space-y-4">
                 {/* Tip Header */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge 
-                    variant="outline" 
-                    className={`text-sm px-3 py-1 ${categoryColors[getCategoryFromTag(selectedTip.tag)]} border-current font-medium`}
+                  <Badge
+                    variant="outline"
+                    className={`text-sm px-3 py-1 ${
+                      categoryColors[getCategoryFromTag(selectedTip.tag)]
+                    } border-current font-medium`}
                   >
                     {getCategoryFromTag(selectedTip.tag)}
                   </Badge>
-                  <Badge variant="outline" className="text-sm px-3 py-1 text-gray-600 border-gray-300">
-                    {getTimeCategory(selectedTip.createdAt) === 'today' ? 'Today' : 
-                     getTimeCategory(selectedTip.createdAt) === 'week' ? 'This Week' :
-                     getTimeCategory(selectedTip.createdAt) === 'month' ? 'This Month' : 'Older'}
+                  <Badge
+                    variant="outline"
+                    className="text-sm px-3 py-1 text-gray-600 border-gray-300"
+                  >
+                    {getTimeCategory(selectedTip.createdAt) === "today"
+                      ? "Today"
+                      : getTimeCategory(selectedTip.createdAt) === "week"
+                      ? "This Week"
+                      : getTimeCategory(selectedTip.createdAt) === "month"
+                      ? "This Month"
+                      : "Older"}
                   </Badge>
                   <span className="text-sm text-gray-500">
                     {new Date(selectedTip.createdAt).toLocaleDateString()}
@@ -392,7 +473,9 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onTipInteraction(selectedTip.id, 'helpful')}
+                      onClick={() =>
+                        onTipInteraction(selectedTip.id, "helpful")
+                      }
                       className="flex-1 text-green-600 border-green-200 hover:bg-green-50 h-10"
                     >
                       <ThumbsUp className="h-4 w-4 mr-2" />
@@ -401,7 +484,9 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onTipInteraction(selectedTip.id, 'not_helpful')}
+                      onClick={() =>
+                        onTipInteraction(selectedTip.id, "not_helpful")
+                      }
                       className="flex-1 text-red-600 border-red-200 hover:bg-red-50 h-10"
                     >
                       <ThumbsDown className="h-4 w-4 mr-2" />
