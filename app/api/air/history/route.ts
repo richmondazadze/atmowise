@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
             const timestamp = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
             
             // Add some realistic variation to the data
-            const variation = 0.8 + (Math.random() * 0.4); // 0.8 to 1.2 multiplier
+            const variation = 0.9 + (i % 3) * 0.1; // 0.9, 1.0, 1.1 pattern
             const timeVariation = Math.sin((i / dataPoints) * Math.PI * 2) * 0.1; // Daily pattern
             
             const generatedReading = {

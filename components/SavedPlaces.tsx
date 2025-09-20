@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Home, Briefcase, Dumbbell, GraduationCap, Plus, Trash2, Wind, Activity } from 'lucide-react';
+import { MapPin, Home, Briefcase, Dumbbell, GraduationCap, Plus, Minus, Wind, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { SavedPlace } from '@shared/schema';
 
@@ -288,9 +288,9 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                         e.stopPropagation();
                         deletePlaceMutation.mutate(place.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50 touch-target flex-shrink-0"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50 touch-target flex-shrink-0 rounded-full w-8 h-8 p-0"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Minus className="h-4 w-4" />
                     </Button>
                   </div>
                   

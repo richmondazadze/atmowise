@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, firstName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<{ error: any }>;
@@ -68,12 +68,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, firstName?: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
+      
+      if (error) {
+        return { error };
+      }
+      
+      // If signup successful and we have a user and firstName, create profile immediately
+      if (data.user && firstName) {
+        try {
+          // Create user in our database
+          const userResponse = await fetch('/api/user/authenticated', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              userId: data.user.id,
+              email: data.user.email 
+            })
+          });
+          
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            
+            // Create profile with first name
+            await fetch('/api/profile', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                userId: userData.id,
+                displayName: firstName,
+                sensitivity: {
+                  ageGroup: 'adult',
+                  asthma: false,
+                  copd: false,
+                  smoker: false,
+                  pregnant: false,
+                  cardiopulmonary: false,
+                  heartDisease: false,
+                  diabetes: false
+                },
+                notifications: {
+                  airQualityAlerts: true,
+                  healthTips: true,
+                  weeklyReports: true
+                },
+                isCompleted: false
+              })
+            });
+          }
+        } catch (profileError) {
+          console.warn('Failed to create profile during signup:', profileError);
+          // Don't fail signup if profile creation fails
+        }
+      }
+      
       return { error };
     } catch (error) {
       console.error("Sign up error:", error);

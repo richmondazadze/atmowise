@@ -10,14 +10,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Address query parameter is required' }, { status: 400 })
     }
 
-    const openWeatherApiKey = process.env.NEXT_PUBLIC_OPENWEATHER_KEY
+    const openWeatherApiKey = process.env.OPENWEATHER_API_KEY
     const airNowApiKey = process.env.NEXT_PUBLIC_AIRNOW_KEY
     const geocodeApiKey = process.env.GEOCODE_API_KEY
     
     if (!openWeatherApiKey || openWeatherApiKey === 'your_openweather_key') {
       return NextResponse.json({ 
         error: 'OpenWeather API key not configured',
-        message: 'Please configure NEXT_PUBLIC_OPENWEATHER_KEY in your environment variables'
+        message: 'Please configure OPENWEATHER_API_KEY in your environment variables'
       }, { status: 500 })
     }
 
