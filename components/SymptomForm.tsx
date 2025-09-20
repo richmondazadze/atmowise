@@ -153,7 +153,7 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Describe any respiratory symptoms, fatigue, eye irritation, etc."
-          className="w-full resize-none"
+          className="w-full resize-none placeholder:text-gray-400"
           rows={4}
           disabled={isLoading}
           data-testid="input-symptom-note"
