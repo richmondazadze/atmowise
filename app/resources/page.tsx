@@ -1,24 +1,18 @@
 'use client'
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { LifeBuoy, Search, ExternalLink, Phone, FileText, AlertTriangle, Heart, Wind, Stethoscope } from 'lucide-react';
+import { LifeBuoy, AlertTriangle } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { PageLayout } from '@/components/PageLayout';
 
 export default function ResourcesPage() {
-  const [searchQuery, setSearchQuery] = useState('');
 
   const resourceCategories = [
     {
       title: 'Cancer Prevention & Research',
-      icon: Stethoscope,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
       resources: [
         {
@@ -31,9 +25,6 @@ export default function ResourcesPage() {
     },
     {
       title: 'Lung Health & Respiratory Care',
-      icon: Heart,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
       borderColor: 'border-green-200',
       resources: [
         {
@@ -46,9 +37,6 @@ export default function ResourcesPage() {
     },
     {
       title: 'Air Quality & Health',
-      icon: Wind,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
       resources: [
         {
@@ -68,13 +56,6 @@ export default function ResourcesPage() {
   ];
 
 
-  const filteredResources = resourceCategories.flatMap(category => 
-    category.resources.filter(resource =>
-      resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      category.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  );
 
   return (
     <PageLayout>
@@ -109,30 +90,28 @@ export default function ResourcesPage() {
 
       {/* Main Content - Mobile Optimized */}
       <div className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8">
-        {/* Search - Mobile Optimized */}
-        <div className="mb-6 lg:mb-8">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#64748B]" />
-            <Input
-              placeholder="Search resources..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-11 pl-10 border-gray-200 focus:border-[#6200D9] focus:ring-[#6200D9] rounded-xl text-base touch-target"
-            />
-          </div>
-        </div>
 
         {/* Emergency Contacts - Simplified */}
         <div className="mb-8 lg:mb-12">
           <div className="bg-gradient-to-br from-red-50 to-red-100/50 rounded-2xl p-6 border border-red-200 shadow-sm">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-red-600">Emergency</h2>
+                  <p className="text-sm text-red-500">Call 911 for medical emergencies</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-red-600">Emergency</h2>
-                <p className="text-sm text-red-500">Call 911 for medical emergencies</p>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white border-0 h-10 px-6 rounded-xl font-medium"
+                onClick={() => window.open('tel:911')}
+              >
+                Call 911
+              </Button>
             </div>
           </div>
         </div>
