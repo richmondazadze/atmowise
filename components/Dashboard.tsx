@@ -539,36 +539,6 @@ export default function Dashboard() {
               lastUpdated={airQualityData?.timestamp ? new Date(airQualityData.timestamp) : undefined}
             />
 
-            {/* Quick Actions - Mobile Optimized */}
-            <div className="bg-white rounded-2xl p-5 lg:p-8 animate-fade-in shadow-sm border border-gray-100/50">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">Quick Actions</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // Navigate to profile page
-                    router.push('/profile');
-                  }}
-                  className="flex flex-col items-center gap-2 h-20 p-4 border-gray-200 hover:bg-gray-50 rounded-xl touch-target"
-                >
-                  <User className="h-5 w-5 text-[#6200D9]" />
-                  <span className="text-xs font-medium text-[#0A1C40]">Health Profile</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // Navigate to timeline page
-                    router.push('/timeline');
-                  }}
-                  className="flex flex-col items-center gap-2 h-20 p-4 border-gray-200 hover:bg-gray-50 rounded-xl touch-target"
-                >
-                  <Activity className="h-5 w-5 text-[#6200D9]" />
-                  <span className="text-xs font-medium text-[#0A1C40]">View Timeline</span>
-                </Button>
-              </div>
-            </div>
 
             {/* Symptom Form - Mobile Optimized */}
             <div className="bg-white rounded-2xl p-5 lg:p-8 animate-fade-in shadow-sm border border-gray-100/50">

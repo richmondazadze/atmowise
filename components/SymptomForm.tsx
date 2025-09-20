@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { AIInsightsModal } from "@/components/AIInsightsModal";
 import type { Profile, AirRead } from "@shared/schema";
 
 interface SymptomFormProps {
@@ -23,6 +24,8 @@ interface SymptomFormProps {
 export function SymptomForm({ userId = "", profile = null, airData = null, onSymptomLogged, onEmergency, embedded = false }: SymptomFormProps) {
   const [note, setNote] = useState("");
   const [severity, setSeverity] = useState([2]);
+  const [showAIInsights, setShowAIInsights] = useState(false);
+  const [symptomData, setSymptomData] = useState<any>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -84,52 +87,21 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
 
       const symptom = await createSymptomMutation.mutateAsync(symptomData);
 
-      // Then get LLM reflection with comprehensive data
-      const reflectionData = {
+      // Prepare data for AI Insights Modal
+      const insightsData = {
         note: note.trim(),
-        pm25: airData?.pm25 || null,
-        pm10: airData?.pm10 || null,
-        o3: airData?.o3 || null,
-        no2: airData?.no2 || null,
-        aqi: airData?.aqi || null,
-        category: airData?.category || null,
-        dominantPollutant: airData?.dominantPollutant || null,
         severity: severity[0],
-        sensitivity: profile?.sensitivity || {},
-        userId: userId,
+        airQuality: airData,
         location: airData ? `${airData.lat}, ${airData.lon}` : null,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
       };
 
-      const reflection = await llmReflectionMutation.mutateAsync(reflectionData);
-
-      // Update the symptom with AI analysis
-      const updateResponse = await fetch(`/api/symptoms`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          symptomId: symptom.id,
-          aiSummary: reflection.summary,
-          aiAction: reflection.action,
-          aiSeverity: reflection.severity,
-        })
-      });
-
-      // Check for emergency
-      if (reflection.severity === 'high' || reflection.emergency) {
-        onEmergency?.();
-      }
-
-      onSymptomLogged?.(reflection);
+      setSymptomData(insightsData);
+      setShowAIInsights(true);
 
       // Reset form
       setNote("");
       setSeverity([2]);
-
-      toast({
-        title: "Symptom logged successfully",
-        description: "AI analysis has been generated for your symptoms.",
-      });
 
     } catch (error) {
       console.error("Symptom submission error:", error);
@@ -153,7 +125,7 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Describe any respiratory symptoms, fatigue, eye irritation, etc."
-          className="w-full resize-none"
+          className="w-full resize-none placeholder:text-gray-400"
           rows={4}
           disabled={isLoading}
           data-testid="input-symptom-note"
@@ -210,15 +182,44 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
 
   if (embedded) {
     // Render without outer Card and header for mobile embedding
-    return <div className="p-0">{FormFields}</div>;
+    return (
+      <div className="p-0">
+        {FormFields}
+        {symptomData && (
+          <AIInsightsModal
+            isOpen={showAIInsights}
+            onClose={() => setShowAIInsights(false)}
+            symptomData={symptomData}
+            userId={userId}
+            onInsightsSaved={() => {
+              onSymptomLogged?.({ message: "AI insights generated and saved" });
+            }}
+          />
+        )}
+      </div>
+    );
   }
 
   return (
-    <Card className="bg-card rounded-2xl shadow-sm border border-border" data-testid="card-symptom-form">
-      <CardContent className="p-6">
-        <h3 className="text-lg font-semibold text-card-foreground mb-4">Log Symptoms</h3>
-        {FormFields}
-      </CardContent>
-    </Card>
+    <>
+      <Card className="bg-card rounded-2xl shadow-sm border border-border" data-testid="card-symptom-form">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">Log Symptoms</h3>
+          {FormFields}
+        </CardContent>
+      </Card>
+      
+      {symptomData && (
+        <AIInsightsModal
+          isOpen={showAIInsights}
+          onClose={() => setShowAIInsights(false)}
+          symptomData={symptomData}
+          userId={userId}
+          onInsightsSaved={() => {
+            onSymptomLogged?.({ message: "AI insights generated and saved" });
+          }}
+        />
+      )}
+    </>
   );
 }

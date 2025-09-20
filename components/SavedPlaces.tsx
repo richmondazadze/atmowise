@@ -288,7 +288,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                         e.stopPropagation();
                         deletePlaceMutation.mutate(place.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50 touch-target flex-shrink-0 rounded-full w-8 h-8 p-0"
+                      className="opacity-70 hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 hover:bg-red-50 touch-target flex-shrink-0 rounded-full w-8 h-8 p-0"
                     >
                       <Minus className="h-4 w-4" />
                     </Button>
