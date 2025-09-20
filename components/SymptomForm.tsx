@@ -94,6 +94,7 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
         airQuality: airData,
         location: airData ? `${airData.lat}, ${airData.lon}` : null,
         timestamp: new Date(),
+        userProfile: profile,
       };
 
       setSymptomData(insightsData);

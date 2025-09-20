@@ -22,23 +22,9 @@ async function testTimelineData() {
     const lat = 40.7128;
     const lon = -74.0060;
 
-    // 1. Create test user
-    console.log('👤 Creating test user...');
-    const userResponse = await fetch('http://localhost:3000/api/user/authenticated', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userId: testUserId,
-        email: testEmail 
-      })
-    });
-
-    if (!userResponse.ok) {
-      throw new Error(`User creation failed: ${userResponse.status}`);
-    }
-
-    const userData = await userResponse.json();
-    console.log('✅ User created:', userData.id);
+    // 1. Use Supabase user ID directly
+    console.log('👤 Using Supabase user ID directly...');
+    console.log('✅ User ID:', testUserId);
 
     // 2. Create air quality data
     console.log('🌬️ Creating air quality data...');
@@ -86,7 +72,7 @@ async function testTimelineData() {
         MAX(timestamp) as latest,
         AVG(aqi) as avg_aqi
       FROM air_reads 
-      WHERE user_id = ${userData.id};
+      WHERE user_id = ${testUserId};
     `);
     
     console.log('✅ Database verification:', dbData[0]);

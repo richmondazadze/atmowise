@@ -15,34 +15,20 @@ export async function GET(
   try {
     const { userId } = params
     
-    // Check if userId is a Supabase user ID (UUID format)
-    let internalUserId = userId;
-    if (isValidUUID(userId)) {
-      // Try to find user by supabaseId first
-      const user = await storage.getUserBySupabaseId(userId);
-      if (user) {
-        internalUserId = user.id;
-      }
+    // Validate userId format
+    if (!isValidUUID(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
     
-    let profile = await storage.getProfile(internalUserId)
+    let profile = await storage.getProfile(userId)
     
     // If profile doesn't exist, create a default one
     if (!profile) {
-      console.log('Profile not found, creating default profile for user:', internalUserId);
-      
-      // Ensure user exists first
-      if (isValidUUID(userId)) {
-        const user = await storage.getUserBySupabaseId(userId);
-        if (!user) {
-          // Create user if they don't exist
-          await storage.createUser({ supabaseId: userId });
-        }
-      }
+      console.log('Profile not found, creating default profile for user:', userId);
       
       // Create default profile
       const defaultProfile = {
-        userId: internalUserId,
+        userId: userId, // Use Supabase user ID directly
         displayName: null,
         sensitivity: {},
         notifications: {
@@ -70,35 +56,22 @@ export async function PUT(
     const { userId } = params
     const body = await request.json()
     
-    // Check if userId is a Supabase user ID (UUID format)
-    let internalUserId = userId;
-    if (isValidUUID(userId)) {
-      // Try to find user by supabaseId first
-      const user = await storage.getUserBySupabaseId(userId);
-      if (user) {
-        internalUserId = user.id;
-      }
+    // Validate userId format
+    if (!isValidUUID(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
     
     // Validate and sanitize the updates
     const updateData = insertProfileSchema.partial().parse(body)
     
     // First try to update existing profile
-    let profile = await storage.updateProfile(internalUserId, updateData)
+    let profile = await storage.updateProfile(userId, updateData)
     
     // If profile doesn't exist, create it
     if (!profile) {
-      // Ensure user exists first
-      if (isValidUUID(userId)) {
-        const user = await storage.getUserBySupabaseId(userId);
-        if (!user) {
-          await storage.createUser({ supabaseId: userId });
-        }
-      }
-      
       // Create new profile with the provided data
       const createData = {
-        userId: internalUserId,
+        userId: userId, // Use Supabase user ID directly
         ...updateData
       };
       profile = await storage.createProfile(createData);

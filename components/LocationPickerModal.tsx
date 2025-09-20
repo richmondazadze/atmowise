@@ -193,15 +193,15 @@ export function LocationPickerModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md rounded-2xl">
-        <DialogHeader>
+      <DialogContent className="w-[95vw] max-w-md mx-auto rounded-2xl p-0">
+        <DialogHeader className="px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-[#6200D9]" />
             Select Location
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="px-6 pb-6 space-y-4">
           {/* Use Current Location Button */}
           {onUseCurrentLocation && (
             <div className="flex justify-center">

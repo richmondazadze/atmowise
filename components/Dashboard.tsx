@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import type { Profile, User as UserType } from "@shared/schema";
+import type { Profile } from "@shared/schema";
 
 export default function Dashboard() {
   const { user: supabaseUser, signOut } = useAuth();
@@ -408,6 +408,32 @@ export default function Dashboard() {
     setSelectedLocation(location);
     setShowLocationPicker(false);
     // The query will automatically refetch with new coordinates due to queryKey change
+  };
+
+  // Handle tip interactions (helpful/not helpful)
+  const handleTipInteraction = async (
+    tipId: string,
+    type: "helpful" | "not_helpful"
+  ) => {
+    try {
+      await fetch("/api/user-interactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: supabaseUser?.id,
+          type: type === "helpful" ? "tip_helpful" : "tip_not_helpful",
+          targetId: tipId,
+        }),
+      });
+
+      // Show feedback
+      toast({
+        title: "Thank you for your feedback!",
+        description: `Your response has been recorded.`,
+      });
+    } catch (error) {
+      console.error("Failed to record tip interaction:", error);
+    }
   };
 
   // Handle location refresh
@@ -791,7 +817,15 @@ export default function Dashboard() {
       {/* Profile Setup Modal - Disabled for now */}
       {/* <ProfileSetupModal
         isOpen={showProfileSetup}
-        onClose={() => setShowProfileSetup(false)}
+        onClose={() => {
+          setShowProfileSetup(false);
+          // Reset the flag when modal is closed
+          setProfileSetupShown(false);
+        }}
+        onProfileCompleted={() => {
+          // Profile is completed, reset the flag so it won't show again
+          setProfileSetupShown(true);
+        }}
         userId={supabaseUser?.id || ''}
         currentProfile={profile}
       /> */}

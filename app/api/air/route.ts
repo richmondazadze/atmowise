@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { storage } from '../../../lib/database'
 
+// Helper function to validate UUID
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -17,24 +23,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    // First, get the internal user ID from the Supabase user ID
-    let internalUserId = userId;
-    try {
-      const user = await storage.getUserBySupabaseId(userId);
-      if (user) {
-        internalUserId = user.id;
-      } else {
-        // Create user if doesn't exist
-        const newUser = await storage.createUser({ supabaseId: userId });
-        internalUserId = newUser.id;
-      }
-    } catch (error) {
-      console.warn('Failed to get/create user:', error);
-      // Fallback to using the Supabase ID directly
+    // Validate userId format
+    if (!isValidUUID(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
     // Check for recent data first (30 minutes cache)
-    const recentData = await storage.getRecentAirRead(internalUserId, lat, lon, 30)
+    const recentData = await storage.getRecentAirRead(userId, lat, lon, 30)
     if (recentData) {
       return NextResponse.json({ ...recentData, cached: true })
     }
@@ -63,7 +58,7 @@ export async function GET(request: NextRequest) {
       // Save demo data to database with user ID
       const savedDemoData = await storage.createAirRead({
         ...demoData,
-        userId: internalUserId
+        userId: userId
       });
       
       return NextResponse.json(savedDemoData);
@@ -98,7 +93,7 @@ export async function GET(request: NextRequest) {
                     standardAQI <= 300 ? 'Very Unhealthy' : 'Hazardous';
 
     const processedData = {
-      userId: internalUserId,
+      userId: userId,
       lat: lat,
       lon: lon,
       source: "openweather",
@@ -146,22 +141,14 @@ export async function GET(request: NextRequest) {
     
     // Save error demo data to database with user ID if available
     if (errorUserId) {
-      // Try to get the internal user ID
-      let internalErrorUserId = errorUserId;
-      try {
-        const user = await storage.getUserBySupabaseId(errorUserId);
-        if (user) {
-          internalErrorUserId = user.id;
-        }
-      } catch (error) {
-        console.warn('Failed to get user for error fallback:', error);
+      // Validate userId format
+      if (isValidUUID(errorUserId)) {
+        const savedErrorData = await storage.createAirRead({
+          ...demoData,
+          userId: errorUserId
+        });
+        return NextResponse.json(savedErrorData);
       }
-      
-      const savedErrorData = await storage.createAirRead({
-        ...demoData,
-        userId: internalErrorUserId
-      });
-      return NextResponse.json(savedErrorData);
     }
     
     return NextResponse.json(demoData);

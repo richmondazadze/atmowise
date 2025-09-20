@@ -82,45 +82,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // If signup successful and we have a user and firstName, create profile immediately
       if (data.user && firstName) {
         try {
-          // Create user in our database
-          const userResponse = await fetch('/api/user/authenticated', {
+          // Create profile with first name using Supabase user ID directly
+          await fetch('/api/profile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
               userId: data.user.id,
-              email: data.user.email 
+              displayName: firstName,
+              sensitivity: {
+                ageGroup: 'adult',
+                asthma: false,
+                copd: false,
+                smoker: false,
+                pregnant: false,
+                cardiopulmonary: false,
+                heartDisease: false,
+                diabetes: false
+              },
+              notifications: {
+                airQualityAlerts: true,
+                healthTips: true,
+                weeklyReports: true
+              },
+              isCompleted: false
             })
           });
-          
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            
-            // Create profile with first name
-            await fetch('/api/profile', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: userData.id,
-                displayName: firstName,
-                sensitivity: {
-                  ageGroup: 'adult',
-                  asthma: false,
-                  copd: false,
-                  smoker: false,
-                  pregnant: false,
-                  cardiopulmonary: false,
-                  heartDisease: false,
-                  diabetes: false
-                },
-                notifications: {
-                  airQualityAlerts: true,
-                  healthTips: true,
-                  weeklyReports: true
-                },
-                isCompleted: false
-              })
-            });
-          }
         } catch (profileError) {
           console.warn('Failed to create profile during signup:', profileError);
           // Don't fail signup if profile creation fails

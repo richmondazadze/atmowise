@@ -81,7 +81,8 @@ export async function POST(request: NextRequest) {
       sensitivity, 
       userId,
       location,
-      timestamp 
+      timestamp,
+      userName = 'User'
     } = await request.json();
 
     if (!note || typeof note !== 'string') {
@@ -150,14 +151,14 @@ Be specific, actionable, and consider the user's health profile.`;
       dominantPollutant: dominantPollutant || 'unknown'
     };
 
-    const userPrompt = `User reported: "${note}"
+    const userPrompt = `${userName} reported: "${note}"
     
 Air Quality Data: ${JSON.stringify(airQualityData)}
 User Health Profile: ${JSON.stringify(sensitivity || {})}
 Location: ${location || 'unknown'}
 Time: ${timestamp || new Date().toISOString()}
 
-Please provide comprehensive health analysis and personalized tips.`;
+Please provide comprehensive health analysis and personalized tips for ${userName}.`;
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -218,27 +219,21 @@ Please provide comprehensive health analysis and personalized tips.`;
     // Store tips in database if user ID provided
     if (userId && parsed.tips && parsed.tips.length > 0) {
       try {
-        // Map Supabase user ID to internal user ID
-        let internalUserId = userId;
-        if (isValidUUID(userId)) {
-          let user = await storage.getUserBySupabaseId(userId);
-          if (!user) {
-            // Create user if they don't exist
-            user = await storage.createUser({ supabaseId: userId });
-            console.log('Created user for tips storage:', user.id);
-          }
-          internalUserId = user.id;
+        // Validate userId format
+        if (!isValidUUID(userId)) {
+          console.warn('Invalid user ID format for tips storage:', userId);
+          return NextResponse.json(parsed);
         }
 
-        // Store each tip
+        // Store each tip directly with Supabase user ID
         for (const tip of parsed.tips) {
           await storage.createTip({
             tag: tip.category || 'general',
             content: `${tip.title}\n\n${tip.content}`,
-            userId: internalUserId
+            userId: userId
           });
         }
-        console.log(`Stored ${parsed.tips.length} tips for user ${internalUserId}`);
+        console.log(`Stored ${parsed.tips.length} tips for user ${userId}`);
       } catch (error) {
         console.error('Failed to store tips:', error);
         // Continue without failing the main response

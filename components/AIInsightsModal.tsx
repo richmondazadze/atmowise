@@ -16,6 +16,7 @@ interface AIInsightsModalProps {
     airQuality?: any;
     location?: string;
     timestamp: Date;
+    userProfile?: any;
   };
   userId: string;
   onInsightsSaved?: () => void;
@@ -68,7 +69,8 @@ export function AIInsightsModal({
           sensitivity: null, // Will be fetched by the API
           userId: userId,
           location: symptomData.location,
-          timestamp: symptomData.timestamp.toISOString()
+          timestamp: symptomData.timestamp.toISOString(),
+          userName: symptomData.userProfile?.displayName || 'User'
         })
       });
       
@@ -99,25 +101,43 @@ export function AIInsightsModal({
   // Save insights mutation
   const saveInsightsMutation = useMutation({
     mutationFn: async (insights: AIResponse) => {
+      console.log('Saving insights:', insights);
+      console.log('User ID:', userId);
+      
+      // Use Supabase user ID directly
+      const actualUserId = userId;
+      
       // Save each tip to the database
-      const tipPromises = insights.tips.map(tip => 
-        fetch('/api/tips', {
+      const tipPromises = insights.tips.map((tip, index) => {
+        console.log(`Saving tip ${index + 1}:`, tip);
+        return fetch('/api/tips', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userId,
+            userId: actualUserId,
             content: `${tip.title}\n\n${tip.content}`,
             tag: tip.category,
             priority: getPriorityLabel(tip.priority)
           })
-        })
-      );
+        });
+      });
       
-      await Promise.all(tipPromises);
+      const results = await Promise.all(tipPromises);
+      console.log('Save results:', results);
+      
+      // Check if all saves were successful
+      const failedSaves = results.filter(response => !response.ok);
+      if (failedSaves.length > 0) {
+        console.error('Some tips failed to save:', failedSaves);
+        throw new Error(`${failedSaves.length} tips failed to save`);
+      }
+      
+      console.log('All tips saved successfully');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tips', userId] });
       queryClient.invalidateQueries({ queryKey: ['user-interactions', userId] });
+      queryClient.invalidateQueries({ queryKey: ['symptoms', userId] });
       toast({
         title: "Insights Saved!",
         description: "Your AI insights and tips have been saved to your profile.",
@@ -221,15 +241,15 @@ export function AIInsightsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] rounded-2xl flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] mx-auto rounded-2xl flex flex-col p-0">
+        <DialogHeader className="flex-shrink-0 px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-[#6200D9]" />
             AI Health Insights & Tips
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 overflow-hidden flex flex-col space-y-6">
+        <div className="flex-1 overflow-hidden flex flex-col px-6 pb-6 space-y-6">
           {/* Loading State */}
           {isGenerating && !aiResponse && (
             <div className="flex items-center justify-center py-8">

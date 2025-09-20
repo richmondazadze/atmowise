@@ -2,8 +2,8 @@ import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq, and, desc, asc, gt } from "drizzle-orm";
 import { 
-  users, profiles, airReads, symptoms, tips, resources, savedPlaces, userInteractions,
-  type User, type InsertUser, type Profile, type InsertProfile,
+  profiles, airReads, symptoms, tips, resources, savedPlaces, userInteractions,
+  type Profile, type InsertProfile,
   type AirRead, type InsertAirRead, type Symptom, type InsertSymptom,
   type Tip, type InsertTip, type Resource, type InsertResource,
   type SavedPlace, type InsertSavedPlace, type UserInteraction, type InsertUserInteraction
@@ -27,13 +27,6 @@ function getDatabase() {
 }
 
 export interface IStorage {
-  // Users
-  getUser(id: string): Promise<User | undefined>;
-  getUserByAnonId(anonId: string): Promise<User | undefined>;
-  getUserBySupabaseId(supabaseId: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  deleteUser(userId: string): Promise<void>;
-
   // Profiles
   getProfile(userId: string): Promise<Profile | undefined>;
   createProfile(profile: InsertProfile): Promise<Profile>;
@@ -54,7 +47,7 @@ export interface IStorage {
   getSymptomsForTimeline(userId: string, days?: number): Promise<Symptom[]>;
 
   // Tips & Resources
-  getTips(tag?: string): Promise<Tip[]>;
+  getTips(tag?: string, userId?: string): Promise<Tip[]>;
   createTip(tip: InsertTip): Promise<Tip>;
   updateTip(tipId: string, updates: Partial<InsertTip>): Promise<Tip | undefined>;
   deleteTip(tipId: string): Promise<void>;
@@ -73,35 +66,7 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser(id: string): Promise<User | undefined> {
-    const { db } = getDatabase();
-    const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
-    return result[0];
-  }
-
-  async getUserByAnonId(anonId: string): Promise<User | undefined> {
-    const { db } = getDatabase();
-    const result = await db.select().from(users).where(eq(users.anonId, anonId)).limit(1);
-    return result[0];
-  }
-
-  async getUserBySupabaseId(supabaseId: string): Promise<User | undefined> {
-    const { db } = getDatabase();
-    const result = await db.select().from(users).where(eq(users.supabaseId, supabaseId)).limit(1);
-    return result[0];
-  }
-
-  async createUser(user: InsertUser): Promise<User> {
-    const { db } = getDatabase();
-    const result = await db.insert(users).values(user).returning();
-    return result[0];
-  }
-
-  async deleteUser(userId: string): Promise<void> {
-    const { db } = getDatabase();
-    // This will cascade delete all related data due to foreign key constraints
-    await db.delete(users).where(eq(users.id, userId));
-  }
+  // Note: User management methods removed - we now use Supabase auth.users directly
 
   async getProfile(userId: string): Promise<Profile | undefined> {
     const { db } = getDatabase();
@@ -361,15 +326,8 @@ export class DatabaseStorage implements IStorage {
       return; // Data already seeded
     }
 
-    // Seed tips
-    const tipsData: InsertTip[] = [
-      { tag: "air-quality", content: "Check air quality before outdoor activities" },
-      { tag: "health", content: "Wear masks during high pollution days" },
-      { tag: "indoor", content: "Use air purifiers in your home" },
-      { tag: "exercise", content: "Avoid outdoor exercise when AQI is above 100" },
-    ];
-
-    await db.insert(tips).values(tipsData);
+    // Note: Tips are now user-specific and created through the app flow
+    // No generic seed data needed
 
     // Seed resources
     const resourcesData: InsertResource[] = [

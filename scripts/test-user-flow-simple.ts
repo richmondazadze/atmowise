@@ -20,23 +20,9 @@ async function testUserFlow() {
     const testUserId = '24018f9d-5ff3-4618-9228-e63a3c9269b2';
     const testEmail = 'azadzerichmond@gmail.com';
 
-    // 1. Test user creation
-    console.log('👤 Testing user creation...');
-    const userResponse = await fetch('http://localhost:3000/api/user/authenticated', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userId: testUserId,
-        email: testEmail 
-      })
-    });
-
-    if (!userResponse.ok) {
-      throw new Error(`User creation failed: ${userResponse.status}`);
-    }
-
-    const userData = await userResponse.json();
-    console.log('✅ User created/found:', userData.id);
+    // 1. Use Supabase user ID directly
+    console.log('👤 Using Supabase user ID directly...');
+    console.log('✅ User ID:', testUserId);
 
     // 2. Test profile creation
     console.log('📋 Testing profile creation...');
@@ -44,7 +30,7 @@ async function testUserFlow() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        userId: userData.id,
+        userId: testUserId,
         displayName: 'Test User',
         sensitivity: { asthma: true, ageGroup: 'adult' },
         notifications: { airQualityAlerts: true }

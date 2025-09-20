@@ -17,8 +17,8 @@ interface CrisisModalProps {
 export function CrisisModal({ isOpen, onClose }: CrisisModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white border-2 border-red-200 shadow-2xl" data-testid="modal-crisis" style={{ zIndex: 9999 }}>
-        <DialogHeader className="text-center">
+      <DialogContent className="w-[95vw] max-w-md mx-auto bg-white border-2 border-red-200 shadow-2xl p-0" data-testid="modal-crisis" style={{ zIndex: 9999 }}>
+        <DialogHeader className="text-center px-6 py-4">
           <div className="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
             <Heart className="h-8 w-8 text-red-600" />
           </div>
@@ -30,7 +30,7 @@ export function CrisisModal({ isOpen, onClose }: CrisisModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3">
+        <div className="px-6 pb-6 space-y-3">
           <a
             href="tel:911"
             className="block w-full p-4 bg-red-600 hover:bg-red-700 rounded-lg text-center text-white font-semibold transition-colors shadow-lg"

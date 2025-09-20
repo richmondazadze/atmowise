@@ -3,19 +3,13 @@ import { pgTable, text, varchar, uuid, timestamp, doublePrecision, smallint, int
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users table (optional anonymous)
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  supabaseId: text("supabase_id").unique(),
-  anonId: text("anon_id"),
-  email: text("email"),
-  createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
-});
+// Note: We now use Supabase auth.users.id directly instead of internal users table
+// This eliminates the need for user ID mapping and simplifies the architecture
 
 // Profiles table
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Supabase auth.users.id
   displayName: text("display_name"),
   sensitivity: jsonb("sensitivity").$type<{
     asthma?: boolean;
@@ -44,7 +38,7 @@ export const profiles = pgTable("profiles", {
 // Saved places table
 export const savedPlaces = pgTable("saved_places", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Supabase auth.users.id
   name: text("name").notNull(),
   type: text("type").notNull(), // home, work, gym, school, custom
   lat: doublePrecision("lat").notNull(),
@@ -56,7 +50,7 @@ export const savedPlaces = pgTable("saved_places", {
 // Air readings table (cached external API results)
 export const airReads = pgTable("air_reads", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Supabase auth.users.id
   lat: doublePrecision("lat").notNull(),
   lon: doublePrecision("lon").notNull(),
   source: text("source").notNull(), // openweather/airnow/demo
@@ -75,7 +69,7 @@ export const airReads = pgTable("air_reads", {
 // Symptoms table
 export const symptoms = pgTable("symptoms", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Supabase auth.users.id
   timestamp: timestamp("timestamp", { withTimezone: true }).default(sql`now()`),
   label: text("label"),
   severity: smallint("severity"), // 1..5
@@ -90,7 +84,7 @@ export const symptoms = pgTable("symptoms", {
 // Tips table
 export const tips = pgTable("tips", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Supabase auth.users.id
   tag: text("tag"),
   content: text("content"),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
@@ -110,7 +104,7 @@ export const resources = pgTable("resources", {
 // User interactions table (tracks user engagement with tips and resources)
 export const userInteractions = pgTable("user_interactions", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(), // Supabase auth.users.id
   type: text("type").notNull(), // 'tip_viewed', 'resource_accessed', 'tip_helpful', etc.
   targetId: uuid("target_id").notNull(), // ID of the tip or resource
   targetType: text("target_type").notNull(), // 'tip' or 'resource'
@@ -120,10 +114,7 @@ export const userInteractions = pgTable("user_interactions", {
 
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-});
+// Note: insertUserSchema removed - we now use Supabase auth.users directly
 
 export const insertProfileSchema = createInsertSchema(profiles).omit({
   id: true,
@@ -162,8 +153,7 @@ export const insertUserInteractionSchema = createInsertSchema(userInteractions).
 });
 
 // Types
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+// Note: User types removed - we now use Supabase auth.users directly
 
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 export type Profile = typeof profiles.$inferSelect;

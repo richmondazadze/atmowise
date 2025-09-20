@@ -20,9 +20,10 @@ interface ProfileSetupModalProps {
   onClose: () => void;
   userId: string;
   currentProfile?: any;
+  onProfileCompleted?: () => void;
 }
 
-export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: ProfileSetupModalProps) {
+export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile, onProfileCompleted }: ProfileSetupModalProps) {
   const [profileData, setProfileData] = useState({
     displayName: currentProfile?.displayName || '',
     ageGroup: currentProfile?.sensitivity?.ageGroup || 'adult' as 'child' | 'adult' | 'elderly',
@@ -58,10 +59,15 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', userId] });
       toast({
-        title: "Profile updated",
+        title: "Profile completed",
         description: "Your health profile has been saved successfully.",
       });
-      onClose();
+      // Notify parent component that profile is completed
+      onProfileCompleted?.();
+      // Close the modal after successful save
+      setTimeout(() => {
+        onClose();
+      }, 100);
     },
     onError: () => {
       toast({
@@ -232,15 +238,8 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
             </div>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-6 pt-4 sm:pt-6 border-t border-gray-200 px-4 sm:px-6">
-          <Button
-            onClick={handleSave}
-            disabled={updateProfileMutation.isPending || !profileData.displayName.trim()}
-            className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-xl"
-          >
-            {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
-          </Button>
-        </div>
+        
+        {/* Footer with both buttons */}
         <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-6 pt-4 sm:pt-6 border-t border-gray-200 px-4 sm:px-6">
           <Button
             variant="outline"
@@ -248,6 +247,13 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
             className="px-4 sm:px-6 py-2 sm:py-3 touch-target order-2 sm:order-1 text-sm sm:text-base rounded-xl"
           >
             Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={updateProfileMutation.isPending || !profileData.displayName.trim()}
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-xl"
+          >
+            {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
           </Button>
         </div>
         
