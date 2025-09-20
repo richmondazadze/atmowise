@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -160,25 +161,38 @@ export default function ResourcesPage() {
                         <Badge variant="outline" className="text-xs border-gray-200 text-[#64748B] px-2 py-1 rounded-full font-medium">
                           {category.title}
                         </Badge>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="bg-gradient-to-r from-[#6200D9] to-[#7C3AED] hover:from-[#4C00A8] hover:to-[#6200D9] text-white border-0 group hover:scale-105 transition-transform h-9 px-4 rounded-xl font-medium touch-target"
-                          onClick={() => {
-                            if (resource.phone) {
-                              window.open(`tel:${resource.phone}`);
-                            } else if (resource.url) {
-                              if (resource.url.startsWith('/')) {
-                                window.location.href = resource.url;
-                              } else {
-                                window.open(resource.url, '_blank');
-                              }
-                            }
-                          }}
-                        >
-                          {resource.phone ? 'Call' : 'View'}
-                          <ExternalLink className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
-                        </Button>
+                        {resource.phone ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-gradient-to-r from-[#6200D9] to-[#7C3AED] hover:from-[#4C00A8] hover:to-[#6200D9] text-white border-0 group hover:scale-105 transition-transform h-9 px-4 rounded-xl font-medium touch-target"
+                            onClick={() => window.open(`tel:${resource.phone}`)}
+                          >
+                            Call
+                            <Phone className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+                          </Button>
+                        ) : resource.url?.startsWith('/') ? (
+                          <Link href={resource.url}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="bg-gradient-to-r from-[#6200D9] to-[#7C3AED] hover:from-[#4C00A8] hover:to-[#6200D9] text-white border-0 group hover:scale-105 transition-transform h-9 px-4 rounded-xl font-medium touch-target"
+                            >
+                              View
+                              <ExternalLink className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+                            </Button>
+                          </Link>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-gradient-to-r from-[#6200D9] to-[#7C3AED] hover:from-[#4C00A8] hover:to-[#6200D9] text-white border-0 group hover:scale-105 transition-transform h-9 px-4 rounded-xl font-medium touch-target"
+                            onClick={() => window.open(resource.url, '_blank')}
+                          >
+                            View
+                            <ExternalLink className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

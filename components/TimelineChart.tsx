@@ -26,34 +26,8 @@ export function TimelineChart({
 }: TimelineChartProps) {
   const chartRef = useRef<HTMLCanvasElement>(null);
 
-  // Generate mock data for demonstration
-  const generateChartData = () => {
-    const days = selectedPeriod === '1d' ? 1 : selectedPeriod === '7d' ? 7 : selectedPeriod === '30d' ? 30 : 90;
-    const data = [];
-    const now = new Date();
-
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      
-      const baseAQI = 75; // Consistent AQI value
-      const hasSymptom = i % 3 === 0; // Every 3rd data point has symptom
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        aqi: Math.max(20, Math.min(200, Math.round(baseAQI))),
-        pm25: Math.round(baseAQI * 0.6),
-        pm10: Math.round(baseAQI * 1.2),
-        o3: Math.round(baseAQI * 0.8),
-        no2: Math.round(baseAQI * 0.4),
-        symptom: hasSymptom ? 2 : null // Consistent symptom severity
-      });
-    }
-
-    return data;
-  };
-
-  const chartData = generateChartData();
+  // Use real data from props
+  const chartData = airData || [];
   const maxValue = chartData.length > 0 ? Math.max(...chartData.map(d => d[selectedMetric as keyof typeof d] as number || 0)) : 100;
 
   const getAQIColor = (aqi: number) => {

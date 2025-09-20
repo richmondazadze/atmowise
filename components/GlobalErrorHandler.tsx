@@ -6,6 +6,21 @@ export function GlobalErrorHandler() {
   useEffect(() => {
     // Handle unhandled promise rejections
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      // Check if this is a navigation-related error that we can safely ignore
+      if (event.reason instanceof Event && event.reason.type === 'error') {
+        const target = event.reason.target as HTMLElement;
+        if (target && (target.tagName === 'A' || target.tagName === 'LINK')) {
+          // This is likely a navigation-related error that we can safely ignore
+          console.warn('Navigation-related promise rejection (ignored):', {
+            type: event.reason.type,
+            target: target.tagName,
+            href: (target as HTMLAnchorElement)?.href || 'N/A'
+          });
+          event.preventDefault();
+          return;
+        }
+      }
+      
       console.error('Unhandled promise rejection:', event.reason);
       
       // Prevent the default browser behavior
@@ -42,6 +57,17 @@ export function GlobalErrorHandler() {
 
     // Handle uncaught errors
     const handleError = (event: ErrorEvent) => {
+      // Check if this is a navigation-related error that we can safely ignore
+      if (event.target && (event.target as HTMLElement).tagName === 'A') {
+        console.warn('Navigation-related error (ignored):', {
+          message: event.message,
+          target: (event.target as HTMLElement).tagName,
+          href: (event.target as HTMLAnchorElement)?.href || 'N/A'
+        });
+        event.preventDefault();
+        return;
+      }
+      
       console.error('Uncaught error:', event.error);
       
       // Prevent the default browser behavior

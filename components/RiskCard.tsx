@@ -98,8 +98,8 @@ export function RiskCard({ airData, profile, isLoading, lastUpdated }: RiskCardP
         <div className="flex items-center justify-center h-32">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6200D9]"></div>
           <span className="ml-3 text-[#64748B] font-medium">Loading air quality data...</span>
-        </div>
-      </div>
+            </div>
+          </div>
     );
   }
 
@@ -114,7 +114,7 @@ export function RiskCard({ airData, profile, isLoading, lastUpdated }: RiskCardP
             Air Quality Status
           </h3>
         </div>
-      </div>
+              </div>
       <div className="space-y-4">
         {/* Main Status - Premium Mobile Design */}
         <div className="text-center p-5 lg:p-6 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#E2E8F0] rounded-2xl border border-gray-100/50">
@@ -141,7 +141,7 @@ export function RiskCard({ airData, profile, isLoading, lastUpdated }: RiskCardP
                   value={airData.pm25}
                   type="PM2.5"
                   unit="μg/m³"
-                  threshold={35}
+                  threshold={25}
                 />
               )}
               {airData.pm10 !== null && (
@@ -149,7 +149,7 @@ export function RiskCard({ airData, profile, isLoading, lastUpdated }: RiskCardP
                   value={airData.pm10}
                   type="PM10"
                   unit="μg/m³"
-                  threshold={150}
+                  threshold={50}
                 />
               )}
               {airData.o3 !== null && (
@@ -157,7 +157,7 @@ export function RiskCard({ airData, profile, isLoading, lastUpdated }: RiskCardP
                   value={airData.o3}
                   type="O3"
                   unit="ppb"
-                  threshold={70}
+                  threshold={50}
                 />
               )}
               {airData.no2 !== null && (
@@ -200,8 +200,8 @@ export function RiskCard({ airData, profile, isLoading, lastUpdated }: RiskCardP
                'Demo Data'}
             </Badge>
           )}
-        </div>
-      </div>
-    </div>
+              </div>
+            </div>
+          </div>
   );
 }

@@ -25,34 +25,38 @@ export function RoundedGauge({ value, type, unit, threshold, className = "" }: R
 
   const getColor = (value: number, threshold: number) => {
     const ratio = value / threshold;
-    if (ratio <= 0.5) return 'text-green-600';
-    if (ratio <= 0.75) return 'text-yellow-500';
-    if (ratio <= 1.0) return 'text-orange-500';
-    return 'text-red-600';
+    if (ratio <= 0.4) return 'text-green-600';
+    if (ratio <= 0.8) return 'text-yellow-500';
+    if (ratio <= 1.2) return 'text-orange-500';
+    if (ratio <= 2.0) return 'text-red-500';
+    return 'text-red-700';
   };
 
   const getGradientColor = (value: number, threshold: number) => {
     const ratio = value / threshold;
-    if (ratio <= 0.5) return 'from-green-400 to-green-500';
-    if (ratio <= 0.75) return 'from-yellow-400 to-yellow-500';
-    if (ratio <= 1.0) return 'from-orange-400 to-orange-500';
-    return 'from-red-400 to-red-500';
+    if (ratio <= 0.4) return 'from-green-400 to-green-500';
+    if (ratio <= 0.8) return 'from-yellow-400 to-yellow-500';
+    if (ratio <= 1.2) return 'from-orange-400 to-orange-500';
+    if (ratio <= 2.0) return 'from-red-400 to-red-500';
+    return 'from-red-600 to-red-700';
   };
 
   const getStatus = (value: number, threshold: number) => {
     const ratio = value / threshold;
-    if (ratio <= 0.5) return 'Good';
-    if (ratio <= 0.75) return 'Moderate';
-    if (ratio <= 1.0) return 'Poor';
-    return 'Unhealthy';
+    if (ratio <= 0.4) return 'Good';
+    if (ratio <= 0.8) return 'Moderate';
+    if (ratio <= 1.2) return 'Poor';
+    if (ratio <= 2.0) return 'Unhealthy';
+    return 'Hazardous';
   };
 
   const getStatusColor = (value: number, threshold: number) => {
     const ratio = value / threshold;
-    if (ratio <= 0.5) return 'bg-green-100 text-green-800';
-    if (ratio <= 0.75) return 'bg-yellow-100 text-yellow-800';
-    if (ratio <= 1.0) return 'bg-orange-100 text-orange-800';
-    return 'bg-red-100 text-red-800';
+    if (ratio <= 0.4) return 'bg-green-100 text-green-800';
+    if (ratio <= 0.8) return 'bg-yellow-100 text-yellow-800';
+    if (ratio <= 1.2) return 'bg-orange-100 text-orange-800';
+    if (ratio <= 2.0) return 'bg-red-100 text-red-800';
+    return 'bg-red-200 text-red-900';
   };
 
   // Ensure value is a valid number, default to 0 if null/undefined
@@ -153,10 +157,11 @@ export function RoundedGauge({ value, type, unit, threshold, className = "" }: R
           <div className="text-xs text-gray-600 mb-2">
             {safeValue > 0 && (
               <div>
-                {ratio <= 0.5 && "✅ Safe for all activities"}
-                {ratio > 0.5 && ratio <= 0.75 && "⚠️ Sensitive groups should limit outdoor activities"}
-                {ratio > 0.75 && ratio <= 1.0 && "⚠️ Everyone should limit outdoor activities"}
-                {ratio > 1.0 && "🚨 Avoid outdoor activities"}
+                {ratio <= 0.4 && "✅ Excellent air quality"}
+                {ratio > 0.4 && ratio <= 0.8 && "⚠️ Good air quality"}
+                {ratio > 0.8 && ratio <= 1.2 && "⚠️ Moderate - sensitive groups be cautious"}
+                {ratio > 1.2 && ratio <= 2.0 && "🚨 Poor - limit outdoor activities"}
+                {ratio > 2.0 && "🚨 Hazardous - avoid outdoor activities"}
               </div>
             )}
           </div>
