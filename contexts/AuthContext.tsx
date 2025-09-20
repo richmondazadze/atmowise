@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 
 interface AuthContextType {
   user: User | null;
@@ -27,9 +27,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     const getInitialSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
         if (error) {
-          console.error('Error getting initial session:', error);
+          console.error("Error getting initial session:", error);
         }
         if (mounted) {
           setSession(session);
@@ -37,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error in getInitialSession:', error);
+        console.error("Error in getInitialSession:", error);
         if (mounted) {
           setLoading(false);
         }
@@ -50,8 +53,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, session?.user?.id);
-      
+      console.log("Auth state change:", event, session?.user?.id);
+
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
@@ -73,8 +76,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       return { error };
     } catch (error) {
-      console.error('Sign up error:', error);
-      return { error: { message: 'An unexpected error occurred during sign up' } };
+      console.error("Sign up error:", error);
+      return {
+        error: { message: "An unexpected error occurred during sign up" },
+      };
     }
   };
 
@@ -86,8 +91,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       return { error };
     } catch (error) {
-      console.error('Sign in error:', error);
-      return { error: { message: 'An unexpected error occurred during sign in' } };
+      console.error("Sign in error:", error);
+      return {
+        error: { message: "An unexpected error occurred during sign in" },
+      };
     }
   };
 
@@ -95,22 +102,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await supabase.auth.signOut();
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error("Sign out error:", error);
     }
   };
 
   const signInWithGoogle = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/`,
         },
       });
       return { error };
     } catch (error) {
-      console.error('Google sign in error:', error);
-      return { error: { message: 'An unexpected error occurred during Google sign in' } };
+      console.error("Google sign in error:", error);
+      return {
+        error: {
+          message: "An unexpected error occurred during Google sign in",
+        },
+      };
     }
   };
 
@@ -130,7 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
