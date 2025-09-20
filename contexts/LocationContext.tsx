@@ -92,8 +92,30 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateCurrentLocation = (lat: number, lon: number, label?: string) => {
-    const locationLabel = label || `Current Location (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+  const updateCurrentLocation = async (lat: number, lon: number, label?: string) => {
+    let locationLabel = label;
+    
+    // If no label provided, try to get a readable address
+    if (!locationLabel) {
+      try {
+        const response = await fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.length > 0) {
+            const location = data[0];
+            locationLabel = `${location.name}, ${location.state || location.country}`;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to get address for current location:', error);
+      }
+      
+      // Fallback to coordinates if geocoding fails
+      if (!locationLabel) {
+        locationLabel = `Current Location (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+      }
+    }
+    
     setCurrentLocation({ lat, lon, label: locationLabel });
     setSelectedLocation({ lat, lon, label: locationLabel });
   };

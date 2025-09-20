@@ -88,13 +88,10 @@ export async function PUT(
     
     // If profile doesn't exist, create it
     if (!profile) {
-      console.log('Profile not found, creating new profile for user:', internalUserId);
-      
       // Ensure user exists first
       if (isValidUUID(userId)) {
         const user = await storage.getUserBySupabaseId(userId);
         if (!user) {
-          // Create user if they don't exist
           await storage.createUser({ supabaseId: userId });
         }
       }
@@ -105,7 +102,6 @@ export async function PUT(
         ...updateData
       };
       profile = await storage.createProfile(createData);
-      console.log('Created new profile:', profile.id);
     }
     
     return NextResponse.json(profile)

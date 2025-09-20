@@ -19,6 +19,7 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +47,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setError(null);
     setMessage(null);
 
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, firstName);
     if (error) {
       setError(error.message);
     } else {
@@ -67,42 +68,34 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white p-0 rounded-lg shadow-xl border-0">
-        <DialogHeader className="p-6 pb-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-lg">🌬️</span>
-                </div>
+      <DialogContent className="w-[95vw] max-w-[425px] bg-white p-0 rounded-lg shadow-xl border-0 mx-auto my-4 sm:my-8">
+        <DialogHeader className="p-4 sm:p-6 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-lg">🌬️</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
                 Welcome to AtmoWise
               </DialogTitle>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 text-xs sm:text-sm leading-relaxed">
                 Track air quality and your health with AI-powered insights
               </p>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-8 w-8 p-0 hover:bg-gray-100"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
         </DialogHeader>
         
-        <div className="px-6 pb-6">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6">
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin" className="text-sm font-medium">Sign In</TabsTrigger>
-              <TabsTrigger value="signup" className="text-sm font-medium">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-4 sm:mb-6 bg-gray-100 h-10 sm:h-11">
+              <TabsTrigger value="signin" className="text-xs sm:text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="text-xs sm:text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm">Sign Up</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="signin" className="space-y-4">
-              <form onSubmit={handleSignIn} className="space-y-4">
+            <TabsContent value="signin" className="space-y-4 sm:space-y-6 mt-0">
+              <form onSubmit={handleSignIn} className="space-y-3 sm:space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="email" className="text-xs sm:text-sm font-medium text-gray-700">
                     Email address
                   </Label>
                   <div className="relative">
@@ -112,14 +105,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 h-11"
+                      className="pl-10 h-10 sm:h-11 text-sm sm:text-base"
                       placeholder="Enter your email"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="password" className="text-xs sm:text-sm font-medium text-gray-700">
                     Password
                   </Label>
                   <div className="relative">
@@ -129,14 +122,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10 h-11"
+                      className="pl-10 pr-10 h-10 sm:h-11 text-sm sm:text-base"
                       placeholder="Enter your password"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -144,7 +137,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium" 
+                  className="w-full h-10 sm:h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm sm:text-base" 
                   disabled={loading}
                 >
                   {loading ? (
@@ -159,10 +152,24 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               </form>
             </TabsContent>
             
-            <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleSignUp} className="space-y-4">
+            <TabsContent value="signup" className="space-y-4 sm:space-y-6 mt-0">
+              <form onSubmit={handleSignUp} className="space-y-3 sm:space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="signup-firstname" className="text-xs sm:text-sm font-medium text-gray-700">
+                    First Name
+                  </Label>
+                  <Input
+                    id="signup-firstname"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="h-10 sm:h-11 text-sm sm:text-base"
+                    placeholder="Enter your first name"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email" className="text-xs sm:text-sm font-medium text-gray-700">
                     Email address
                   </Label>
                   <div className="relative">
@@ -172,14 +179,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 h-11"
+                      className="pl-10 h-10 sm:h-11 text-sm sm:text-base"
                       placeholder="Enter your email"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-sm font-medium text-gray-700">
+                  <Label htmlFor="signup-password" className="text-xs sm:text-sm font-medium text-gray-700">
                     Password
                   </Label>
                   <div className="relative">
@@ -189,14 +196,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10 h-11"
+                      className="pl-10 pr-10 h-10 sm:h-11 text-sm sm:text-base"
                       placeholder="Create a password"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -207,7 +214,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </div>
                 <Button 
                   type="submit" 
-                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium" 
+                  className="w-full h-10 sm:h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm sm:text-base" 
                   disabled={loading}
                 >
                   {loading ? (
@@ -223,7 +230,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-6">
+          <div className="mt-6 sm:mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-gray-200" />
@@ -234,7 +241,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
             <Button
               variant="outline"
-              className="w-full mt-4 h-11 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium"
+              className="w-full mt-4 h-10 sm:h-11 border-gray-200 hover:bg-gray-50 text-gray-700 font-medium text-sm sm:text-base"
               onClick={handleGoogleSignIn}
               disabled={loading}
             >
@@ -262,13 +269,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
           {error && (
             <Alert className="mt-4 border-red-200 bg-red-50" variant="destructive">
-              <AlertDescription className="text-red-800">{error}</AlertDescription>
+              <AlertDescription className="text-red-800 text-xs sm:text-sm">{error}</AlertDescription>
             </Alert>
           )}
 
           {message && (
             <Alert className="mt-4 border-green-200 bg-green-50">
-              <AlertDescription className="text-green-800">{message}</AlertDescription>
+              <AlertDescription className="text-green-800 text-xs sm:text-sm">{message}</AlertDescription>
             </Alert>
           )}
         </div>

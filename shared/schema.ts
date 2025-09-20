@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, uuid, timestamp, doublePrecision, smallint, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, uuid, timestamp, doublePrecision, smallint, integer, jsonb, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -37,6 +37,7 @@ export const profiles = pgTable("profiles", {
     lat: number;
     lon: number;
   }>>(),
+  isCompleted: boolean("is_completed").default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
 });
 

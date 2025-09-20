@@ -8,8 +8,8 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "@/contexts/LocationContext";
 import { RiskCard } from "@/components/RiskCard";
-// import { ProfileToggles } from "@/components/ProfileToggles";
-// import { ProfileSetupModal } from "@/components/ProfileSetupModal";
+import { ProfileToggles } from "@/components/ProfileToggles";
+import { ProfileSetupModal } from "@/components/ProfileSetupModal";
 import { SavedPlaces } from "@/components/SavedPlaces";
 import { SymptomForm } from "@/components/SymptomForm";
 import { LLMResponseCard } from "@/components/LLMResponseCard";
@@ -33,8 +33,8 @@ export default function Dashboard() {
   // UI state
   const [showLocationPicker, setShowLocationPicker] = useState(false);
 
-  // Profile setup state (disabled for now)
-  // const [showProfileSetup, setShowProfileSetup] = useState(false);
+  // Profile setup state
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
 
   // Geolocation hook
   const { 
@@ -220,15 +220,15 @@ export default function Dashboard() {
     retryDelay: 1000,
   });
 
-  // Check if profile needs setup (disabled for now)
-  // const needsProfileSetup = profile && (!profile.displayName || !profile.sensitivity?.ageGroup);
+  // Check if profile needs setup (only show if not completed)
+  const needsProfileSetup = profile && !profile.isCompleted;
   
-  // Auto-show profile setup for new users (disabled for now)
-  // useEffect(() => {
-  //   if (profile && needsProfileSetup && !showProfileSetup) {
-  //     setShowProfileSetup(true);
-  //   }
-  // }, [profile, needsProfileSetup, showProfileSetup]);
+  // Auto-show profile setup for new users who haven't completed it
+  useEffect(() => {
+    if (profile && needsProfileSetup && !showProfileSetup) {
+      setShowProfileSetup(true);
+    }
+  }, [profile, needsProfileSetup, showProfileSetup]);
 
   // Symptoms data for counting
   const { data: symptoms = [], isLoading: symptomsLoading } = useQuery({
@@ -639,13 +639,13 @@ export default function Dashboard() {
         onClose={() => setShowCrisisModal(false)}
       />
 
-      {/* Profile Setup Modal - Disabled for now */}
-      {/* <ProfileSetupModal
+      {/* Profile Setup Modal */}
+      <ProfileSetupModal
         isOpen={showProfileSetup}
         onClose={() => setShowProfileSetup(false)}
         userId={supabaseUser?.id || ''}
         currentProfile={profile}
-      /> */}
+      />
 
       {/* Navigation */}
       <Navigation onCrisis={() => setShowCrisisModal(true)} />

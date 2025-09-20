@@ -13,8 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Lungs, Baby, User, Shield, Zap, CheckCircle, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Heart, Activity, Baby, User, Shield, Zap, CheckCircle, X } from 'lucide-react';
 
 interface ProfileSetupModalProps {
   isOpen: boolean;
@@ -51,7 +50,7 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
       const response = await fetch(`/api/profile/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ ...data, isCompleted: true })
       });
       if (!response.ok) throw new Error('Failed to update profile');
       return response.json();
@@ -109,20 +108,20 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-white border-0 shadow-2xl mx-4" style={{ zIndex: 9999 }}>
-        <DialogHeader className="text-center pb-6">
+      <DialogContent className="w-[95vw] max-w-2xl bg-white border-0 shadow-2xl mx-auto my-4 sm:my-8 rounded-2xl">
+        <DialogHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
           <div className="w-12 h-12 bg-gradient-to-br from-[#6200D9] to-[#4C00A8] rounded-xl flex items-center justify-center mx-auto mb-4">
             <User className="h-6 w-6 text-white" />
           </div>
-          <DialogTitle className="text-lg lg:text-xl font-bold text-[#0A1C40]">
+          <DialogTitle className="text-lg sm:text-xl font-bold text-[#0A1C40]">
             Complete Your Health Profile
           </DialogTitle>
-          <DialogDescription className="text-sm lg:text-base text-[#64748B] leading-relaxed">
+          <DialogDescription className="text-sm sm:text-base text-[#64748B] leading-relaxed">
             Help us provide better air quality recommendations for your health
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 max-h-80 overflow-y-auto">
+        <div className="space-y-6 sm:space-y-8 max-h-80 overflow-y-auto px-4 sm:px-6">
           {/* Basic Info */}
           <div>
             <label className="block text-sm font-semibold text-[#0A1C40] mb-2">
@@ -133,15 +132,15 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
               value={profileData.displayName}
               onChange={(e) => setProfileData(prev => ({ ...prev, displayName: e.target.value }))}
               placeholder="Enter your name"
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#6200D9] focus:border-transparent text-sm sm:text-base"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#0A1C40] mb-2">
+            <label className="block text-sm font-semibold text-[#0A1C40] mb-3">
               Age Group
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {[
                 { value: 'child', label: 'Child', icon: Baby },
                 { value: 'adult', label: 'Adult', icon: User },
@@ -150,14 +149,14 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
                 <button
                   key={value}
                   onClick={() => setProfileData(prev => ({ ...prev, ageGroup: value as any }))}
-                  className={`p-4 rounded-lg border-2 transition-all duration-200 touch-target ${
+                  className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 touch-target ${
                     profileData.ageGroup === value
                       ? 'border-[#6200D9] bg-[#6200D9]/5'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
-                  <Icon className="h-5 w-5 mx-auto mb-2 text-[#6200D9]" />
-                  <div className="text-sm font-semibold text-[#0A1C40]">{label}</div>
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5 mx-auto mb-1 sm:mb-2 text-[#6200D9]" />
+                  <div className="text-xs sm:text-sm font-semibold text-[#0A1C40]">{label}</div>
                 </button>
               ))}
             </div>
@@ -168,10 +167,10 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
             <label className="block text-sm font-semibold text-[#0A1C40] mb-3">
               Health Conditions
             </label>
-            <div className="space-y-3">
+            <div className="space-y-3 sm:space-y-4">
               {[
-                { key: 'asthma', label: 'Asthma', icon: Lungs },
-                { key: 'copd', label: 'COPD', icon: Lungs },
+                { key: 'asthma', label: 'Asthma', icon: Activity },
+                { key: 'copd', label: 'COPD', icon: Activity },
                 { key: 'smoker', label: 'Smoker', icon: Zap },
                 { key: 'pregnant', label: 'Pregnant', icon: Baby },
                 { key: 'heartDisease', label: 'Heart Disease', icon: Heart },
@@ -180,11 +179,11 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
               ].map(({ key, label, icon: Icon }) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg touch-target"
+                  className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-xl touch-target"
                 >
-                  <div className="flex items-center space-x-3">
-                    <Icon className="h-5 w-5 text-[#6200D9] flex-shrink-0" />
-                    <span className="text-sm font-medium text-[#0A1C40]">{label}</span>
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-[#6200D9] flex-shrink-0" />
+                    <span className="text-xs sm:text-sm font-medium text-[#0A1C40]">{label}</span>
                   </div>
                   <Switch
                     checked={profileData.sensitivity[key as keyof typeof profileData.sensitivity]}
@@ -196,7 +195,7 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
           </div>
 
           {/* Risk Level Indicator */}
-          <div className="p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
+          <div className="p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <RiskIcon className="h-4 w-4 text-[#6200D9]" />
@@ -213,7 +212,7 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
             <label className="block text-sm font-semibold text-[#0A1C40] mb-3">
               Notifications
             </label>
-            <div className="space-y-3">
+            <div className="space-y-3 sm:space-y-4">
               {[
                 { key: 'airQualityAlerts', label: 'Air Quality Alerts' },
                 { key: 'healthTips', label: 'Health Tips' },
@@ -221,9 +220,9 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
               ].map(({ key, label }) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg touch-target"
+                  className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-xl touch-target"
                 >
-                  <span className="text-sm font-medium text-[#0A1C40]">{label}</span>
+                  <span className="text-xs sm:text-sm font-medium text-[#0A1C40]">{label}</span>
                   <Switch
                     checked={profileData.notifications[key as keyof typeof profileData.notifications]}
                     onCheckedChange={(checked) => updateNotifications(key, checked)}
@@ -233,23 +232,25 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile }: P
             </div>
           </div>
         </div>
-
-        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 pt-6 border-t border-gray-200">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="px-6 py-3 touch-target order-2 sm:order-1"
-          >
-            Cancel
-          </Button>
+        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-6 pt-4 sm:pt-6 border-t border-gray-200 px-4 sm:px-6">
           <Button
             onClick={handleSave}
             disabled={updateProfileMutation.isPending || !profileData.displayName.trim()}
-            className="px-6 py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2"
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-xl"
           >
             {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
           </Button>
         </div>
+        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-6 pt-4 sm:pt-6 border-t border-gray-200 px-4 sm:px-6">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="px-4 sm:px-6 py-2 sm:py-3 touch-target order-2 sm:order-1 text-sm sm:text-base rounded-xl"
+          >
+            Cancel
+          </Button>
+        </div>
+        
       </DialogContent>
     </Dialog>
   );
