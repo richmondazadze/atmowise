@@ -30,7 +30,9 @@ export interface IStorage {
   // Users
   getUser(id: string): Promise<User | undefined>;
   getUserByAnonId(anonId: string): Promise<User | undefined>;
+  getUserBySupabaseId(supabaseId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  deleteUser(userId: string): Promise<void>;
 
   // Profiles
   getProfile(userId: string): Promise<Profile | undefined>;
@@ -53,6 +55,9 @@ export interface IStorage {
 
   // Tips & Resources
   getTips(tag?: string): Promise<Tip[]>;
+  createTip(tip: InsertTip): Promise<Tip>;
+  updateTip(tipId: string, updates: Partial<InsertTip>): Promise<Tip | undefined>;
+  deleteTip(tipId: string): Promise<void>;
   getResources(type?: string): Promise<Resource[]>;
   seedInitialData(): Promise<void>;
 
@@ -80,10 +85,22 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getUserBySupabaseId(supabaseId: string): Promise<User | undefined> {
+    const { db } = getDatabase();
+    const result = await db.select().from(users).where(eq(users.supabaseId, supabaseId)).limit(1);
+    return result[0];
+  }
+
   async createUser(user: InsertUser): Promise<User> {
     const { db } = getDatabase();
     const result = await db.insert(users).values(user).returning();
     return result[0];
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    const { db } = getDatabase();
+    // This will cascade delete all related data due to foreign key constraints
+    await db.delete(users).where(eq(users.id, userId));
   }
 
   async getProfile(userId: string): Promise<Profile | undefined> {
@@ -226,15 +243,40 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async getTips(tag?: string): Promise<Tip[]> {
+  async getTips(tag?: string, userId?: string): Promise<Tip[]> {
     const { db } = getDatabase();
     let query = db.select().from(tips);
     
+    const conditions = [];
     if (tag) {
-      query = query.where(eq(tips.tag, tag));
+      conditions.push(eq(tips.tag, tag));
+    }
+    if (userId) {
+      conditions.push(eq(tips.userId, userId));
     }
     
-    return await query;
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+    
+    return await query.orderBy(desc(tips.createdAt));
+  }
+
+  async createTip(tip: InsertTip): Promise<Tip> {
+    const { db } = getDatabase();
+    const result = await db.insert(tips).values(tip).returning();
+    return result[0];
+  }
+
+  async updateTip(tipId: string, updates: Partial<InsertTip>): Promise<Tip | undefined> {
+    const { db } = getDatabase();
+    const result = await db.update(tips).set(updates).where(eq(tips.id, tipId)).returning();
+    return result[0];
+  }
+
+  async deleteTip(tipId: string): Promise<void> {
+    const { db } = getDatabase();
+    await db.delete(tips).where(eq(tips.id, tipId));
   }
 
   async getResources(type?: string): Promise<Resource[]> {

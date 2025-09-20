@@ -6,14 +6,16 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Ensure user exists first
+    // Ensure user exists first and get internal user ID
     if (body.userId) {
-      let user = await storage.getUser(body.userId);
+      let user = await storage.getUserBySupabaseId(body.userId);
       if (!user) {
         // Create user if they don't exist
-        user = await storage.createUser({ anonId: body.userId });
+        user = await storage.createUser({ supabaseId: body.userId });
         console.log('Created user for profile:', user.id);
       }
+      // Update the userId to use the internal user ID
+      body.userId = user.id;
     }
     
     const profileData = insertProfileSchema.parse(body)

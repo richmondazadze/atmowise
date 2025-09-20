@@ -97,12 +97,17 @@ export function LocationPicker({ onLocationSelect, currentLocation, onUseCurrent
       
       const result = await response.json();
       
+      // Show preview data first
+      setSearchResults([result]);
+      
       // Automatically select the location after getting air quality data
       onLocationSelect(result.location, result.airQuality);
       
-      // Clear the form
-      setAddress('');
-      setSearchResults([]);
+      // Clear the form after a short delay to show the selection
+      setTimeout(() => {
+        setAddress('');
+        setSearchResults([]);
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to search location');
     } finally {
@@ -128,6 +133,15 @@ export function LocationPicker({ onLocationSelect, currentLocation, onUseCurrent
       
       const result = await response.json();
       setSearchResults([result]);
+      
+      // Automatically select the location after getting air quality data
+      onLocationSelect(result.location, result.airQuality);
+      
+      // Clear the form after a short delay to show the selection
+      setTimeout(() => {
+        setAddress('');
+        setSearchResults([]);
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to search location');
     } finally {

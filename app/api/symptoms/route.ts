@@ -13,11 +13,11 @@ export async function POST(request: NextRequest) {
     let actualUserId = null;
     if (userId) {
       if (isValidUUID(userId)) {
-        // Check if user exists by anonId (Supabase ID)
-        let user = await storage.getUserByAnonId(userId);
+        // Check if user exists by supabaseId
+        let user = await storage.getUserBySupabaseId(userId);
         if (!user) {
-          // Create user with Supabase ID as anonId
-          user = await storage.createUser({ anonId: userId });
+          // Create user with Supabase ID as supabaseId
+          user = await storage.createUser({ supabaseId: userId });
         }
         actualUserId = user.id;
       } else {
@@ -63,7 +63,21 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const symptoms = await storage.getSymptomsByUser(userId, limit)
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
+    }
+
+    // Check if userId is a Supabase user ID (UUID format)
+    let internalUserId = userId;
+    if (isValidUUID(userId)) {
+      // Try to find user by supabaseId first
+      const user = await storage.getUserBySupabaseId(userId);
+      if (user) {
+        internalUserId = user.id;
+      }
+    }
+
+    const symptoms = await storage.getSymptomsByUser(internalUserId, limit)
     
     return NextResponse.json(symptoms)
   } catch (error: any) {

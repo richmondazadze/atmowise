@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from '@/contexts/LocationContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,23 +31,10 @@ interface TimelineData {
 
 export default function TimelinePage() {
   const { user } = useAuth();
+  const { selectedLocation } = useLocation();
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('7d');
   const [selectedMetric, setSelectedMetric] = useState('aqi');
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number; label: string } | null>(null);
-
-  // Load saved location from localStorage
-  useEffect(() => {
-    const savedLocation = localStorage.getItem('atmowise-selected-location');
-    if (savedLocation) {
-      try {
-        const location = JSON.parse(savedLocation);
-        setSelectedLocation(location);
-      } catch (error) {
-        console.warn('Failed to parse saved location:', error);
-      }
-    }
-  }, []);
 
   // Convert period to days
   const getDaysFromPeriod = (period: string) => {

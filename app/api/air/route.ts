@@ -17,19 +17,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    // User should already exist from Dashboard, but ensure it exists as fallback
+    // First, get the internal user ID from the Supabase user ID
+    let internalUserId = userId;
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/anonymous`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ anonId: userId })
-      });
+      const user = await storage.getUserBySupabaseId(userId);
+      if (user) {
+        internalUserId = user.id;
+      } else {
+        // Create user if doesn't exist
+        const newUser = await storage.createUser({ supabaseId: userId });
+        internalUserId = newUser.id;
+      }
     } catch (error) {
-      console.warn('Failed to ensure user exists:', error);
+      console.warn('Failed to get/create user:', error);
+      // Fallback to using the Supabase ID directly
     }
 
     // Check for recent data first (30 minutes cache)
-    const recentData = await storage.getRecentAirRead(userId, lat, lon, 30)
+    const recentData = await storage.getRecentAirRead(internalUserId, lat, lon, 30)
     if (recentData) {
       return NextResponse.json({ ...recentData, cached: true })
     }
@@ -58,7 +63,7 @@ export async function GET(request: NextRequest) {
       // Save demo data to database with user ID
       const savedDemoData = await storage.createAirRead({
         ...demoData,
-        userId: userId
+        userId: internalUserId
       });
       
       return NextResponse.json(savedDemoData);
@@ -93,7 +98,7 @@ export async function GET(request: NextRequest) {
                     standardAQI <= 300 ? 'Very Unhealthy' : 'Hazardous';
 
     const processedData = {
-      userId: userId,
+      userId: internalUserId,
       lat: lat,
       lon: lon,
       source: "openweather",
@@ -141,9 +146,20 @@ export async function GET(request: NextRequest) {
     
     // Save error demo data to database with user ID if available
     if (errorUserId) {
+      // Try to get the internal user ID
+      let internalErrorUserId = errorUserId;
+      try {
+        const user = await storage.getUserBySupabaseId(errorUserId);
+        if (user) {
+          internalErrorUserId = user.id;
+        }
+      } catch (error) {
+        console.warn('Failed to get user for error fallback:', error);
+      }
+      
       const savedErrorData = await storage.createAirRead({
         ...demoData,
-        userId: errorUserId
+        userId: internalErrorUserId
       });
       return NextResponse.json(savedErrorData);
     }

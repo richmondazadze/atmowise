@@ -6,7 +6,9 @@ import { z } from "zod";
 // Users table (optional anonymous)
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  supabaseId: text("supabase_id").unique(),
   anonId: text("anon_id"),
+  email: text("email"),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
 });
 
@@ -72,7 +74,7 @@ export const airReads = pgTable("air_reads", {
 // Symptoms table
 export const symptoms = pgTable("symptoms", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   timestamp: timestamp("timestamp", { withTimezone: true }).default(sql`now()`),
   label: text("label"),
   severity: smallint("severity"), // 1..5
@@ -80,13 +82,14 @@ export const symptoms = pgTable("symptoms", {
   aiSummary: text("ai_summary"),
   aiAction: text("ai_action"),
   aiSeverity: text("ai_severity"),
-  linkedAirId: uuid("linked_air_id").references(() => airReads.id),
+  linkedAirId: uuid("linked_air_id").references(() => airReads.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
 });
 
 // Tips table
 export const tips = pgTable("tips", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   tag: text("tag"),
   content: text("content"),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),

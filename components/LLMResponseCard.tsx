@@ -3,11 +3,19 @@ import { Badge } from "@/components/ui/badge";
 import { Bot, Lightbulb, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+interface Tip {
+  title: string;
+  content: string;
+  category: 'immediate' | 'prevention' | 'lifestyle' | 'medical';
+  priority: number;
+}
+
 interface LLMResponse {
   summary: string;
   action: string;
   severity: "low" | "moderate" | "high";
   explainers?: string;
+  tips?: Tip[];
 }
 
 interface LLMResponseCardProps {
@@ -47,7 +55,7 @@ export function LLMResponseCard({ response, isVisible, onEmergency }: LLMRespons
             <Bot className="h-4 w-4 text-primary" />
           </div>
           <div className="flex-1">
-            <h4 className="font-medium text-card-foreground mb-2">AI Health Reflection</h4>
+            <h4 className="font-medium text-card-foreground mb-2">AI Health Insights</h4>
             <div className="space-y-3">
               <div className="p-3 bg-muted/30 rounded-lg">
                 <p className="text-sm text-card-foreground" data-testid="text-ai-summary">
@@ -91,6 +99,32 @@ export function LLMResponseCard({ response, isVisible, onEmergency }: LLMRespons
                 <p className="text-xs text-muted-foreground italic" data-testid="text-ai-explainers">
                   {response.explainers}
                 </p>
+              )}
+
+              {response.tips && response.tips.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <div className="text-xs font-medium text-accent mb-2">Personalized Tips</div>
+                  {response.tips.slice(0, 3).map((tip, index) => (
+                    <div key={index} className="p-2 bg-accent/5 rounded-lg border border-accent/10">
+                      <div className="flex items-start gap-2">
+                        <div className="w-2 h-2 bg-accent rounded-full mt-2 flex-shrink-0" />
+                        <div className="flex-1">
+                          <div className="text-xs font-medium text-card-foreground mb-1">
+                            {tip.title}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {tip.content}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {response.tips.length > 3 && (
+                    <p className="text-xs text-muted-foreground italic">
+                      +{response.tips.length - 3} more tips available
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>

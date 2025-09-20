@@ -84,13 +84,21 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
 
       const symptom = await createSymptomMutation.mutateAsync(symptomData);
 
-      // Then get LLM reflection
+      // Then get LLM reflection with comprehensive data
       const reflectionData = {
         note: note.trim(),
         pm25: airData?.pm25 || null,
+        pm10: airData?.pm10 || null,
+        o3: airData?.o3 || null,
+        no2: airData?.no2 || null,
         aqi: airData?.aqi || null,
+        category: airData?.category || null,
+        dominantPollutant: airData?.dominantPollutant || null,
         severity: severity[0],
         sensitivity: profile?.sensitivity || {},
+        userId: userId,
+        location: airData ? `${airData.lat}, ${airData.lon}` : null,
+        timestamp: new Date().toISOString(),
       };
 
       const reflection = await llmReflectionMutation.mutateAsync(reflectionData);

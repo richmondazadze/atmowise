@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { storage } from '@/lib/database'
 
 // Emergency keywords for safety override
 const EMERGENCY_REGEX = /(can't breathe|cannot breathe|chest pain|chest tight|faint|fainting|passing out|pass out|severe shortness|call 911|call emergency|difficulty breathing|choking)/i;
@@ -68,7 +69,20 @@ function getFallbackResponse(note: string, severity: number, aqi: number | null)
 
 export async function POST(request: NextRequest) {
   try {
-    const { note, pm25, aqi, sensitivity } = await request.json();
+    const { 
+      note, 
+      pm25, 
+      pm10, 
+      o3, 
+      no2, 
+      aqi, 
+      category, 
+      dominantPollutant,
+      sensitivity, 
+      userId,
+      location,
+      timestamp 
+    } = await request.json();
 
     if (!note || typeof note !== 'string') {
       return NextResponse.json({ error: 'Note is required' }, { status: 400 });
@@ -80,7 +94,8 @@ export async function POST(request: NextRequest) {
         summary: "This may be an emergency situation.",
         action: "Seek immediate medical attention or call emergency services (911).",
         severity: "high",
-        emergency: true
+        emergency: true,
+        tips: []
       });
     }
 
@@ -89,12 +104,60 @@ export async function POST(request: NextRequest) {
     if (!openRouterApiKey) {
       console.warn('OpenRouter API key not configured, using fallback');
       const fallback = getFallbackResponse(note, 2, aqi);
-      return NextResponse.json(fallback);
+      return NextResponse.json({ ...fallback, tips: [] });
     }
 
-    const systemPrompt = `You are a concise, empathetic, safety-first health assistant. NEVER give medical diagnoses. If the input text indicates an emergency (e.g., 'can't breathe', 'chest pain'), respond with severity:'high' and an instruction to seek immediate medical attention. Return only valid JSON with keys: summary, action, severity. Keep responses brief (max 2 sentences each).`;
+    // Enhanced system prompt for comprehensive analysis and tips
+    const systemPrompt = `You are an expert health and air quality assistant. Analyze the user's symptoms, air quality data, and health profile to provide:
 
-    const userPrompt = `note="${note}", pm25=${pm25 || 'unknown'}, aqi=${aqi || 'unknown'}, sensitivity=${JSON.stringify(sensitivity || {})}`;
+1. A brief summary of their condition
+2. Immediate action recommendations
+3. Severity assessment (low/moderate/high)
+4. 3-5 personalized health tips based on their specific situation
+
+Consider:
+- Air quality levels (PM2.5, PM10, O3, NO2, AQI)
+- User's health sensitivities (asthma, COPD, etc.)
+- Current symptoms and severity
+- Location and environmental factors
+- Time of day and seasonal considerations
+
+Return ONLY valid JSON with this structure:
+{
+  "summary": "Brief 1-2 sentence summary",
+  "action": "Immediate action recommendation",
+  "severity": "low|moderate|high",
+  "tips": [
+    {
+      "title": "Tip title",
+      "content": "Detailed tip content",
+      "category": "immediate|prevention|lifestyle|medical",
+      "priority": 1-5
+    }
+  ]
+}
+
+Be specific, actionable, and consider the user's health profile.`;
+
+    // Build comprehensive user prompt with all available data
+    const airQualityData = {
+      pm25: pm25 || 'unknown',
+      pm10: pm10 || 'unknown', 
+      o3: o3 || 'unknown',
+      no2: no2 || 'unknown',
+      aqi: aqi || 'unknown',
+      category: category || 'unknown',
+      dominantPollutant: dominantPollutant || 'unknown'
+    };
+
+    const userPrompt = `User reported: "${note}"
+    
+Air Quality Data: ${JSON.stringify(airQualityData)}
+User Health Profile: ${JSON.stringify(sensitivity || {})}
+Location: ${location || 'unknown'}
+Time: ${timestamp || new Date().toISOString()}
+
+Please provide comprehensive health analysis and personalized tips.`;
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -110,7 +173,7 @@ export async function POST(request: NextRequest) {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
-        max_tokens: 200,
+        max_tokens: 800,
         temperature: 0.7
       })
     });
@@ -118,7 +181,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       console.warn('OpenRouter API failed:', response.status, response.statusText);
       const fallback = getFallbackResponse(note, 2, aqi);
-      return NextResponse.json(fallback);
+      return NextResponse.json({ ...fallback, tips: [] });
     }
 
     const data = await response.json();
@@ -127,7 +190,7 @@ export async function POST(request: NextRequest) {
     if (!llmText) {
       console.warn('Empty LLM response, using fallback');
       const fallback = getFallbackResponse(note, 2, aqi);
-      return NextResponse.json(fallback);
+      return NextResponse.json({ ...fallback, tips: [] });
     }
 
     // Parse LLM response safely
@@ -137,7 +200,12 @@ export async function POST(request: NextRequest) {
     if (!parsed.summary || !parsed.action || !parsed.severity) {
       console.warn('Invalid LLM response structure, using fallback');
       const fallback = getFallbackResponse(note, 2, aqi);
-      return NextResponse.json(fallback);
+      return NextResponse.json({ ...fallback, tips: [] });
+    }
+
+    // Ensure tips array exists
+    if (!parsed.tips || !Array.isArray(parsed.tips)) {
+      parsed.tips = [];
     }
 
     // Safety check: override severity if emergency keywords detected
@@ -147,6 +215,36 @@ export async function POST(request: NextRequest) {
       parsed.emergency = true;
     }
 
+    // Store tips in database if user ID provided
+    if (userId && parsed.tips && parsed.tips.length > 0) {
+      try {
+        // Map Supabase user ID to internal user ID
+        let internalUserId = userId;
+        if (isValidUUID(userId)) {
+          let user = await storage.getUserBySupabaseId(userId);
+          if (!user) {
+            // Create user if they don't exist
+            user = await storage.createUser({ supabaseId: userId });
+            console.log('Created user for tips storage:', user.id);
+          }
+          internalUserId = user.id;
+        }
+
+        // Store each tip
+        for (const tip of parsed.tips) {
+          await storage.createTip({
+            tag: tip.category || 'general',
+            content: `${tip.title}\n\n${tip.content}`,
+            userId: internalUserId
+          });
+        }
+        console.log(`Stored ${parsed.tips.length} tips for user ${internalUserId}`);
+      } catch (error) {
+        console.error('Failed to store tips:', error);
+        // Continue without failing the main response
+      }
+    }
+
     return NextResponse.json(parsed);
 
   } catch (error: any) {
@@ -154,6 +252,12 @@ export async function POST(request: NextRequest) {
     
     // Use fallback response on any error
     const fallback = getFallbackResponse('', 2, null);
-    return NextResponse.json(fallback);
+    return NextResponse.json({ ...fallback, tips: [] });
   }
+}
+
+// Helper function to validate UUID
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
 }

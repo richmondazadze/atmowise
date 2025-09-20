@@ -6,16 +6,18 @@ import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/queryClient";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "@/contexts/LocationContext";
 import { RiskCard } from "@/components/RiskCard";
 // import { ProfileToggles } from "@/components/ProfileToggles";
 // import { ProfileSetupModal } from "@/components/ProfileSetupModal";
 import { SavedPlaces } from "@/components/SavedPlaces";
 import { SymptomForm } from "@/components/SymptomForm";
 import { LLMResponseCard } from "@/components/LLMResponseCard";
+import { TipsCard } from "@/components/TipsCard";
 import { CrisisModal } from "@/components/CrisisModal";
 import { Navigation } from "@/components/Navigation";
 import { PageLayout } from "@/components/PageLayout";
-import { LocationPicker } from "@/components/LocationPicker";
+import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { MapPin, RefreshCw, LogOut, User, Wind, Activity, TrendingUp, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -23,36 +25,16 @@ import type { Profile, User as UserType } from "@shared/schema";
 
 export default function Dashboard() {
   const { user: supabaseUser, signOut } = useAuth();
+  const { selectedLocation, setSelectedLocation, requestLocationPermission, locationPermission } = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  // Location state
-  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lon: number; label: string } | null>(null);
+  // UI state
   const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   // Profile setup state (disabled for now)
   // const [showProfileSetup, setShowProfileSetup] = useState(false);
-
-  // Load saved location from localStorage on mount
-  useEffect(() => {
-    const savedLocation = localStorage.getItem('atmowise-selected-location');
-    if (savedLocation) {
-      try {
-        const location = JSON.parse(savedLocation);
-        setSelectedLocation(location);
-        } catch (error) {
-        console.warn('Failed to parse saved location:', error);
-      }
-    }
-  }, []);
-
-  // Save location to localStorage when changed
-  useEffect(() => {
-    if (selectedLocation) {
-      localStorage.setItem('atmowise-selected-location', JSON.stringify(selectedLocation));
-    }
-  }, [selectedLocation]);
 
   // Geolocation hook
   const { 
@@ -120,10 +102,13 @@ export default function Dashboard() {
         }
 
         // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch('/api/user/anonymous', {
+        const userResponse = await fetch('/api/user/authenticated', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ anonId: supabaseUser.id })
+          body: JSON.stringify({ 
+            userId: supabaseUser.id,
+            email: supabaseUser.email 
+          })
         });
         
         let actualUserId = supabaseUser.id;
@@ -132,7 +117,7 @@ export default function Dashboard() {
           actualUserId = userData.id;
         }
         
-        const url = `/api/air?lat=${airQualityLat}&lon=${airQualityLon}&address=${encodeURIComponent(selectedLocation?.label || currentLocationLabel)}&userId=${actualUserId}`;
+        const url = `/api/air?lat=${airQualityLat}&lon=${airQualityLon}&address=${encodeURIComponent(selectedLocation?.label || currentLocationLabel)}&userId=${supabaseUser.id}`;
         const response = await fetch(url);
         if (!response.ok) {
           console.error('Air quality API error:', response.status, response.statusText);
@@ -184,10 +169,13 @@ export default function Dashboard() {
           console.log('Profile not found, creating default profile for user:', supabaseUser.id);
           
           // First ensure the user exists in our database
-          const userResponse = await fetch('/api/user/anonymous', {
+          const userResponse = await fetch('/api/user/authenticated', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ anonId: supabaseUser.id })
+            body: JSON.stringify({ 
+              userId: supabaseUser.id,
+              email: supabaseUser.email 
+            })
           });
           
           let actualUserId = supabaseUser.id;
@@ -195,6 +183,9 @@ export default function Dashboard() {
             const userData = await userResponse.json();
             actualUserId = userData.id;
             console.log('Created/found user with ID:', actualUserId);
+          } else {
+            console.error('Failed to create/find user:', userResponse.status, userResponse.statusText);
+            // Continue with Supabase ID as fallback
           }
           
           // Now create the profile
@@ -250,16 +241,22 @@ export default function Dashboard() {
         }
         
         // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch('/api/user/anonymous', {
+        const userResponse = await fetch('/api/user/authenticated', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ anonId: supabaseUser.id })
+          body: JSON.stringify({ 
+            userId: supabaseUser.id,
+            email: supabaseUser.email 
+          })
         });
         
         let actualUserId = supabaseUser.id;
         if (userResponse.ok) {
           const userData = await userResponse.json();
           actualUserId = userData.id;
+        } else {
+          console.error('Failed to create/find user for symptoms:', userResponse.status, userResponse.statusText);
+          // Continue with Supabase ID as fallback
         }
         
         console.log('Fetching symptoms for user:', actualUserId);
@@ -279,6 +276,52 @@ export default function Dashboard() {
     enabled: !!supabaseUser?.id,
   });
 
+  // Tips data
+  const { data: tips, isLoading: tipsLoading } = useQuery({
+    queryKey: ['tips', supabaseUser?.id],
+    queryFn: async () => {
+      try {
+        if (!supabaseUser?.id) {
+          console.log('No user ID available for tips query');
+          return [];
+        }
+        
+        // First ensure the user exists in our database and get the correct user ID
+        const userResponse = await fetch('/api/user/authenticated', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            userId: supabaseUser.id,
+            email: supabaseUser.email 
+          })
+        });
+        
+        let actualUserId = supabaseUser.id;
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          actualUserId = userData.id;
+        } else {
+          console.error('Failed to create/find user for tips:', userResponse.status, userResponse.statusText);
+          // Continue with Supabase ID as fallback
+        }
+        
+        console.log('Fetching tips for user:', actualUserId);
+        const response = await fetch(`/api/tips?userId=${actualUserId}&limit=10`);
+        if (!response.ok) {
+          console.error('Failed to fetch tips:', response.status, response.statusText);
+          return [];
+        }
+        const data = await response.json();
+        console.log('Tips fetched:', data.length);
+        return data;
+      } catch (error) {
+        console.error('Tips fetch error:', error);
+        return [];
+      }
+    },
+    enabled: !!supabaseUser?.id,
+  });
+
   // LLM response
   const [llmResponse, setLlmResponse] = useState<{
     summary: string;
@@ -286,6 +329,7 @@ export default function Dashboard() {
     severity: "low" | "moderate" | "high";
     explainers?: string;
     emergency?: boolean;
+    tips?: any[];
   } | null>(null);
   const [showLlmResponse, setShowLlmResponse] = useState(false);
 
@@ -366,6 +410,14 @@ export default function Dashboard() {
               >
                 <RefreshCw className={`h-4 w-4 transition-transform duration-500 ${(locationLoading || airQualityLoading) ? 'animate-spin' : 'hover:rotate-180'}`} />
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOut}
+                className="p-2.5 h-11 w-11 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 touch-target rounded-xl"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -388,15 +440,6 @@ export default function Dashboard() {
                 <MapPin className="h-4 w-4" />
                 {selectedLocation ? selectedLocation.label : 'Select Location'}
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleLocationRefresh}
-                disabled={locationLoading || airQualityLoading}
-                className="flex items-center gap-2 border-[#E2E8F0] hover:bg-gray-50 transition-all duration-200"
-              >
-                <RefreshCw className={`h-4 w-4 transition-transform duration-500 ${(locationLoading || airQualityLoading) ? 'animate-spin' : 'hover:rotate-180'}`} />
-                Refresh
-              </Button>
             </div>
           </div>
         </div>
@@ -408,19 +451,19 @@ export default function Dashboard() {
         <div className="flex items-center space-x-2 text-sm">
           <MapPin className="h-4 w-4 text-[#6200D9] flex-shrink-0" />
           <span className="text-[#64748B] truncate flex-1 min-w-0">
-            {locationLoading && !selectedLocation
-              ? "Getting location..."
-              : locationError && !selectedLocation
-              ? "Location unavailable"
-              : currentLocationLabel}
-          </span>
-          {selectedLocation && (
+                  {locationLoading && !selectedLocation
+                    ? "Getting location..."
+                    : locationError && !selectedLocation
+                    ? "Location unavailable"
+                    : currentLocationLabel}
+                </span>
+                {selectedLocation && (
             <span className="text-xs bg-[#6200D9] text-white px-2 py-1 rounded-full font-medium flex-shrink-0">
-              Selected
-            </span>
-          )}
-        </div>
-      </div>
+                    Selected
+                  </span>
+                )}
+              </div>
+            </div>
 
       {/* Main Content - Mobile Optimized */}
       <div className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8">
@@ -432,35 +475,60 @@ export default function Dashboard() {
               <div className="flex items-center space-x-4 mb-4 lg:mb-6">
                 <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
                   <Wind className="h-6 w-6 lg:h-7 lg:w-7 text-white drop-shadow-sm" />
-                </div>
+            </div>
                 <div className="min-w-0 flex-1">
                   <h2 className="text-xl lg:text-2xl font-bold text-[#0A1C40] mb-1 tracking-tight">Welcome back!</h2>
                   <p className="text-sm lg:text-base text-[#64748B] leading-relaxed font-medium">Track your air quality exposure and get personalized insights</p>
-                </div>
-              </div>
+          </div>
+        </div>
             </div>
 
-            {/* Location Picker */}
-            {showLocationPicker && (
-              <div className="animate-slide-up">
-              <LocationPicker
-                onLocationSelect={handleLocationSelect}
-                currentLocation={selectedLocation || undefined}
-                  onUseCurrentLocation={() => {
-                    if (currentLat && currentLon) {
-                      const currentLocationData = {
-                        lat: currentLat,
-                        lon: currentLon,
-                        label: `Current Location (${currentLat.toFixed(4)}, ${currentLon.toFixed(4)})`
-                      };
-                      setSelectedLocation(currentLocationData);
-                      setShowLocationPicker(false);
+            {/* Location Picker Modal */}
+            <LocationPickerModal
+              isOpen={showLocationPicker}
+              onClose={() => setShowLocationPicker(false)}
+              onLocationSelect={handleLocationSelect}
+              currentLocation={selectedLocation || undefined}
+              onUseCurrentLocation={async () => {
+                if (currentLat && currentLon) {
+                  // Get a readable address for the current location
+                  try {
+                    const response = await fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${currentLat}&lon=${currentLon}&limit=1&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`);
+                    if (response.ok) {
+                      const data = await response.json();
+                      if (data.length > 0) {
+                        const location = data[0];
+                        const label = `${location.name}, ${location.state || location.country}`;
+                        const currentLocationData = {
+                          lat: currentLat,
+                          lon: currentLon,
+                          label: label
+                        };
+                        setSelectedLocation(currentLocationData);
+                        setShowLocationPicker(false);
+                        return;
+                      }
                     }
-                  }}
-                  isCurrentLocationLoading={locationLoading}
-                />
-              </div>
-            )}
+                  } catch (error) {
+                    console.warn('Failed to get address for current location:', error);
+                  }
+                  
+                  // Fallback to coordinates if geocoding fails
+                  const currentLocationData = {
+                    lat: currentLat,
+                    lon: currentLon,
+                    label: `Current Location (${currentLat.toFixed(4)}, ${currentLon.toFixed(4)})`
+                  };
+                  setSelectedLocation(currentLocationData);
+                  setShowLocationPicker(false);
+                } else {
+                  // Request location permission if not available
+                  await requestLocationPermission();
+                  setShowLocationPicker(false);
+                }
+              }}
+              isCurrentLocationLoading={locationLoading}
+            />
 
             {/* Air Quality Risk Card */}
             <RiskCard
@@ -549,11 +617,17 @@ export default function Dashboard() {
               }}
             />
 
-            {/* AI Response */}
+            {/* AI Health Insights */}
             <LLMResponseCard
               response={llmResponse}
               isVisible={showLlmResponse}
               onEmergency={() => setShowCrisisModal(true)}
+            />
+
+            {/* Personalized Health Tips */}
+            <TipsCard
+              tips={tips || []}
+              className="mt-6"
             />
           </div>
         </div>
