@@ -10,11 +10,25 @@ export function GlobalErrorHandler() {
       if (event.reason instanceof Event && event.reason.type === 'error') {
         const target = event.reason.target as HTMLElement;
         if (target && (target.tagName === 'A' || target.tagName === 'LINK')) {
-          // This is likely a navigation-related error that we can safely ignore
+          const href = (target as HTMLAnchorElement)?.href || '';
+          
+          // Filter out common Next.js development errors that are safe to ignore
+          if (href.includes('/_next/static/') || 
+              href.includes('localhost:3000/_next/') ||
+              href.includes('.css') ||
+              href.includes('.js') ||
+              href.includes('chunk') ||
+              href.includes('webpack')) {
+            // Silently ignore these common Next.js development errors
+            event.preventDefault();
+            return;
+          }
+          
+          // Log other navigation-related errors as warnings
           console.warn('Navigation-related promise rejection (ignored):', {
             type: event.reason.type,
             target: target.tagName,
-            href: (target as HTMLAnchorElement)?.href || 'N/A'
+            href: href
           });
           event.preventDefault();
           return;
@@ -59,10 +73,25 @@ export function GlobalErrorHandler() {
     const handleError = (event: ErrorEvent) => {
       // Check if this is a navigation-related error that we can safely ignore
       if (event.target && (event.target as HTMLElement).tagName === 'A') {
+        const href = (event.target as HTMLAnchorElement)?.href || '';
+        
+        // Filter out common Next.js development errors that are safe to ignore
+        if (href.includes('/_next/static/') || 
+            href.includes('localhost:3000/_next/') ||
+            href.includes('.css') ||
+            href.includes('.js') ||
+            href.includes('chunk') ||
+            href.includes('webpack')) {
+          // Silently ignore these common Next.js development errors
+          event.preventDefault();
+          return;
+        }
+        
+        // Log other navigation-related errors as warnings
         console.warn('Navigation-related error (ignored):', {
           message: event.message,
           target: (event.target as HTMLElement).tagName,
-          href: (event.target as HTMLAnchorElement)?.href || 'N/A'
+          href: href
         });
         event.preventDefault();
         return;
