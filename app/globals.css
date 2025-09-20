@@ -245,18 +245,142 @@
   [data-radix-dialog-overlay] {
     z-index: 9998 !important;
     background-color: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
   }
   
   [data-radix-dialog-content] {
     z-index: 9999 !important;
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    background: white !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  }
+  
+  @keyframes modal-overlay-enter {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+  }
+  
+  @keyframes modal-content-enter {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
   
   .crisis-modal {
     z-index: 9999 !important;
+  }
+  
+  /* Enhanced Modal Visibility */
+  [data-radix-dialog-overlay][data-state="open"] {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+  
+  /* Modal Content Enhancements */
+  [data-radix-dialog-content][data-state="open"] {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+  }
+  
+  /* Mobile Modal Adjustments */
+  @media (max-width: 640px) {
+    [data-radix-dialog-content] {
+      margin: 16px !important;
+      max-width: calc(100vw - 32px) !important;
+      max-height: calc(100vh - 32px) !important;
+    }
+  }
+  
+  /* Modal Focus and Accessibility */
+  [data-radix-dialog-overlay]:focus {
+    outline: none !important;
+  }
+  
+  [data-radix-dialog-content]:focus {
+    outline: none !important;
+  }
+  
+  /* Ensure modal content is always visible */
+  [data-radix-dialog-content] {
+    color: rgb(10, 28, 64) !important; /* High contrast text */
+  }
+  
+  /* Modal backdrop click prevention */
+  [data-radix-dialog-overlay] {
+    cursor: default !important;
+  }
+  
+  /* Enhanced Modal Animations */
+  [data-radix-dialog-overlay][data-state="closed"] {
+    animation: modal-overlay-exit 0.15s ease-in !important;
+  }
+  
+  [data-radix-dialog-content][data-state="closed"] {
+    animation: modal-content-exit 0.15s ease-in !important;
+  }
+  
+  @keyframes modal-overlay-exit {
+    from {
+      opacity: 1;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    to {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+    }
+  }
+  
+  @keyframes modal-content-exit {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+  }
+  
+  /* Modal Content Styling */
+  [data-radix-dialog-content] {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+  
+  /* Ensure proper contrast for all modal content */
+  [data-radix-dialog-content] * {
+    color: inherit !important;
+  }
+  
+  /* Modal Content Isolation */
+  [data-radix-dialog-content] {
+    isolation: isolate !important;
+    position: relative !important;
+    z-index: 9999 !important;
+  }
+  
+  /* Ensure modal content is above everything */
+  [data-radix-dialog-portal] {
+    z-index: 9997 !important;
   }
   
   /* Button System */
