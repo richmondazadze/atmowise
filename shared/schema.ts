@@ -17,9 +17,18 @@ export const profiles = pgTable("profiles", {
   displayName: text("display_name"),
   sensitivity: jsonb("sensitivity").$type<{
     asthma?: boolean;
+    copd?: boolean;
+    smoker?: boolean;
     pregnant?: boolean;
-    ageGroup?: string;
+    ageGroup?: 'child' | 'adult' | 'elderly';
     cardiopulmonary?: boolean;
+    heartDisease?: boolean;
+    diabetes?: boolean;
+  }>(),
+  notifications: jsonb("notifications").$type<{
+    airQualityAlerts?: boolean;
+    healthTips?: boolean;
+    weeklyReports?: boolean;
   }>(),
   savedPlaces: jsonb("saved_places").$type<Array<{
     name: string;
@@ -29,18 +38,33 @@ export const profiles = pgTable("profiles", {
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
 });
 
+// Saved places table
+export const savedPlaces = pgTable("saved_places", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // home, work, gym, school, custom
+  lat: doublePrecision("lat").notNull(),
+  lon: doublePrecision("lon").notNull(),
+  address: text("address"),
+  createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
+});
+
 // Air readings table (cached external API results)
 export const airReads = pgTable("air_reads", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  lat: doublePrecision("lat"),
-  lon: doublePrecision("lon"),
-  source: text("source"), // openaq/openweather/airnow
-  timestamp: timestamp("timestamp", { withTimezone: true }),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  lat: doublePrecision("lat").notNull(),
+  lon: doublePrecision("lon").notNull(),
+  source: text("source").notNull(), // openweather/airnow/demo
+  timestamp: timestamp("timestamp", { withTimezone: true }).notNull(),
   pm25: doublePrecision("pm25"),
   pm10: doublePrecision("pm10"),
   o3: doublePrecision("o3"),
   no2: doublePrecision("no2"),
   aqi: integer("aqi"),
+  category: text("category"), // Good, Moderate, Unhealthy, etc.
+  dominantPollutant: text("dominant_pollutant"), // PM2.5, O3, NO2, etc.
   rawPayload: jsonb("raw_payload"),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
 });
@@ -79,15 +103,17 @@ export const resources = pgTable("resources", {
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
 });
 
-// Saved places table (optional normalized)
-export const savedPlaces = pgTable("saved_places", {
+// User interactions table (tracks user engagement with tips and resources)
+export const userInteractions = pgTable("user_interactions", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
-  name: text("name"),
-  lat: doublePrecision("lat"),
-  lon: doublePrecision("lon"),
+  type: text("type").notNull(), // 'tip_viewed', 'resource_accessed', 'tip_helpful', etc.
+  targetId: uuid("target_id").notNull(), // ID of the tip or resource
+  targetType: text("target_type").notNull(), // 'tip' or 'resource'
+  metadata: jsonb("metadata"), // Additional data like rating, feedback, etc.
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`),
 });
+
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -126,6 +152,11 @@ export const insertSavedPlaceSchema = createInsertSchema(savedPlaces).omit({
   createdAt: true,
 });
 
+export const insertUserInteractionSchema = createInsertSchema(userInteractions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -147,3 +178,6 @@ export type Resource = typeof resources.$inferSelect;
 
 export type InsertSavedPlace = z.infer<typeof insertSavedPlaceSchema>;
 export type SavedPlace = typeof savedPlaces.$inferSelect;
+
+export type InsertUserInteraction = z.infer<typeof insertUserInteractionSchema>;
+export type UserInteraction = typeof userInteractions.$inferSelect;

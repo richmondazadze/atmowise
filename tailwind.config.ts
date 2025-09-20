@@ -2,9 +2,20 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
   theme: {
     extend: {
+      fontFamily: {
+        'sans': ['var(--font-bricolage-grotesque)', 'system-ui', 'sans-serif'],
+        'bricolage': ['var(--font-bricolage-grotesque)', 'system-ui', 'sans-serif'],
+      },
+      screens: {
+        'xs': '475px',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
