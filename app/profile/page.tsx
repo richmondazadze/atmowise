@@ -147,13 +147,16 @@ export default function ProfilePage() {
   };
 
   const handleNestedChange = (parent: string, field: string, value: any) => {
-    setProfileData(prev => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent as keyof typeof prev],
-        [field]: value
-      }
-    }));
+    setProfileData(prev => {
+      const currentParent = prev[parent as keyof typeof prev];
+      return {
+        ...prev,
+        [parent]: {
+          ...(currentParent && typeof currentParent === 'object' ? currentParent : {}),
+          [field]: value
+        }
+      };
+    });
   };
 
   if (!user) {

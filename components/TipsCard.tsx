@@ -229,9 +229,9 @@ export function TipsCard({ tips, className = '', onTipInteraction }: TipsCardPro
           </div>
         </CardHeader>
         
-        <CardContent className="px-0 pb-0">
+        <CardContent className="px-0 pb-2">
           {/* Scrollable Tips Container */}
-          <div className="max-h-80 overflow-y-auto overscroll-contain">
+          <div className="max-h-96 overflow-y-auto overscroll-contain">
             {filteredAndSortedTips.length === 0 ? (
               <div className="text-center py-8 px-6">
                 <Search className="h-8 w-8 mx-auto mb-3 text-gray-300" />

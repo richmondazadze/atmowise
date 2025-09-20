@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { TrendingUp, MapPin, Calendar, Activity, RefreshCw, Download, Filter, Wind, AlertCircle } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { PageLayout } from '@/components/PageLayout';
-import { TimelineChart } from '@/components/TimelineChart';
+import { EnhancedTimelineChart } from '@/components/EnhancedTimelineChart';
 import { useToast } from '@/hooks/use-toast';
 
 interface TimelineData {
@@ -394,13 +394,14 @@ export default function TimelinePage() {
 
         {/* Interactive Chart */}
         {!isLoading && !error && timelineData.length > 0 && (
-          <TimelineChart
+          <EnhancedTimelineChart
             airData={timelineData}
             symptomData={[]} // No symptom data for now
             selectedMetric={selectedMetric}
             onMetricChange={setSelectedMetric}
             selectedPeriod={selectedPeriod}
             onPeriodChange={setSelectedPeriod}
+            forecastData={[]} // TODO: Add forecast data
           />
         )}
 

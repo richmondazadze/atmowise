@@ -7,7 +7,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "@/contexts/LocationContext";
-import { RiskCard } from "@/components/RiskCard";
+import { EnhancedRiskCard } from "@/components/EnhancedRiskCard";
 import { SavedPlaces } from "@/components/SavedPlaces";
 import { SymptomForm } from "@/components/SymptomForm";
 import { LLMResponseCard } from "@/components/LLMResponseCard";
@@ -16,6 +16,10 @@ import { CrisisModal } from "@/components/CrisisModal";
 import { Navigation } from "@/components/Navigation";
 import { PageLayout } from "@/components/PageLayout";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
+import { AIQAExplainer } from "@/components/AIQAExplainer";
+import { RunCoach } from "@/components/RunCoach";
+import { ExportShareButton } from "@/components/ExportShareButton";
+import { SettingsToggle } from "@/components/SettingsToggle";
 import {
   MapPin,
   RefreshCw,
@@ -122,22 +126,6 @@ export default function Dashboard() {
           };
         }
 
-        // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch("/api/user/authenticated", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: supabaseUser.id,
-            email: supabaseUser.email,
-          }),
-        });
-
-        let actualUserId = supabaseUser.id;
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          actualUserId = userData.id;
-        }
-
         const url = `/api/air?lat=${airQualityLat}&lon=${airQualityLon}&address=${encodeURIComponent(
           selectedLocation?.label || currentLocationLabel
         )}&userId=${supabaseUser.id}`;
@@ -201,42 +189,18 @@ export default function Dashboard() {
         }
 
         // If profile doesn't exist (404), create a default one
-        if (response.status === 404) {
+      if (response.status === 404) {
           console.log(
             "Profile not found, creating default profile for user:",
             supabaseUser.id
           );
 
-          // First ensure the user exists in our database
-          const userResponse = await fetch("/api/user/authenticated", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: supabaseUser.id,
-              email: supabaseUser.email,
-            }),
-          });
-
-          let actualUserId = supabaseUser.id;
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            actualUserId = userData.id;
-            console.log("Created/found user with ID:", actualUserId);
-          } else {
-            console.error(
-              "Failed to create/find user:",
-              userResponse.status,
-              userResponse.statusText
-            );
-            // Continue with Supabase ID as fallback
-          }
-
-          // Now create the profile
+          // Create the profile directly with Supabase user ID
           const createResponse = await fetch("/api/profile", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              userId: actualUserId,
+              userId: supabaseUser.id,
               displayName: supabaseUser.email?.split("@")[0] || "User",
               sensitivity: {
                 asthma: false,
@@ -248,7 +212,7 @@ export default function Dashboard() {
           });
 
           if (createResponse.ok) {
-            return createResponse.json();
+        return createResponse.json();
           }
         }
 
@@ -283,32 +247,9 @@ export default function Dashboard() {
           return [];
         }
 
-        // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch("/api/user/authenticated", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: supabaseUser.id,
-            email: supabaseUser.email,
-          }),
-        });
-
-        let actualUserId = supabaseUser.id;
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          actualUserId = userData.id;
-        } else {
-          console.error(
-            "Failed to create/find user for symptoms:",
-            userResponse.status,
-            userResponse.statusText
-          );
-          // Continue with Supabase ID as fallback
-        }
-
-        console.log("Fetching symptoms for user:", actualUserId);
+        console.log("Fetching symptoms for user:", supabaseUser.id);
         const response = await fetch(
-          `/api/symptoms?userId=${actualUserId}&limit=100`
+          `/api/symptoms?userId=${supabaseUser.id}&limit=100`
         );
         if (!response.ok) {
           console.error(
@@ -339,32 +280,9 @@ export default function Dashboard() {
           return [];
         }
 
-        // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch("/api/user/authenticated", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: supabaseUser.id,
-            email: supabaseUser.email,
-          }),
-        });
-
-        let actualUserId = supabaseUser.id;
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          actualUserId = userData.id;
-        } else {
-          console.error(
-            "Failed to create/find user for tips:",
-            userResponse.status,
-            userResponse.statusText
-          );
-          // Continue with Supabase ID as fallback
-        }
-
-        console.log("Fetching tips for user:", actualUserId);
+        console.log("Fetching tips for user:", supabaseUser.id);
         const response = await fetch(
-          `/api/tips?userId=${actualUserId}&limit=10`
+          `/api/tips?userId=${supabaseUser.id}&limit=10`
         );
         if (!response.ok) {
           console.error(
@@ -379,6 +297,39 @@ export default function Dashboard() {
         return data;
       } catch (error) {
         console.error("Tips fetch error:", error);
+        return [];
+      }
+    },
+    enabled: !!supabaseUser?.id,
+  });
+
+  // Saved places data
+  const { data: savedPlaces = [], isLoading: savedPlacesLoading } = useQuery({
+    queryKey: ["saved-places", supabaseUser?.id],
+    queryFn: async () => {
+      try {
+        if (!supabaseUser?.id) {
+          console.log("No user ID available for saved places query");
+          return [];
+        }
+
+        console.log("Fetching saved places for user:", supabaseUser.id);
+        const response = await fetch(
+          `/api/saved-places?userId=${supabaseUser.id}`
+        );
+        if (!response.ok) {
+          console.error(
+            "Failed to fetch saved places:",
+            response.status,
+            response.statusText
+          );
+          return [];
+        }
+        const data = await response.json();
+        console.log("Saved places fetched:", data.length);
+        return data;
+      } catch (error) {
+        console.error("Saved places fetch error:", error);
         return [];
       }
     },
@@ -581,6 +532,7 @@ export default function Dashboard() {
                 <MapPin className="h-4 w-4" />
                 {selectedLocation ? selectedLocation.label : "Select Location"}
               </Button>
+              <SettingsToggle />
             </div>
           </div>
         </div>
@@ -591,17 +543,17 @@ export default function Dashboard() {
         <div className="flex items-center space-x-2 text-sm">
           <MapPin className="h-4 w-4 text-[#6200D9] flex-shrink-0" />
           <span className="text-[#64748B] truncate flex-1 min-w-0">
-            {locationLoading && !selectedLocation
-              ? "Getting location..."
-              : locationError && !selectedLocation
-              ? "Location unavailable"
-              : currentLocationLabel}
-          </span>
-          {selectedLocation && (
+                  {locationLoading && !selectedLocation
+                    ? "Getting location..."
+                    : locationError && !selectedLocation
+                    ? "Location unavailable"
+                    : currentLocationLabel}
+                </span>
+                {selectedLocation && (
             <span className="text-xs bg-[#6200D9] text-white px-2 py-1 rounded-full font-medium flex-shrink-0">
-              Selected
-            </span>
-          )}
+                    Selected
+                  </span>
+                )}
         </div>
       </div>
 
@@ -632,14 +584,14 @@ export default function Dashboard() {
             <LocationPickerModal
               isOpen={showLocationPicker}
               onClose={() => setShowLocationPicker(false)}
-              onLocationSelect={handleLocationSelect}
-              currentLocation={selectedLocation || undefined}
+                onLocationSelect={handleLocationSelect}
+                currentLocation={selectedLocation || undefined}
               onUseCurrentLocation={async () => {
                 if (currentLat && currentLon) {
                   // Get a readable address for the current location
                   try {
                     const response = await fetch(
-                      `https://api.openweathermap.org/geo/1.0/reverse?lat=${currentLat}&lon=${currentLon}&limit=1&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}`
+                      `/api/location/reverse?lat=${currentLat}&lon=${currentLon}`
                     );
                     if (response.ok) {
                       const data = await response.json();
@@ -684,54 +636,35 @@ export default function Dashboard() {
               isCurrentLocationLoading={locationLoading}
             />
 
-            {/* Air Quality Risk Card */}
-            <RiskCard
-              airData={airQualityData}
-              profile={profile}
-              isLoading={airQualityLoading}
-              lastUpdated={
-                airQualityData?.timestamp
-                  ? new Date(airQualityData.timestamp)
-                  : undefined
-              }
+            {/* Enhanced Air Quality Risk Card */}
+            <EnhancedRiskCard
+              aqi={airQualityData?.aqi || 0}
+              category={airQualityData?.category || 'Unknown'}
+              dominantPollutant={airQualityData?.dominantPollutant || 'PM2.5'}
+              previousAqi={airQualityData?.previousAqi}
+              className="animate-fade-in"
             />
 
-            {/* Quick Actions - Mobile Optimized */}
-            <div className="bg-white rounded-2xl p-5 lg:p-8 animate-fade-in shadow-sm border border-gray-100/50">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
-                  Quick Actions
-                </h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // Navigate to profile page
-                    router.push("/profile");
-                  }}
-                  className="flex flex-col items-center gap-2 h-20 p-4 border-gray-200 hover:bg-gray-50 rounded-xl touch-target"
-                >
-                  <User className="h-5 w-5 text-[#6200D9]" />
-                  <span className="text-xs font-medium text-[#0A1C40]">
-                    Health Profile
-                  </span>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // Navigate to timeline page
-                    router.push("/timeline");
-                  }}
-                  className="flex flex-col items-center gap-2 h-20 p-4 border-gray-200 hover:bg-gray-50 rounded-xl touch-target"
-                >
-                  <Activity className="h-5 w-5 text-[#6200D9]" />
-                  <span className="text-xs font-medium text-[#0A1C40]">
-                    View Timeline
-                  </span>
-                </Button>
-              </div>
-            </div>
+            {/* AI QA Explainer */}
+            {airQualityData && (
+              <AIQAExplainer
+                currentAqi={airQualityData.aqi}
+                dominantPollutant={airQualityData.dominantPollutant}
+                category={airQualityData.category}
+                userId={supabaseUser?.id || ''}
+              />
+            )}
+
+            {/* Run Coach */}
+            {airQualityData && selectedLocation && (
+              <RunCoach
+                currentAqi={airQualityData.aqi}
+                currentLocation={selectedLocation}
+                savedPlaces={savedPlaces || []}
+                forecastData={[]} // TODO: Add forecast data
+              />
+            )}
+
 
             {/* Symptom Form - Mobile Optimized */}
             <div className="bg-white rounded-2xl p-5 lg:p-8 animate-fade-in shadow-sm border border-gray-100/50">
@@ -829,6 +762,21 @@ export default function Dashboard() {
         userId={supabaseUser?.id || ''}
         currentProfile={profile}
       /> */}
+
+      {/* Export/Share Button - Desktop Only */}
+      {airQualityData && (
+        <div className="hidden lg:block">
+          <ExportShareButton
+            airQualityData={{
+              aqi: airQualityData.aqi,
+              category: airQualityData.category,
+              dominantPollutant: airQualityData.dominantPollutant,
+              location: selectedLocation?.label || 'Unknown Location',
+              timestamp: airQualityData.timestamp || new Date().toISOString()
+            }}
+          />
+        </div>
+      )}
 
       {/* Navigation */}
       <Navigation onCrisis={() => setShowCrisisModal(true)} />

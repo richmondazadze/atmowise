@@ -145,7 +145,6 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
             min={1}
             step={1}
             className="w-full [&>span:first-child]:h-3 [&>span:first-child]:bg-[#E2E8F0] [&>span:first-child>span]:bg-gradient-to-r [&>span:first-child>span]:from-[#6200D9] [&>span:first-child>span]:to-[#4C00A8]"
-            thumbClassName="h-6 w-6 bg-white border-2 border-[#6200D9] shadow-lg"
             disabled={isLoading}
             data-testid="slider-severity"
           />

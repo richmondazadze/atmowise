@@ -1,6 +1,6 @@
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, and, desc, asc, gt } from "drizzle-orm";
+import { eq, and, desc, asc, gt, gte, lte } from "drizzle-orm";
 import { 
   profiles, airReads, symptoms, tips, resources, savedPlaces, userInteractions,
   type Profile, type InsertProfile,
@@ -117,14 +117,20 @@ export class DatabaseStorage implements IStorage {
     const { db } = getDatabase();
     const cutoffTime = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     
+    // Add tolerance for location matching (±0.01 degrees ≈ 1km)
+    const latTolerance = 0.01;
+    const lonTolerance = 0.01;
+    
     const result = await db
       .select()
       .from(airReads)
       .where(
         and(
           eq(airReads.userId, userId),
-          eq(airReads.lat, lat),
-          eq(airReads.lon, lon),
+          gte(airReads.lat, lat - latTolerance),
+          lte(airReads.lat, lat + latTolerance),
+          gte(airReads.lon, lon - lonTolerance),
+          lte(airReads.lon, lon + lonTolerance),
           gt(airReads.timestamp, cutoffTime)
         )
       )

@@ -58,14 +58,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
     }
   ];
 
-  const secondaryNavItems = [
-    {
-      path: "/settings",
-      icon: Settings,
-      label: "Settings",
-      description: "App preferences"
-    }
-  ];
+  // Removed secondary navigation items
 
   return (
     <div className={cn(
@@ -145,67 +138,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
           })}
         </nav>
 
-        {/* Divider */}
-        <div className="px-4 py-2">
-          <div className="border-t border-[#E2E8F0]" />
-        </div>
 
-        {/* Secondary Navigation */}
-        <nav className="p-4 pt-0 space-y-2">
-          {secondaryNavItems.map((item) => {
-            const isActive = pathname === item.path;
-            const Icon = item.icon;
-            
-            return (
-              <Link
-                key={item.path}
-                href={item.path}
-                className={cn(
-                  "flex items-center px-4 py-3 rounded-lg font-medium transition-all duration-200 group",
-                  isActive 
-                    ? "bg-[#6200D9] text-white shadow-lg" 
-                    : "text-[#64748B] hover:bg-gray-100 hover:text-[#0A1C40]"
-                )}
-              >
-                <Icon className={cn(
-                  "h-5 w-5 flex-shrink-0 transition-colors",
-                  isActive ? "text-white" : "text-[#64748B] group-hover:text-[#0A1C40]"
-                )} />
-                
-                <div className={cn(
-                  "ml-3 transition-all duration-300 overflow-hidden",
-                  isCollapsed ? "opacity-0 w-0 ml-0" : "opacity-100"
-                )}>
-                  <div className="font-semibold">{item.label}</div>
-                  <div className={cn(
-                    "text-xs transition-colors",
-                    isActive ? "text-white/70" : "text-[#64748B] group-hover:text-[#0A1C40]"
-                  )}>
-                    {item.description}
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Crisis Button */}
-        {onCrisis && (
-          <div className="p-4">
-            <Button
-              onClick={onCrisis}
-              className={cn(
-                "w-full bg-gradient-to-r from-[#EF4444] to-[#DC2626] text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105",
-                isCollapsed ? "px-2" : "px-4"
-              )}
-            >
-              <LifeBuoy className="h-4 w-4 flex-shrink-0" />
-              {!isCollapsed && (
-                <span className="ml-2 font-semibold">Emergency Help</span>
-              )}
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Footer */}

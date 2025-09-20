@@ -54,8 +54,8 @@ export function ProfileToggles({ profile, onUpdate }: ProfileTogglesProps) {
               <span className="text-card-foreground">Older Adult (65+)</span>
             </div>
             <Switch
-              checked={sensitivity.ageGroup === "senior"}
-              onCheckedChange={(checked) => handleToggle("ageGroup", checked ? "senior" : "adult")}
+              checked={sensitivity.ageGroup === "elderly"}
+              onCheckedChange={(checked) => handleToggle("ageGroup", checked ? "elderly" : "adult")}
               data-testid="toggle-senior"
             />
           </div>
