@@ -117,15 +117,15 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md rounded-2xl">
-        <DialogHeader>
+      <DialogContent className="w-[95vw] max-w-md mx-auto rounded-2xl p-0">
+        <DialogHeader className="px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
             <Save className="h-5 w-5 text-[#6200D9]" />
             Save Location
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="px-6 pb-6 space-y-6">
           {/* Authentication Warning */}
           {!userId && (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">

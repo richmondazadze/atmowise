@@ -5,30 +5,17 @@ export async function POST(request: NextRequest) {
   try {
     const { userId, note, severity, linkedAirId } = await request.json()
 
-    if (!note || !severity) {
-      return NextResponse.json({ error: 'Note and severity are required' }, { status: 400 })
+    if (!note || !severity || !userId) {
+      return NextResponse.json({ error: 'Note, severity, and userId are required' }, { status: 400 })
     }
 
-    // Handle user ID - create user if needed or use null for anonymous
-    let actualUserId = null;
-    if (userId) {
-      if (isValidUUID(userId)) {
-        // Check if user exists by supabaseId
-        let user = await storage.getUserBySupabaseId(userId);
-        if (!user) {
-          // Create user with Supabase ID as supabaseId
-          user = await storage.createUser({ supabaseId: userId });
-        }
-        actualUserId = user.id;
-      } else {
-        // Create demo user for non-UUID IDs
-        const demoUser = await storage.createUser({ anonId: userId });
-        actualUserId = demoUser.id;
-      }
+    // Validate that userId is a valid Supabase user ID (UUID format)
+    if (!isValidUUID(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 })
     }
 
     const symptomData = {
-      userId: actualUserId,
+      userId: userId, // Use Supabase user ID directly
       timestamp: new Date(),
       note: note.trim(),
       severity: parseInt(severity),
@@ -67,17 +54,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    // Check if userId is a Supabase user ID (UUID format)
-    let internalUserId = userId;
-    if (isValidUUID(userId)) {
-      // Try to find user by supabaseId first
-      const user = await storage.getUserBySupabaseId(userId);
-      if (user) {
-        internalUserId = user.id;
-      }
+    // Validate that userId is a valid Supabase user ID (UUID format)
+    if (!isValidUUID(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 })
     }
 
-    const symptoms = await storage.getSymptomsByUser(internalUserId, limit)
+    const symptoms = await storage.getSymptomsByUser(userId, limit)
     
     return NextResponse.json(symptoms)
   } catch (error: any) {

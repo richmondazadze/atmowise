@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { storage } from '../../../../lib/database';
 
+// Helper function to validate UUID
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 // Helper function to get AQI category
 function getAQICategory(aqi: number): string {
   if (aqi <= 50) return 'Good';
@@ -45,14 +51,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Latitude and longitude are required' }, { status: 400 });
     }
 
-    // First, get the internal user ID from the Supabase user ID
-    const user = await storage.getUserBySupabaseId(supabaseUserId);
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    // Validate userId format
+    if (!isValidUUID(supabaseUserId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
     // Get historical air quality data for the specified period
-    let historicalData = await storage.getAirReadsForTimeline(user.id, lat, lon, days);
+    let historicalData = await storage.getAirReadsForTimeline(supabaseUserId, lat, lon, days);
     
     // If no historical data exists or only 1 reading, try to fetch real historical data first
     if (historicalData.length <= 1) {
@@ -81,7 +86,7 @@ export async function GET(request: NextRequest) {
               historicalApiData.list.forEach((item: any, index: number) => {
                 const reading = {
                   id: `historical-${index}`,
-                  userId: user.id,
+                  userId: supabaseUserId,
                   lat: lat,
                   lon: lon,
                   source: 'openweather-historical',
@@ -93,6 +98,7 @@ export async function GET(request: NextRequest) {
                   aqi: item.main.aqi || 0,
                   category: getAQICategory(item.main.aqi),
                   dominantPollutant: getDominantPollutant(item.components),
+                  rawPayload: item,
                   createdAt: new Date(item.dt * 1000)
                 };
                 historicalData.push(reading);
@@ -103,7 +109,7 @@ export async function GET(request: NextRequest) {
             }
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.log('Historical API fetch failed, falling back to generated data:', error.message);
       }
       
@@ -112,7 +118,7 @@ export async function GET(request: NextRequest) {
         console.log('Generating realistic sample data for timeline');
         
         // Get current air quality data
-        const currentAirData = historicalData.length > 0 ? historicalData[0] : await storage.getRecentAirRead(user.id, lat, lon, 60);
+        const currentAirData = historicalData.length > 0 ? historicalData[0] : await storage.getRecentAirRead(supabaseUserId, lat, lon, 60);
         
         if (currentAirData) {
           // Generate historical data points based on current data
@@ -129,7 +135,7 @@ export async function GET(request: NextRequest) {
             
             const generatedReading = {
               id: `generated-${i}`,
-              userId: user.id,
+              userId: supabaseUserId,
               lat: lat,
               lon: lon,
               source: 'generated',
@@ -141,6 +147,7 @@ export async function GET(request: NextRequest) {
               aqi: Math.max(0, (currentAirData.aqi || 0) * variation + timeVariation),
               category: currentAirData.category || 'Good',
               dominantPollutant: currentAirData.dominantPollutant || 'PM2.5',
+              rawPayload: { generated: true, variation, timeVariation },
               createdAt: timestamp
             };
             

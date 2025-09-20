@@ -17,17 +17,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
-    // Check if userId is a Supabase user ID (UUID format)
-    let internalUserId = userId;
-    if (isValidUUID(userId)) {
-      // Try to find user by supabaseId first
-      const user = await storage.getUserBySupabaseId(userId);
-      if (user) {
-        internalUserId = user.id;
-      }
+    // Validate userId format
+    if (!isValidUUID(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
-    const savedPlaces = await storage.getSavedPlaces(internalUserId)
+    const savedPlaces = await storage.getSavedPlaces(userId)
     return NextResponse.json(savedPlaces)
   } catch (error: any) {
     console.error('Get saved places error:', error)
@@ -39,12 +34,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
-    // Handle user ID mapping
-    if (body.userId && isValidUUID(body.userId)) {
-      const user = await storage.getUserBySupabaseId(body.userId);
-      if (user) {
-        body.userId = user.id;
-      }
+    // Validate userId format
+    if (!body.userId || !isValidUUID(body.userId)) {
+      return NextResponse.json({ error: 'Valid user ID is required' }, { status: 400 });
     }
     
     const savedPlaceData = insertSavedPlaceSchema.parse(body)

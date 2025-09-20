@@ -15,18 +15,12 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get('tag');
     const limit = parseInt(searchParams.get('limit') || '20');
 
-    // Check if userId is a Supabase user ID (UUID format)
-    let internalUserId = userId;
-    if (userId && isValidUUID(userId)) {
-      // Try to find user by supabaseId first
-      const user = await storage.getUserBySupabaseId(userId);
-      if (user) {
-        internalUserId = user.id;
-      }
+    // Validate userId if provided
+    if (userId && !isValidUUID(userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
-    const tips = await storage.getTips(tag, internalUserId);
-
+    const tips = await storage.getTips(tag ?? undefined, userId);
     return NextResponse.json(tips);
   } catch (error: any) {
     console.error('Get tips error:', error);
@@ -38,12 +32,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Handle user ID mapping for user-specific tips
-    if (body.userId && isValidUUID(body.userId)) {
-      const user = await storage.getUserBySupabaseId(body.userId);
-      if (user) {
-        body.userId = user.id;
-      }
+    // Validate userId if provided
+    if (body.userId && !isValidUUID(body.userId)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
     
     const tipData = insertTipSchema.parse(body);

@@ -8,7 +8,6 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "@/contexts/LocationContext";
 import { RiskCard } from "@/components/RiskCard";
-import { ProfileToggles } from "@/components/ProfileToggles";
 import { ProfileSetupModal } from "@/components/ProfileSetupModal";
 import { SavedPlaces } from "@/components/SavedPlaces";
 import { SymptomForm } from "@/components/SymptomForm";
@@ -21,7 +20,7 @@ import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { MapPin, RefreshCw, LogOut, User, Wind, Activity, TrendingUp, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import type { Profile, User as UserType } from "@shared/schema";
+import type { Profile } from "@shared/schema";
 
 export default function Dashboard() {
   const { user: supabaseUser, signOut } = useAuth();
@@ -35,6 +34,7 @@ export default function Dashboard() {
 
   // Profile setup state
   const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [profileSetupShown, setProfileSetupShown] = useState(false);
 
   // Geolocation hook
   const { 
@@ -101,22 +101,7 @@ export default function Dashboard() {
           };
         }
 
-        // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch('/api/user/authenticated', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            userId: supabaseUser.id,
-            email: supabaseUser.email 
-          })
-        });
-        
-        let actualUserId = supabaseUser.id;
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          actualUserId = userData.id;
-        }
-        
+        // Use Supabase user ID directly
         const url = `/api/air?lat=${airQualityLat}&lon=${airQualityLon}&address=${encodeURIComponent(selectedLocation?.label || currentLocationLabel)}&userId=${supabaseUser.id}`;
         const response = await fetch(url);
         if (!response.ok) {
@@ -168,32 +153,14 @@ export default function Dashboard() {
         if (response.status === 404) {
           console.log('Profile not found, creating default profile for user:', supabaseUser.id);
           
-          // First ensure the user exists in our database
-          const userResponse = await fetch('/api/user/authenticated', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              userId: supabaseUser.id,
-              email: supabaseUser.email 
-            })
-          });
-          
-          let actualUserId = supabaseUser.id;
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            actualUserId = userData.id;
-            console.log('Created/found user with ID:', actualUserId);
-          } else {
-            console.error('Failed to create/find user:', userResponse.status, userResponse.statusText);
-            // Continue with Supabase ID as fallback
-          }
+          // Use Supabase user ID directly
           
           // Now create the profile
           const createResponse = await fetch('/api/profile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              userId: actualUserId,
+              userId: supabaseUser.id,
               displayName: supabaseUser.email?.split('@')[0] || 'User',
               sensitivity: {
                 asthma: false,
@@ -225,10 +192,19 @@ export default function Dashboard() {
   
   // Auto-show profile setup for new users who haven't completed it
   useEffect(() => {
-    if (profile && needsProfileSetup && !showProfileSetup) {
+    // Only show modal if:
+    // 1. Profile exists
+    // 2. Profile is not completed
+    // 3. Modal is not already showing
+    // 4. We haven't already shown it in this session
+    if (profile && 
+        profile.isCompleted === false && 
+        !showProfileSetup && 
+        !profileSetupShown) {
       setShowProfileSetup(true);
+      setProfileSetupShown(true);
     }
-  }, [profile, needsProfileSetup, showProfileSetup]);
+  }, [profile?.isCompleted, showProfileSetup, profileSetupShown]);
 
   // Symptoms data for counting
   const { data: symptoms = [], isLoading: symptomsLoading } = useQuery({
@@ -240,27 +216,9 @@ export default function Dashboard() {
           return [];
         }
         
-        // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch('/api/user/authenticated', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            userId: supabaseUser.id,
-            email: supabaseUser.email 
-          })
-        });
-        
-        let actualUserId = supabaseUser.id;
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          actualUserId = userData.id;
-        } else {
-          console.error('Failed to create/find user for symptoms:', userResponse.status, userResponse.statusText);
-          // Continue with Supabase ID as fallback
-        }
-        
-        console.log('Fetching symptoms for user:', actualUserId);
-        const response = await fetch(`/api/symptoms?userId=${actualUserId}&limit=100`);
+        // Use Supabase user ID directly
+        console.log('Fetching symptoms for user:', supabaseUser.id);
+        const response = await fetch(`/api/symptoms?userId=${supabaseUser.id}&limit=100`);
         if (!response.ok) {
           console.error('Failed to fetch symptoms:', response.status, response.statusText);
           return [];
@@ -286,27 +244,9 @@ export default function Dashboard() {
           return [];
         }
         
-        // First ensure the user exists in our database and get the correct user ID
-        const userResponse = await fetch('/api/user/authenticated', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            userId: supabaseUser.id,
-            email: supabaseUser.email 
-          })
-        });
-        
-        let actualUserId = supabaseUser.id;
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          actualUserId = userData.id;
-        } else {
-          console.error('Failed to create/find user for tips:', userResponse.status, userResponse.statusText);
-          // Continue with Supabase ID as fallback
-        }
-        
-        console.log('Fetching tips for user:', actualUserId);
-        const response = await fetch(`/api/tips?userId=${actualUserId}&limit=10`);
+        // Use Supabase user ID directly
+        console.log('Fetching tips for user:', supabaseUser.id);
+        const response = await fetch(`/api/tips?userId=${supabaseUser.id}&limit=10`);
         if (!response.ok) {
           console.error('Failed to fetch tips:', response.status, response.statusText);
           return [];
@@ -341,6 +281,29 @@ export default function Dashboard() {
     setSelectedLocation(location);
     setShowLocationPicker(false);
     // The query will automatically refetch with new coordinates due to queryKey change
+  };
+
+  // Handle tip interactions (helpful/not helpful)
+  const handleTipInteraction = async (tipId: string, type: 'helpful' | 'not_helpful') => {
+    try {
+      await fetch('/api/user-interactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: supabaseUser?.id,
+          type: type === 'helpful' ? 'tip_helpful' : 'tip_not_helpful',
+          targetId: tipId
+        })
+      });
+      
+      // Show feedback
+      toast({
+        title: "Thank you for your feedback!",
+        description: `Your response has been recorded.`,
+      });
+    } catch (error) {
+      console.error('Failed to record tip interaction:', error);
+    }
   };
 
   // Handle location refresh
@@ -479,6 +442,16 @@ export default function Dashboard() {
                 <div className="min-w-0 flex-1">
                   <h2 className="text-xl lg:text-2xl font-bold text-[#0A1C40] mb-1 tracking-tight">Welcome back!</h2>
                   <p className="text-sm lg:text-base text-[#64748B] leading-relaxed font-medium">Track your air quality exposure and get personalized insights</p>
+                  {needsProfileSetup && (
+                    <Button
+                      onClick={() => setShowProfileSetup(true)}
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 text-xs"
+                    >
+                      Complete Profile
+                    </Button>
+                  )}
           </div>
         </div>
       </div>
@@ -572,10 +545,6 @@ export default function Dashboard() {
                     {symptomsLoading ? '...' : symptoms.length}
                   </span>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border border-gray-100">
-                  <span className="text-sm lg:text-base text-[#64748B] font-semibold">AI Insights</span>
-                  <span className="text-sm lg:text-base text-[#0A1C40] font-bold">0</span>
-                </div>
               </div>
             </div>
 
@@ -599,6 +568,7 @@ export default function Dashboard() {
             <TipsCard
               tips={tips || []}
               className="mt-6"
+              onTipInteraction={handleTipInteraction}
             />
           </div>
         </div>
@@ -613,7 +583,15 @@ export default function Dashboard() {
       {/* Profile Setup Modal */}
       <ProfileSetupModal
         isOpen={showProfileSetup}
-        onClose={() => setShowProfileSetup(false)}
+        onClose={() => {
+          setShowProfileSetup(false);
+          // Reset the flag when modal is closed
+          setProfileSetupShown(false);
+        }}
+        onProfileCompleted={() => {
+          // Profile is completed, reset the flag so it won't show again
+          setProfileSetupShown(true);
+        }}
         userId={supabaseUser?.id || ''}
         currentProfile={profile}
       />

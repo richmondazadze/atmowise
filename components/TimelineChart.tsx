@@ -97,10 +97,10 @@ export function TimelineChart({
           </CardTitle>
           <div className="flex items-center gap-2">
             <Select value={selectedMetric} onValueChange={onMetricChange}>
-              <SelectTrigger className="w-24 lg:w-32 text-xs lg:text-sm border-[#E2E8F0]">
+              <SelectTrigger className="w-24 lg:w-32 text-xs lg:text-sm h-8 lg:h-9 min-h-[36px]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="min-w-[120px]">
                 <SelectItem value="aqi">AQI</SelectItem>
                 <SelectItem value="pm25">PM2.5</SelectItem>
                 <SelectItem value="pm10">PM10</SelectItem>
