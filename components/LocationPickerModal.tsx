@@ -16,6 +16,7 @@ interface LocationPickerModalProps {
   currentLocation?: { lat: number; lon: number; label: string };
   onUseCurrentLocation?: () => void;
   isCurrentLocationLoading?: boolean;
+  userId?: string;
 }
 
 export function LocationPickerModal({ 
@@ -24,7 +25,8 @@ export function LocationPickerModal({
   onLocationSelect, 
   currentLocation, 
   onUseCurrentLocation, 
-  isCurrentLocationLoading 
+  isCurrentLocationLoading,
+  userId
 }: LocationPickerModalProps) {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,6 +35,8 @@ export function LocationPickerModal({
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [selectedLocationForSave, setSelectedLocationForSave] = useState<{ lat: number; lon: number; label: string } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +95,7 @@ export function LocationPickerModal({
     setSelectedIndex(-1);
     setSuggestions([]); // Clear suggestions
     
-    // Automatically search for air quality and select location
+    // Search for air quality data and show in modal
     setLoading(true);
     setError(null);
     setSearchResults([]);
@@ -105,14 +109,8 @@ export function LocationPickerModal({
       
       const result = await response.json();
       
-      // Show preview data first
+      // Show preview data in modal - don't auto-select
       setSearchResults([result]);
-      
-      // Automatically select the location after getting air quality data
-      onLocationSelect(result.location, result.airQuality);
-      
-      // Close modal after selection
-      onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to search location');
     } finally {
@@ -139,11 +137,7 @@ export function LocationPickerModal({
       const result = await response.json();
       setSearchResults([result]);
       
-      // Automatically select the location after getting air quality data
-      onLocationSelect(result.location, result.airQuality);
-      
-      // Close modal after selection
-      onClose();
+      // Show preview data in modal - don't auto-select
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to search location');
     } finally {
@@ -158,13 +152,18 @@ export function LocationPickerModal({
     onClose();
   };
 
+  const handleSaveLocation = (result: any) => {
+    setSelectedLocationForSave(result.location);
+    setShowSaveModal(true);
+  };
+
   const getAQIDisplay = (aqi: number | null) => {
     return getAQIInfo(aqi);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-[#6200D9]" />
@@ -181,7 +180,7 @@ export function LocationPickerModal({
                 variant="outline"
                 onClick={onUseCurrentLocation}
                 disabled={isCurrentLocationLoading}
-                className="flex items-center gap-2 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 h-12 px-6 w-full"
+                className="flex items-center gap-2 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 h-12 px-6 w-full rounded-2xl"
               >
                 <MapPin className="h-4 w-4" />
                 {isCurrentLocationLoading ? 'Getting Location...' : 'Use Current Location'}
@@ -200,7 +199,7 @@ export function LocationPickerModal({
                 onChange={(e) => setAddress(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onFocus={() => setShowSuggestions(true)}
-                className="pl-10 h-12 text-base"
+                className="pl-10 h-12 text-base rounded-2xl"
                 autoComplete="off"
               />
               
@@ -236,7 +235,7 @@ export function LocationPickerModal({
             <Button 
               type="submit" 
               disabled={loading || !address.trim()}
-              className="h-12 px-6 bg-[#6200D9] hover:bg-[#4C00A8]"
+              className="h-12 px-6 bg-[#6200D9] hover:bg-[#4C00A8] rounded-2xl"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Search'}
             </Button>
@@ -258,10 +257,9 @@ export function LocationPickerModal({
                 return (
                   <div
                     key={index}
-                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                    onClick={() => handleLocationSelect(result)}
+                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <MapPin className="h-4 w-4 text-gray-400" />
@@ -287,6 +285,25 @@ export function LocationPickerModal({
                       </div>
                       <Check className="h-5 w-5 text-[#6200D9]" />
                     </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleLocationSelect(result)}
+                        className="flex-1 h-10 bg-[#6200D9] hover:bg-[#4C00A8] text-white text-sm rounded-2xl"
+                      >
+                        Select Location
+                      </Button>
+                      <Button
+                        onClick={() => handleSaveLocation(result)}
+                        variant="outline"
+                        disabled={!userId}
+                        className="h-10 px-3 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 text-sm rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={!userId ? "Sign in to save locations" : "Save this location"}
+                      >
+                        <BookmarkPlus className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
@@ -294,6 +311,19 @@ export function LocationPickerModal({
           )}
         </div>
       </DialogContent>
+      
+      {/* Save Location Modal */}
+      {selectedLocationForSave && userId && (
+        <SaveLocationModal
+          isOpen={showSaveModal}
+          onClose={() => {
+            setShowSaveModal(false);
+            setSelectedLocationForSave(null);
+          }}
+          location={selectedLocationForSave}
+          userId={userId}
+        />
+      )}
     </Dialog>
   );
 }

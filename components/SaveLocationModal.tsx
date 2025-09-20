@@ -82,7 +82,14 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
   };
 
   const handleSave = () => {
-    if (!userId) return;
+    if (!userId) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to save locations.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const finalName = selectedType === 'custom' ? customName : placeName;
     if (!finalName.trim()) {
@@ -110,7 +117,7 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Save className="h-5 w-5 text-[#6200D9]" />
@@ -119,6 +126,16 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
         </DialogHeader>
         
         <div className="space-y-6">
+          {/* Authentication Warning */}
+          {!userId && (
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+              <div className="flex items-center gap-2 text-yellow-800">
+                <X className="h-4 w-4" />
+                <span className="text-sm font-medium">Sign in required to save locations</span>
+              </div>
+            </div>
+          )}
+
           {/* Location Preview */}
           <div className="p-4 bg-gray-50 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
@@ -140,12 +157,13 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
                   <button
                     key={type.key}
                     type="button"
-                    onClick={() => setSelectedType(type.key as any)}
-                    className={`p-3 rounded-xl border-2 transition-all duration-200 touch-target ${
+                    onClick={() => userId && setSelectedType(type.key as any)}
+                    disabled={!userId}
+                    className={`p-3 rounded-2xl border-2 transition-all duration-200 touch-target ${
                       selectedType === type.key
                         ? 'border-[#6200D9] bg-[#6200D9]/5'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    } ${!userId ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <div className="flex flex-col items-center space-y-2">
                       <Icon className="h-5 w-5 text-gray-600" />
@@ -167,14 +185,17 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
               type="text"
               value={selectedType === 'custom' ? customName : placeName}
               onChange={(e) => {
-                if (selectedType === 'custom') {
-                  setCustomName(e.target.value);
-                } else {
-                  setPlaceName(e.target.value);
+                if (userId) {
+                  if (selectedType === 'custom') {
+                    setCustomName(e.target.value);
+                  } else {
+                    setPlaceName(e.target.value);
+                  }
                 }
               }}
               placeholder={selectedType === 'custom' ? 'Enter custom name...' : `Enter ${PLACE_TYPES.find(t => t.key === selectedType)?.label.toLowerCase()} name...`}
-              className="h-11 text-sm"
+              className="h-11 text-sm rounded-2xl"
+              disabled={!userId}
             />
           </div>
 
@@ -183,16 +204,16 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
             <Button
               variant="outline"
               onClick={handleClose}
-              className="px-4 sm:px-6 py-2 sm:py-3 touch-target order-2 sm:order-1 text-sm sm:text-base rounded-xl"
+              className="px-4 sm:px-6 py-2 sm:py-3 touch-target order-2 sm:order-1 text-sm sm:text-base rounded-2xl"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
-              disabled={createPlaceMutation.isPending || !(selectedType === 'custom' ? customName.trim() : placeName.trim())}
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-xl"
+              disabled={!userId || createPlaceMutation.isPending || !(selectedType === 'custom' ? customName.trim() : placeName.trim())}
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {createPlaceMutation.isPending ? 'Saving...' : 'Save Location'}
+              {!userId ? 'Sign In Required' : createPlaceMutation.isPending ? 'Saving...' : 'Save Location'}
             </Button>
           </div>
         </div>

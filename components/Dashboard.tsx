@@ -481,14 +481,14 @@ export default function Dashboard() {
                   <p className="text-sm lg:text-base text-[#64748B] leading-relaxed font-medium">Track your air quality exposure and get personalized insights</p>
           </div>
         </div>
-            </div>
+      </div>
 
             {/* Location Picker Modal */}
             <LocationPickerModal
               isOpen={showLocationPicker}
               onClose={() => setShowLocationPicker(false)}
-              onLocationSelect={handleLocationSelect}
-              currentLocation={selectedLocation || undefined}
+                onLocationSelect={handleLocationSelect}
+                currentLocation={selectedLocation || undefined}
               onUseCurrentLocation={async () => {
                 if (currentLat && currentLon) {
                   // Get a readable address for the current location
@@ -528,6 +528,7 @@ export default function Dashboard() {
                 }
               }}
               isCurrentLocationLoading={locationLoading}
+              userId={supabaseUser?.id}
             />
 
             {/* Air Quality Risk Card */}
