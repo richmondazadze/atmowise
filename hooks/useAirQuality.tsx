@@ -46,7 +46,7 @@ export function getAirQualityStatus(pm25: number | null, aqi: number | null, sen
   }
 
   // Adjust for sensitivity
-  if (sensitivity.asthma || sensitivity.pregnant || sensitivity.ageGroup === "senior") {
+  if (sensitivity.asthma || sensitivity.pregnant || sensitivity.ageGroup === "elderly") {
     if (level >= 2) level = Math.min(level + 1, 5);
   }
 

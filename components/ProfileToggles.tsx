@@ -56,7 +56,7 @@ export function ProfileToggles({ profile, onUpdate }: ProfileTogglesProps) {
             <Switch
               checked={sensitivity.ageGroup === "elderly"}
               onCheckedChange={(checked) => handleToggle("ageGroup", checked ? "elderly" : "adult")}
-              data-testid="toggle-senior"
+              data-testid="toggle-elderly"
             />
           </div>
         </div>

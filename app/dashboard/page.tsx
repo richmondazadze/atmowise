@@ -620,6 +620,7 @@ export default function DashboardPage() {
           )}
         </AnimatePresence>
 
+
         {/* Navigation */}
         <Navigation />
         

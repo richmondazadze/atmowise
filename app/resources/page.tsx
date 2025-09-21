@@ -3,6 +3,7 @@
 import { PageLayout } from '@/components/PageLayout'
 import { Navigation } from '@/components/Navigation'
 import { FloatingSettingsButton } from '@/components/FloatingSettingsButton'
+import { SponsorSection } from '@/components/SponsorSection'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -46,73 +47,6 @@ export default function ResourcesPage() {
     }
   ];
 
-  // Health resources organized by category
-  const healthResources = [
-    {
-      category: 'For People with Asthma',
-      resources: [
-        {
-          title: 'Asthma Action Plan',
-          description: 'Create a personalized plan to manage asthma during poor air quality days',
-          type: 'Guide',
-          icon: BookOpen,
-          color: 'text-blue-600'
-        },
-        {
-          title: 'Medication Management',
-          description: 'When and how to adjust medications based on air quality',
-          type: 'Medical',
-          icon: Heart,
-          color: 'text-red-600'
-        },
-        {
-          title: 'Indoor Air Quality Tips',
-          description: 'How to improve air quality in your home',
-          type: 'Tips',
-          icon: Shield,
-          color: 'text-green-600'
-        }
-      ]
-    },
-    {
-      category: 'For Pregnant Women',
-      resources: [
-        {
-          title: 'Pregnancy Air Quality Guide',
-          description: 'Understanding air pollution risks during pregnancy',
-          type: 'Guide',
-          icon: BookOpen,
-          color: 'text-blue-600'
-        },
-        {
-          title: 'Safe Outdoor Activities',
-          description: 'Guidelines for outdoor exercise and activities',
-          type: 'Lifestyle',
-          icon: Users,
-          color: 'text-purple-600'
-        }
-      ]
-    },
-    {
-      category: 'For Seniors',
-      resources: [
-        {
-          title: 'Senior Health & Air Quality',
-          description: 'Special considerations for older adults',
-          type: 'Guide',
-          icon: BookOpen,
-          color: 'text-blue-600'
-        },
-        {
-          title: 'Indoor Exercise Alternatives',
-          description: 'Safe indoor activities when air quality is poor',
-          type: 'Lifestyle',
-          icon: Users,
-          color: 'text-purple-600'
-        }
-      ]
-    }
-  ];
 
   // Emergency contacts and support
   const emergencyContacts = [
@@ -263,77 +197,12 @@ export default function ResourcesPage() {
               </Card>
             </motion.div>
 
-            {/* Health Resources by Category */}
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.5 }}
-            >
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-[#6200D9]" />
-                    Health Resources by Category
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">
-                    Personalized guidance based on your health profile
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {healthResources.map((category, categoryIndex) => (
-                      <motion.div
-                        key={category.category}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.6 + (categoryIndex * 0.1) }}
-                      >
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{category.category}</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {category.resources.map((resource, resourceIndex) => {
-                            const Icon = resource.icon;
-                            return (
-                              <motion.div
-                                key={resource.title}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.3, delay: 0.7 + (categoryIndex * 0.1) + (resourceIndex * 0.05) }}
-                                className="group"
-                              >
-                                <Card className="hover:shadow-md transition-all duration-300 hover:scale-105">
-                                  <CardContent className="p-4">
-                                    <div className="flex items-start gap-3">
-                                      <div className={`p-2 rounded-lg bg-gray-50`}>
-                                        <Icon className={`h-5 w-5 ${resource.color}`} />
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                          <h4 className="font-medium text-gray-900 truncate">{resource.title}</h4>
-                                          <Badge variant="outline" className="text-xs">
-                                            {resource.type}
-                                          </Badge>
-                                        </div>
-                                        <p className="text-sm text-gray-600">{resource.description}</p>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
 
             {/* Emergency Contacts */}
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.8 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
             >
               <Card className="shadow-sm border-red-200">
                 <CardHeader>
@@ -383,7 +252,7 @@ export default function ResourcesPage() {
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 1.0 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
             >
               <Card className="shadow-sm">
                 <CardHeader>
@@ -419,6 +288,9 @@ export default function ResourcesPage() {
                 </CardContent>
               </Card>
             </motion.div>
+
+            {/* Sponsor Section */}
+            <SponsorSection />
           </div>
         </motion.div>
 

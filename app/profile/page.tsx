@@ -32,7 +32,7 @@ export default function ProfilePage() {
     sensitivity: {
       asthma: false,
       pregnant: false,
-      ageGroup: 'adult' as 'child' | 'adult' | 'senior',
+      ageGroup: 'adult' as 'child' | 'adult' | 'elderly',
       cardiopulmonary: false,
     }
   });
@@ -482,7 +482,7 @@ export default function ProfilePage() {
                                   ...prev,
                                   sensitivity: { 
                                     ...prev.sensitivity, 
-                                    ageGroup: e.target.value as 'child' | 'adult' | 'senior' 
+                                    ageGroup: e.target.value as 'child' | 'adult' | 'elderly' 
                                   }
                                 }))
                               }
@@ -491,7 +491,7 @@ export default function ProfilePage() {
                             >
                               <option value="child">Child (0-12)</option>
                               <option value="adult">Adult (13-64)</option>
-                              <option value="senior">Senior (65+)</option>
+                              <option value="elderly">Elderly (65+)</option>
                             </select>
                           </div>
                         </div>

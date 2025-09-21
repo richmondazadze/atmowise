@@ -296,7 +296,14 @@ export default function TimelinePage() {
                       <p className="text-sm text-gray-500">Check back later or try a different time period</p>
                     </div>
                   ) : (
-                    <EnhancedTimelineChart data={airQualityHistory} />
+                    <EnhancedTimelineChart 
+                      airData={airQualityHistory}
+                      symptomData={[]}
+                      selectedMetric="aqi"
+                      onMetricChange={() => {}}
+                      selectedPeriod={selectedPeriod}
+                      onPeriodChange={(period: string) => setSelectedPeriod(period as '7d' | '30d' | '90d')}
+                    />
                   )}
                 </CardContent>
               </Card>
