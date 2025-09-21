@@ -26,6 +26,7 @@ interface ExerciseRecommendation {
 }
 
 export function RunCoach({ currentAqi, currentLocation, savedPlaces, forecastData = [] }: RunCoachProps) {
+  const [selectedRecommendation, setSelectedRecommendation] = useState<ExerciseRecommendation | null>(null);
   const [recommendations, setRecommendations] = useState<ExerciseRecommendation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -205,6 +206,7 @@ export function RunCoach({ currentAqi, currentLocation, savedPlaces, forecastDat
                 size="sm" 
                 variant="outline" 
                 className="text-xs h-8 px-3 w-full sm:w-auto"
+                onClick={() => setSelectedRecommendation(rec)}
               >
                 View Details
               </Button>
@@ -224,6 +226,86 @@ export function RunCoach({ currentAqi, currentLocation, savedPlaces, forecastDat
           </div>
         )}
       </CardContent>
+
+      {/* Details Modal */}
+      {selectedRecommendation && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Exercise Details
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedRecommendation(null)}
+                className="h-8 w-8 p-0"
+              >
+                ×
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center">
+                  {selectedRecommendation.icon}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                    {selectedRecommendation.location}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Score: {Math.round(selectedRecommendation.score)}/100
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Wind className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {selectedRecommendation.windSpeed.toFixed(1)} mph {getWindDirection(selectedRecommendation.windDirection)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {selectedRecommendation.timeWindow}
+                  </span>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <h5 className="font-medium text-gray-900 dark:text-white mb-2">Recommendation</h5>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {selectedRecommendation.reason}
+                </p>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                <h5 className="font-medium text-blue-900 dark:text-blue-300 mb-2">Air Quality</h5>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-blue-700 dark:text-blue-400">
+                    AQI: {selectedRecommendation.aqi}
+                  </span>
+                  <Badge 
+                    className={`text-xs ${
+                      selectedRecommendation.aqi <= 50 ? 'bg-green-100 text-green-700 border-green-200' :
+                      selectedRecommendation.aqi <= 100 ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
+                      selectedRecommendation.aqi <= 150 ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                      'bg-red-100 text-red-700 border-red-200'
+                    }`}
+                  >
+                    {selectedRecommendation.aqi <= 50 ? 'Good' :
+                     selectedRecommendation.aqi <= 100 ? 'Moderate' :
+                     selectedRecommendation.aqi <= 150 ? 'Unhealthy for Sensitive' : 'Unhealthy'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

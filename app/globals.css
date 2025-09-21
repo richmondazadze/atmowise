@@ -835,9 +835,11 @@
       left: 0 !important;
       right: 0 !important;
       z-index: 60 !important;
-      transform: translateZ(0);
-      -webkit-transform: translateZ(0);
-      will-change: transform;
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+      will-change: transform !important;
+      transition: none !important;
+      animation: none !important;
     }
     
     /* Ensure bottom nav stays above all content */

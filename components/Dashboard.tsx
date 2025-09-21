@@ -511,23 +511,32 @@ export default function Dashboard() {
       </header>
 
       {/* Desktop Header */}
-      <header className="hidden lg:block sticky top-0 z-30 header-premium">
-        <div className="px-8 py-6">
+      <header className="hidden lg:block bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="heading-1 text-[#0A1C40]">Dashboard</h1>
-              <p className="body-large text-[#64748B]">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Monitor air quality and your health insights
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <Button
                 variant="outline"
-                onClick={() => setShowLocationPicker(!showLocationPicker)}
-                className="flex items-center gap-2 border-[#E2E8F0] hover:bg-gray-50"
+                onClick={() => setShowLocationPicker(true)}
+                className="flex items-center gap-2 h-9 px-4 text-sm"
               >
                 <MapPin className="h-4 w-4" />
                 {selectedLocation ? selectedLocation.label : "Select Location"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleLocationRefresh}
+                disabled={locationLoading || airQualityLoading}
+                className="flex items-center gap-2 h-9 px-4 text-sm"
+              >
+                <RefreshCw className={`h-4 w-4 ${locationLoading || airQualityLoading ? 'animate-spin' : ''}`} />
+                Refresh
               </Button>
             </div>
           </div>
@@ -580,8 +589,8 @@ export default function Dashboard() {
             <LocationPickerModal
               isOpen={showLocationPicker}
               onClose={() => setShowLocationPicker(false)}
-              onLocationSelect={handleLocationSelect}
-              currentLocation={selectedLocation || undefined}
+                onLocationSelect={handleLocationSelect}
+                currentLocation={selectedLocation || undefined}
               userId={supabaseUser?.id}
               onUseCurrentLocation={async () => {
                 if (currentLat && currentLon) {

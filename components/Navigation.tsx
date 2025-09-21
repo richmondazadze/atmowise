@@ -27,7 +27,7 @@ export function Navigation({}: NavigationProps) {
 
 
             {/* Mobile Bottom Navigation */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl border-t border-gray-100/50 dark:border-gray-700/50 z-[60] shadow-lg safe-area-bottom" data-testid="nav-bottom" style={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl border-t border-gray-100/50 dark:border-gray-700/50 z-[60] shadow-lg safe-area-bottom" data-testid="nav-bottom" style={{ position: 'fixed', bottom: 0, left: 0, right: 0, transform: 'translateZ(0)', willChange: 'transform' }}>
               <div className="flex items-center justify-around px-4 py-3">
                 {navItems.map((item) => {
                   const isActive = pathname === item.path;
