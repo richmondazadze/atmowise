@@ -21,7 +21,7 @@ export function AIQAExplainer({ currentAqi, dominantPollutant, category, userId 
       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <MessageCircle className="h-5 w-5 text-[#6200D9]" />
+            <MessageCircle className="h-5 w-5 text-[#71E07E]" />
             Ask AI About Air Quality
           </CardTitle>
           <p className="text-sm text-gray-600">
@@ -32,7 +32,7 @@ export function AIQAExplainer({ currentAqi, dominantPollutant, category, userId 
         <CardContent>
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="w-full bg-gradient-to-r from-[#6200D9] to-[#BA5FFF] hover:from-[#4C00A8] hover:to-[#A855F7] text-white"
+            className="w-full bg-gradient-to-r from-[#71E07E] to-[#10B981] hover:from-[#059669] hover:to-[#047857] text-[#0A1C40]"
           >
             <MessageCircle className="h-4 w-4 mr-2" />
             Start AI Chat

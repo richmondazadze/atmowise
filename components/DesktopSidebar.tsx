@@ -102,10 +102,10 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
             href={item.path}
             className={cn(
               "relative flex items-center rounded-xl font-medium transition-all duration-300 ease-out group overflow-hidden",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6200D9] focus-visible:ring-offset-2",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#71E07E] focus-visible:ring-offset-2",
               "px-4 py-4",
               isActive
-                ? "bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white shadow-lg"
+                ? "bg-gradient-to-r from-[#71E07E] to-[#10B981] text-[#0A1C40] shadow-lg"
                 : "text-[#64748B] hover:bg-gray-50 hover:text-[#0A1C40]"
             )}
           >
@@ -193,7 +193,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
 
             {/* Ripple effect */}
             <motion.div
-              className="absolute inset-0 bg-[#6200D9]/10 rounded-xl"
+              className="absolute inset-0 bg-[#71E07E]/10 rounded-xl"
               initial={{ scale: 0, opacity: 0 }}
               whileTap={{
                 scale: 1.2,
@@ -210,7 +210,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="absolute inset-0 rounded-xl shadow-lg shadow-[#6200D9]/20"
+                  className="absolute inset-0 rounded-xl shadow-lg shadow-[#71E07E]/20"
                 />
               )}
             </AnimatePresence>
@@ -320,7 +320,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                 }`}
                 alt="User Avatar"
               />
-              <AvatarFallback className="bg-gradient-to-br from-[#6200D9] to-[#4C00A8] text-white text-xs">
+              <AvatarFallback className="bg-gradient-to-br from-[#71E07E] to-[#10B981] text-[#0A1C40] text-xs">
                 {user?.email?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>

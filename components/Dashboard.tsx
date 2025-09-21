@@ -439,7 +439,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6200D9] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#71E07E] mx-auto mb-4"></div>
           <p className="text-gray-600">Please sign in to view your dashboard</p>
         </div>
       </div>
@@ -551,7 +551,7 @@ export default function Dashboard() {
       {/* Mobile Location Status */}
       <div className="lg:hidden bg-[#F8FAFC] dark:bg-gray-900 border-b border-[#E2E8F0] dark:border-gray-700 px-4 py-3">
         <div className="flex items-center space-x-2 text-sm">
-          <MapPin className="h-4 w-4 text-[#6200D9] dark:text-purple-400 flex-shrink-0" />
+          <MapPin className="h-4 w-4 text-[#71E07E] dark:text-teal-400 flex-shrink-0" />
           <span className="text-[#64748B] dark:text-gray-300 truncate flex-1 min-w-0">
             {locationLoading && !selectedLocation
               ? "Getting location..."
@@ -560,7 +560,7 @@ export default function Dashboard() {
               : currentLocationLabel}
           </span>
           {selectedLocation && (
-            <span className="text-xs bg-[#6200D9] dark:bg-purple-600 text-white px-2 py-1 rounded-full font-medium flex-shrink-0">
+            <span className="text-xs bg-[#71E07E] dark:bg-teal-600 text-[#0A1C40] dark:text-white px-2 py-1 rounded-full font-medium flex-shrink-0">
               Selected
             </span>
           )}
@@ -575,7 +575,7 @@ export default function Dashboard() {
             {/* Welcome Section - Premium Mobile Design */}
             <div className="bg-white rounded-2xl lg:rounded-2xl p-5 lg:p-8 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100/50">
               <div className="flex items-center space-x-4 mb-4 lg:mb-6">
-                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-[#71E07E] via-[#10B981] to-[#059669] rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
                   <Wind className="h-6 w-6 lg:h-7 lg:w-7 text-white drop-shadow-sm" />
                 </div>
                 <div className="min-w-0 flex-1">

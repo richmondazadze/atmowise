@@ -68,9 +68,9 @@ export function Navigation({}: NavigationProps) {
                 <Link
                   href={item.path}
                   className={cn(
-                    "flex flex-col items-center py-2 px-4 transition-all duration-300 ease-out rounded-xl min-h-[48px] min-w-[48px] justify-center focus:outline-none focus:ring-2 focus:ring-[#6200D9] focus:ring-offset-2 relative overflow-hidden group",
+                    "flex flex-col items-center py-2 px-4 transition-all duration-300 ease-out rounded-xl min-h-[48px] min-w-[48px] justify-center focus:outline-none focus:ring-2 focus:ring-[#71E07E] focus:ring-offset-2 relative overflow-hidden group",
                     isActive
-                      ? "text-[#6200D9] dark:text-purple-400 bg-[#6200D9]/10 dark:bg-purple-400/10 shadow-sm"
+                      ? "text-[#71E07E] dark:text-teal-400 bg-[#71E07E]/10 dark:bg-teal-400/10 shadow-sm"
                       : "text-[#64748B] dark:text-gray-400 hover:text-[#0A1C40] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
                   )}
                   data-testid={`nav-${item.label.toLowerCase()}`}
@@ -88,7 +88,7 @@ export function Navigation({}: NavigationProps) {
                           duration: 0.4, 
                           ease: [0.25, 0.46, 0.45, 0.94] 
                         }}
-                        className="absolute inset-0 bg-gradient-to-r from-[#6200D9]/10 to-[#4C00A8]/10 rounded-xl"
+                        className="absolute inset-0 bg-gradient-to-r from-[#71E07E]/10 to-[#10B981]/10 rounded-xl"
                       />
                     )}
                   </AnimatePresence>
@@ -114,7 +114,7 @@ export function Navigation({}: NavigationProps) {
                     className="text-xs font-medium relative z-10"
                     animate={{ 
                       fontWeight: isActive ? 600 : 500,
-                      color: isActive ? "#6200D9" : undefined,
+                      color: isActive ? "#71E07E" : undefined,
                       y: isActive ? -1 : 0
                     }}
                     transition={{ duration: 0.2 }}
@@ -124,7 +124,7 @@ export function Navigation({}: NavigationProps) {
                   
                   {/* Ripple effect on tap */}
                   <motion.div
-                    className="absolute inset-0 bg-[#6200D9]/20 rounded-xl"
+                    className="absolute inset-0 bg-[#71E07E]/20 rounded-xl"
                     initial={{ scale: 0, opacity: 0 }}
                     whileTap={{ 
                       scale: 1.2, 
@@ -141,7 +141,7 @@ export function Navigation({}: NavigationProps) {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="absolute inset-0 rounded-xl shadow-lg shadow-[#6200D9]/20"
+                        className="absolute inset-0 rounded-xl shadow-lg shadow-[#71E07E]/20"
                       />
                     )}
                   </AnimatePresence>

@@ -34,7 +34,7 @@ const AQI_COLORS = {
   100: "#F97316", // Unhealthy for Sensitive - Orange
   150: "#EF4444", // Unhealthy - Red
   200: "#BA5FFF", // Very Unhealthy - Accent purple
-  300: "#6200D9", // Hazardous - Primary blue
+  300: "#6200D9", // Hazardous - Secondary blue
 };
 
 const TIME_WINDOWS = [
@@ -364,8 +364,8 @@ export function EnhancedTimelineChart({
             {/* Area under the curve for modern look */}
             <defs>
               <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#6200D9" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="#6200D9" stopOpacity="0.05" />
+                <stop offset="0%" stopColor="#71E07E" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="#71E07E" stopOpacity="0.05" />
               </linearGradient>
             </defs>
             
@@ -378,7 +378,7 @@ export function EnhancedTimelineChart({
             {/* Main data line - modern and smooth */}
             <polyline
               fill="none"
-              stroke="#6200D9"
+              stroke="#71E07E"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -454,7 +454,7 @@ export function EnhancedTimelineChart({
           {/* Modern Legend */}
           <div className="absolute top-4 right-4 flex flex-col gap-2">
             <div className="flex items-center gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
-              <div className="w-3 h-3 bg-[#6200D9] rounded-full"></div>
+              <div className="w-3 h-3 bg-[#71E07E] rounded-full"></div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {getMetricLabel(selectedMetric)}
               </span>

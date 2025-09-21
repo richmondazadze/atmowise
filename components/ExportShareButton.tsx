@@ -136,7 +136,7 @@ Track your air quality with AtmoWise!`;
       {/* Floating Action Button */}
       <Button
         onClick={() => setShowOptions(!showOptions)}
-        className="w-12 h-12 rounded-full bg-gradient-to-r from-[#6200D9] to-[#BA5FFF] hover:from-[#4C00A8] hover:to-[#A855F7] text-white shadow-lg hover:shadow-xl transition-all duration-300"
+        className="w-12 h-12 rounded-full bg-gradient-to-r from-[#71E07E] to-[#10B981] hover:from-[#059669] hover:to-[#047857] text-[#0A1C40] shadow-lg hover:shadow-xl transition-all duration-300"
         aria-label="Export or Share"
       >
         <Share2 className="h-5 w-5" />
@@ -157,7 +157,7 @@ Track your air quality with AtmoWise!`;
               className="w-full justify-start gap-3 h-10 text-sm"
             >
               {isExporting ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6200D9]"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#71E07E]"></div>
               ) : (
                 <ImageIcon className="h-4 w-4" />
               )}
@@ -171,7 +171,7 @@ Track your air quality with AtmoWise!`;
               className="w-full justify-start gap-3 h-10 text-sm"
             >
               {isSharing ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6200D9]"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#71E07E]"></div>
               ) : (
                 <Share2 className="h-4 w-4" />
               )}
@@ -199,7 +199,7 @@ Track your air quality with AtmoWise!`;
         <Card>
           <CardContent className="p-6">
             <div className="text-center space-y-4">
-              <div className="text-4xl font-bold text-[#6200D9]">
+              <div className="text-4xl font-bold text-[#71E07E]">
                 {airQualityData.aqi}
               </div>
               <div className="text-lg font-semibold text-gray-700">
