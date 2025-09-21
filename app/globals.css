@@ -373,28 +373,34 @@
 
 /* Cards and containers - Clean dark mode with outlines */
 .dark .bg-white {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 .dark .bg-white.rounded-2xl {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 .dark .bg-white.rounded-xl {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 .dark .bg-white.rounded-lg {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 .dark .bg-white.rounded-md {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Specific card components */
 .dark .card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 .dark .shadow-sm {
@@ -407,68 +413,81 @@
 
 /* Timeline period buttons */
 .dark .bg-white.text-[#64748B] {
-  @apply bg-gray-800 text-gray-300 border border-gray-600;
+  @apply bg-gray-800 text-gray-300;
+  border: 1px solid #4B5563;
 }
 
 /* Specific card types for better mobile dark mode */
 .dark .bg-white.shadow-sm {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
 }
 
 .dark .bg-white.shadow-lg {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 10px 10px -5px rgb(0 0 0 / 0.4);
 }
 
 /* Air quality cards */
 .dark .air-quality-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Symptom form cards */
 .dark .symptom-form-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Tips cards */
 .dark .tips-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Statistics cards */
 .dark .stats-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Profile cards */
 .dark .profile-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Resource cards */
 .dark .resource-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Modal cards */
 .dark .modal-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Settings modal */
 .dark .settings-modal {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Chart containers */
 .dark .chart-container {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Data visualization cards */
 .dark .data-card {
-  @apply bg-gray-900 border border-gray-700;
+  @apply bg-gray-900;
+  border: 1px solid #374151;
 }
 
 /* Modals and overlays */
@@ -477,7 +496,7 @@
 }
 
 /* Floating elements */
-.dark .fixed.bottom-20 {
+.dark .fixed.bottom-20 button {
   @apply bg-gray-800 hover:bg-gray-700;
 }
 
@@ -507,22 +526,26 @@
 /* Mobile-specific card improvements */
 @media (max-width: 768px) {
   .dark .bg-white {
-    @apply bg-gray-900 border border-gray-700;
+    @apply bg-gray-900;
+    border: 1px solid #374151;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
   }
   
   .dark .bg-white.rounded-2xl {
-    @apply bg-gray-900 border border-gray-700;
+    @apply bg-gray-900;
+    border: 1px solid #374151;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
   }
   
   .dark .bg-white.rounded-xl {
-    @apply bg-gray-900 border border-gray-700;
+    @apply bg-gray-900;
+    border: 1px solid #374151;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
   }
   
   .dark .bg-white.rounded-lg {
-    @apply bg-gray-900 border border-gray-700;
+    @apply bg-gray-900;
+    border: 1px solid #374151;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
   }
 }
@@ -531,6 +554,12 @@
 .dark .bg-white\/98 {
   background-color: rgb(23 23 23 / 0.98);
   border: 1px solid rgb(55 65 81);
+}
+
+/* Mobile header dark mode */
+.dark .lg\:hidden.sticky.top-0.z-40.bg-white\/98 {
+  background-color: rgb(23 23 23 / 0.98) !important;
+  border-color: rgb(55 65 81 / 0.5) !important;
 }
 
 .dark .bg-white\/95 {
@@ -570,23 +599,23 @@
 
 /* Card borders and separators */
 .dark .bg-white hr {
-  @apply border-gray-700;
+  border-color: #374151;
 }
 
 .dark .bg-white .border-t {
-  @apply border-gray-700;
+  border-top-color: #374151;
 }
 
 .dark .bg-white .border-b {
-  @apply border-gray-700;
+  border-bottom-color: #374151;
 }
 
 .dark .bg-white .border-l {
-  @apply border-gray-700;
+  border-left-color: #374151;
 }
 
 .dark .bg-white .border-r {
-  @apply border-gray-700;
+  border-right-color: #374151;
 }
 
 /* Card shadows for better depth */
@@ -853,6 +882,52 @@
 
 .dark .to-red-100\/50 {
   --tw-gradient-to: rgb(153 27 27 / 0.5) !important;
+}
+
+/* Dark mode button contrast improvements */
+.dark .bg-gradient-to-r.from-\[#6200D9\].to-\[#7C3AED\] {
+  background: linear-gradient(to right, #7C3AED, #A855F7) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4) !important;
+}
+
+.dark .bg-gradient-to-r.from-\[#6200D9\].to-\[#4C00A8\] {
+  background: linear-gradient(to right, #7C3AED, #6D28D9) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4) !important;
+}
+
+/* Timeline period buttons dark mode */
+.dark .bg-white.text-\[#64748B\].hover\:bg-gray-50 {
+  @apply bg-gray-800 text-gray-200 hover:bg-gray-700 border-gray-600;
+}
+
+/* Tips cards dark mode improvements */
+.dark .bg-gray-50.rounded-xl.border.border-gray-100 {
+  @apply bg-gray-800;
+  border-color: #374151;
+}
+
+.dark .bg-gray-50.rounded-xl.border.border-gray-100:hover {
+  @apply bg-gray-700;
+  border-color: #4B5563;
+}
+
+/* Tips card content dark mode */
+.dark .bg-gray-50 h4 {
+  @apply text-white;
+}
+
+.dark .bg-gray-50 p {
+  @apply text-gray-300;
+}
+
+.dark .bg-gray-50 .text-gray-600 {
+  @apply text-gray-400;
+}
+
+.dark .bg-gray-50 .text-gray-500 {
+  @apply text-gray-400;
 }
   
   /* Gauge Animations */

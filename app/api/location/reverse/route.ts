@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const lat = searchParams.get('lat');
+  const lon = searchParams.get('lon');
+
+  if (!lat || !lon) {
+    return NextResponse.json({ error: 'Missing lat or lon parameters' }, { status: 400 });
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const lat = searchParams.get('lat');
-    const lon = searchParams.get('lon');
-
-    if (!lat || !lon) {
-      return NextResponse.json({ error: 'Missing lat or lon parameters' }, { status: 400 });
-    }
-
     const openWeatherApiKey = process.env.OPENWEATHER_API_KEY;
     
     if (!openWeatherApiKey) {
@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
       name: 'Current Location',
       state: '',
       country: 'Unknown',
-      lat: parseFloat(searchParams.get('lat') || '0'),
-      lon: parseFloat(searchParams.get('lon') || '0')
+      lat: parseFloat(lat || '0'),
+      lon: parseFloat(lon || '0')
     }]);
   }
 }

@@ -416,14 +416,14 @@ export function EnhancedTimelineChart({
         </div>
 
         {/* Best Time Windows */}
-        {statistics.bestTime && (
-          <div className="mt-4 p-3 lg:p-4 bg-green-50 rounded-lg border border-green-200">
+        {statistics.bestTime && !isNaN(statistics.bestTime.hour) && statistics.bestTime.hour >= 0 && statistics.bestTime.hour <= 23 && (
+          <div className="mt-4 p-3 lg:p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-semibold text-green-800">Best Time for Outdoor Activities</span>
+              <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-semibold text-green-800 dark:text-green-200">Best Time for Outdoor Activities</span>
             </div>
-            <div className="text-sm text-green-700">
-              {statistics.bestTime ? `${statistics.bestTime.hour}:00 - AQI ${statistics.bestTime.value} (Lowest pollution)` : 'No data available'}
+            <div className="text-sm text-green-700 dark:text-green-300">
+              {statistics.bestTime.hour.toString().padStart(2, '0')}:00 - AQI {statistics.bestTime.value} (Lowest pollution)
             </div>
           </div>
         )}
