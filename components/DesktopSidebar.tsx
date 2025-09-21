@@ -41,7 +41,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
 
   const mainNavItems: NavItem[] = [
     {
-      path: "/dashboard",
+      path: "/",
       icon: Home,
       label: "Dashboard",
       description: "Overview & insights",
@@ -83,7 +83,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
         <Link
           href={item.path}
           className={cn(
-            "relative flex items-center rounded-xl font-medium transition-all duration-300 ease-out group overflow-hidden",
+            "relative flex items-center rounded-xl font-medium transition-all duration-200 ease-in-out group overflow-hidden",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6200D9] focus-visible:ring-offset-2",
             isCollapsed ? "p-3 justify-center w-12 h-12" : "px-4 py-3",
             isActive
@@ -93,13 +93,13 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
         >
           <div
             className={cn(
-              "flex items-center justify-center transition-all duration-300 ease-out",
-              isCollapsed ? "w-5 h-5 mx-auto" : "w-5 h-5 flex-shrink-0"
+              "flex items-center justify-center transition-all duration-200",
+              isCollapsed ? "w-5 h-5" : "w-5 h-5 flex-shrink-0"
             )}
           >
             <Icon
               className={cn(
-                "transition-all duration-300 ease-out",
+                "transition-colors duration-200",
                 isCollapsed ? "w-5 h-5" : "w-5 h-5",
                 isActive
                   ? "text-white"
@@ -110,7 +110,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
 
           <div
             className={cn(
-              "transition-all duration-300 ease-out overflow-hidden",
+              "transition-all duration-200 ease-in-out overflow-hidden",
               isCollapsed
                 ? "w-0 opacity-0 ml-0"
                 : "w-auto opacity-100 ml-3 flex-1"
@@ -121,7 +121,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
             </div>
             <div
               className={cn(
-                "text-xs leading-tight mt-0.5 transition-colors duration-300 ease-out truncate",
+                "text-xs leading-tight mt-0.5 transition-colors duration-200 truncate",
                 isActive
                   ? "text-white/80"
                   : "text-[#64748B] group-hover:text-[#0A1C40]/80"
@@ -156,9 +156,8 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 h-screen bg-white/95 backdrop-blur-sm border-r border-gray-200/80 shadow-xl transition-all duration-300 ease-out z-50 flex flex-col",
+        "fixed left-0 top-0 h-screen bg-white/95 backdrop-blur-sm border-r border-gray-200/80 shadow-xl transition-all duration-300 ease-in-out z-50 flex flex-col",
         isCollapsed ? "w-16" : "w-64",
-        "overflow-x-hidden", // Prevent horizontal scrolling
         className
       )}
     >
@@ -168,13 +167,13 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
           <div className="flex items-center">
             <div
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="w-8 h-8 bg-gradient-to-br from-[#6200D9] to-[#4C00A8] rounded-lg flex items-center justify-center shadow-md flex-shrink-0 cursor-pointer transition-transform duration-300 ease-out hover:scale-105"
+              className="w-8 h-8 bg-gradient-to-br from-[#6200D9] to-[#4C00A8] rounded-lg flex items-center justify-center shadow-md flex-shrink-0 cursor-pointer"
             >
-              <Wind className="h-4 w-4 text-white transition-transform duration-300 ease-out" />
+              <Wind className="h-4 w-4 text-white" />
             </div>
             <div
               className={cn(
-                "transition-all duration-300 ease-out overflow-hidden",
+                "transition-all duration-300 ease-in-out overflow-hidden",
                 isCollapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100 ml-3"
               )}
             >
@@ -187,14 +186,29 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
             </div>
           </div>
 
+          {/* Collapse Toggle Button - Only show when not collapsed */}
+          {!isCollapsed && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="h-7 w-7 p-0 text-gray-500 hover:text-[#0A1C40] hover:bg-gray-100 rounded-md flex-shrink-0"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </Button>
+          )}
         </div>
       </div>
 
       {/* Navigation Content */}
-      <div className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto py-4">
         {/* Main Navigation */}
-        <nav className={cn("space-y-3 mt-12", isCollapsed ? "px-2" : "px-4")}>
-          
+        <nav className={cn("space-y-2", isCollapsed ? "px-2" : "px-4")}>
+          {!isCollapsed && (
+            <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2">
+              Navigation
+            </h2>
+          )}
           {mainNavItems.map((item) => (
             <NavItemComponent
               key={item.path}
@@ -211,7 +225,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
 
         <div
           className={cn(
-            "my-4 border-t border-gray-200/60 transition-all duration-300 ease-out",
+            "my-4 border-t border-gray-200/60",
             isCollapsed ? "mx-2" : "mx-4"
           )}
         />
@@ -254,30 +268,28 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
       {/* Footer */}
       <div
         className={cn(
-          "border-t border-gray-200/50 flex-shrink-0 transition-all duration-300 ease-out",
+          "border-t border-gray-200/50 flex-shrink-0",
           isCollapsed ? "p-3" : "p-4"
         )}
       >
         {!isCollapsed && (
-          <div className="flex items-center space-x-3 mb-3 transition-all duration-300 ease-out">
-            <Avatar className="h-8 w-8 ring-1 ring-gray-200 transition-all duration-300 ease-out">
+          <div className="flex items-center space-x-3 mb-3">
+            <Avatar className="h-8 w-8 ring-1 ring-gray-200">
               <AvatarImage
                 src={`https://api.dicebear.com/7.x/initials/svg?seed=${
                   user?.email || "User"
                 }`}
                 alt="User Avatar"
               />
-              <AvatarFallback className="bg-gradient-to-br from-[#6200D9] to-[#4C00A8] text-white text-xs whitespace-nowrap transition-all duration-300 ease-out">
+              <AvatarFallback className="bg-gradient-to-br from-[#6200D9] to-[#4C00A8] text-white text-xs">
                 {user?.email?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0 transition-all duration-300 ease-out">
-              <p className="text-sm font-medium text-[#0A1C40] truncate whitespace-nowrap">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-[#0A1C40] truncate">
                 {user?.email?.split("@")[0] || "User"}
               </p>
-              <p className="text-xs text-[#64748B] whitespace-nowrap">
-                User Account
-              </p>
+              <p className="text-xs text-[#64748B]">User Account</p>
             </div>
           </div>
         )}
@@ -287,7 +299,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
           size="sm"
           onClick={signOut}
           className={cn(
-            "w-full text-[#64748B] hover:text-[#0A1C40] hover:bg-gray-100 rounded-lg transition-all duration-300 ease-out",
+            "w-full text-[#64748B] hover:text-[#0A1C40] hover:bg-gray-100 rounded-lg",
             isCollapsed
               ? "justify-center p-2 h-12 w-12"
               : "justify-start px-3 py-2 h-10"
@@ -295,15 +307,11 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
         >
           <LogOut
             className={cn(
-              "transition-all duration-300 ease-out",
+              "transition-colors",
               isCollapsed ? "h-5 w-5" : "h-4 w-4"
             )}
           />
-          {!isCollapsed && (
-            <span className="ml-2 font-medium transition-all duration-300 ease-out">
-              Sign Out
-            </span>
-          )}
+          {!isCollapsed && <span className="ml-2 font-medium">Sign Out</span>}
         </Button>
       </div>
     </aside>
