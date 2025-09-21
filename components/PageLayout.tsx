@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -11,13 +11,13 @@ interface PageLayoutProps {
 
 export function PageLayout({ children, className }: PageLayoutProps) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ 
-        duration: 0.4, 
-        ease: [0.25, 0.46, 0.45, 0.94] 
+      transition={{
+        duration: 0.4,
+        ease: [0.25, 0.46, 0.45, 0.94],
       }}
       className={cn(
         "min-h-screen bg-background",
@@ -26,7 +26,7 @@ export function PageLayout({ children, className }: PageLayoutProps) {
         className
       )}
     >
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, delay: 0.1 }}

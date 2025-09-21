@@ -1,46 +1,46 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '@/contexts/AuthContext'
-import { useToast } from '@/hooks/use-toast'
-import { PageLayout } from '@/components/PageLayout'
-import { Navigation } from '@/components/Navigation'
-import { FloatingSettingsButton } from '@/components/FloatingSettingsButton'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
-import { Separator } from '@/components/ui/separator'
-import { User, Edit3, X, Save, AlertCircle, CheckCircle } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import type { Profile } from '@shared/schema'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { PageLayout } from "@/components/PageLayout";
+import { Navigation } from "@/components/Navigation";
+import { FloatingSettingsButton } from "@/components/FloatingSettingsButton";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { User, Edit3, X, Save, AlertCircle, CheckCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import type { Profile } from "@shared/schema";
 
 export default function ProfilePage() {
   const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [formData, setFormData] = useState({
-    displayName: '',
+    displayName: "",
     sensitivity: {
       asthma: false,
       pregnant: false,
-      ageGroup: 'adult' as 'child' | 'adult' | 'elderly',
+      ageGroup: "adult" as "child" | "adult" | "elderly",
       cardiopulmonary: false,
-    }
+    },
   });
 
   // Redirect to auth if not logged in
   useEffect(() => {
     if (!user) {
-      router.push('/auth');
+      router.push("/auth");
     }
   }, [user, router]);
 
@@ -48,12 +48,12 @@ export default function ProfilePage() {
   const {
     data: profile,
     isLoading: profileLoading,
-    error: profileError
+    error: profileError,
   } = useQuery({
-    queryKey: ['profile', user?.id],
+    queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      
+
       try {
         const response = await fetch(`/api/profile/${user.id}`);
         if (response.ok) {
@@ -61,7 +61,7 @@ export default function ProfilePage() {
         }
         return null;
       } catch (error) {
-        console.error('Profile fetch error:', error);
+        console.error("Profile fetch error:", error);
         return null;
       }
     },
@@ -72,23 +72,23 @@ export default function ProfilePage() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: async (updatedProfile: Partial<Profile>) => {
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user?.id,
-          ...updatedProfile
-        })
+          ...updatedProfile,
+        }),
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error("Failed to update profile");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["profile", user?.id] });
       toast({
         title: "Profile Updated",
         description: "Your profile has been updated successfully.",
@@ -97,26 +97,26 @@ export default function ProfilePage() {
       setHasChanges(false);
     },
     onError: (error) => {
-      console.error('Profile update error:', error);
+      console.error("Profile update error:", error);
       toast({
         title: "Update Failed",
         description: "Failed to update profile. Please try again.",
         variant: "destructive",
       });
-    }
+    },
   });
 
   // Initialize form data when profile loads
   useEffect(() => {
     if (profile) {
       setFormData({
-        displayName: profile.displayName || '',
+        displayName: profile.displayName || "",
         sensitivity: {
           asthma: profile.sensitivity?.asthma || false,
           pregnant: profile.sensitivity?.pregnant || false,
-          ageGroup: profile.sensitivity?.ageGroup || 'adult',
+          ageGroup: profile.sensitivity?.ageGroup || "adult",
           cardiopulmonary: profile.sensitivity?.cardiopulmonary || false,
-        }
+        },
       });
     }
   }, [profile]);
@@ -124,36 +124,40 @@ export default function ProfilePage() {
   // Check for changes
   useEffect(() => {
     if (profile) {
-      const hasFormChanges = 
-        formData.displayName !== (profile.displayName || '') ||
-        formData.sensitivity.asthma !== (profile.sensitivity?.asthma || false) ||
-        formData.sensitivity.pregnant !== (profile.sensitivity?.pregnant || false) ||
-        formData.sensitivity.ageGroup !== (profile.sensitivity?.ageGroup || 'adult') ||
-        formData.sensitivity.cardiopulmonary !== (profile.sensitivity?.cardiopulmonary || false);
-      
+      const hasFormChanges =
+        formData.displayName !== (profile.displayName || "") ||
+        formData.sensitivity.asthma !==
+          (profile.sensitivity?.asthma || false) ||
+        formData.sensitivity.pregnant !==
+          (profile.sensitivity?.pregnant || false) ||
+        formData.sensitivity.ageGroup !==
+          (profile.sensitivity?.ageGroup || "adult") ||
+        formData.sensitivity.cardiopulmonary !==
+          (profile.sensitivity?.cardiopulmonary || false);
+
       setHasChanges(hasFormChanges);
     }
   }, [formData, profile]);
 
   const handleSave = () => {
     if (!profile) return;
-    
+
     updateProfileMutation.mutate({
       displayName: formData.displayName,
-      sensitivity: formData.sensitivity
+      sensitivity: formData.sensitivity,
     });
   };
 
   const handleCancel = () => {
     if (profile) {
       setFormData({
-        displayName: profile.displayName || '',
+        displayName: profile.displayName || "",
         sensitivity: {
           asthma: profile.sensitivity?.asthma || false,
           pregnant: profile.sensitivity?.pregnant || false,
-          ageGroup: profile.sensitivity?.ageGroup || 'adult',
+          ageGroup: profile.sensitivity?.ageGroup || "adult",
           cardiopulmonary: profile.sensitivity?.cardiopulmonary || false,
-        }
+        },
       });
     }
     setIsEditing(false);
@@ -163,13 +167,13 @@ export default function ProfilePage() {
   // Show loading state
   if (!user) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center"
       >
         <div className="text-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -177,7 +181,7 @@ export default function ProfilePage() {
           >
             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
           </motion.div>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
@@ -198,17 +202,17 @@ export default function ProfilePage() {
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="lg:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 py-4 mb-6"
+          className="lg:hidden sticky top-0 z-40 dark:bg-gray-900 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 py-4 mb-6"
         >
           <div className="px-4">
             <div className="flex items-center justify-between">
-              <motion.div 
+              <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
                 className="flex items-center space-x-3 min-w-0 flex-1"
               >
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
@@ -217,11 +221,15 @@ export default function ProfilePage() {
                   <User className="h-5 w-5 text-white drop-shadow-sm" />
                 </motion.div>
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">Profile</h1>
-                  <p className="text-xs text-[#64748B] font-medium truncate">Account & preferences</p>
+                  <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">
+                    Profile
+                  </h1>
+                  <p className="text-xs text-[#64748B] font-medium truncate">
+                    Account & preferences
+                  </p>
                 </div>
               </motion.div>
-              <motion.div 
+              <motion.div
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.3 }}
@@ -234,7 +242,10 @@ export default function ProfilePage() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                     >
-                      <Badge variant="outline" className="text-orange-600 border-orange-200 text-xs px-2 py-1 rounded-full font-medium">
+                      <Badge
+                        variant="outline"
+                        className="text-orange-600 border-orange-200 text-xs px-2 py-1 rounded-full font-medium"
+                      >
                         Unsaved
                       </Badge>
                     </motion.div>
@@ -278,9 +289,11 @@ export default function ProfilePage() {
                 transition={{ duration: 0.4, delay: 0.2 }}
               >
                 <h1 className="heading-1 text-[#0A1C40]">Profile</h1>
-                <p className="body-large text-[#64748B]">Manage your account and health preferences</p>
+                <p className="body-large text-[#64748B]">
+                  Manage your account and health preferences
+                </p>
               </motion.div>
-              <motion.div 
+              <motion.div
                 initial={{ x: 20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.3 }}
@@ -293,7 +306,10 @@ export default function ProfilePage() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                     >
-                      <Badge variant="outline" className="text-orange-600 border-orange-200">
+                      <Badge
+                        variant="outline"
+                        className="text-orange-600 border-orange-200"
+                      >
                         Unsaved Changes
                       </Badge>
                     </motion.div>
@@ -326,7 +342,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8"
+          className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8 dark:bg-gray-800"
         >
           <div className="max-w-4xl mx-auto">
             {profileLoading ? (
@@ -350,9 +366,16 @@ export default function ProfilePage() {
                 className="text-center py-12"
               >
                 <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to load profile</h3>
-                <p className="text-gray-600 mb-4">There was an error loading your profile data.</p>
-                <Button onClick={() => window.location.reload()} variant="outline">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Failed to load profile
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  There was an error loading your profile data.
+                </p>
+                <Button
+                  onClick={() => window.location.reload()}
+                  variant="outline"
+                >
                   Try Again
                 </Button>
               </motion.div>
@@ -377,7 +400,7 @@ export default function ProfilePage() {
                           <Label htmlFor="email">Email Address</Label>
                           <Input
                             id="email"
-                            value={user?.email || ''}
+                            value={user?.email || ""}
                             disabled
                             className="bg-gray-50"
                           />
@@ -387,7 +410,12 @@ export default function ProfilePage() {
                           <Input
                             id="displayName"
                             value={formData.displayName}
-                            onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                displayName: e.target.value,
+                              }))
+                            }
                             disabled={!isEditing}
                             placeholder="Enter your display name"
                           />
@@ -419,71 +447,91 @@ export default function ProfilePage() {
                           <div className="flex items-center justify-between">
                             <div>
                               <Label htmlFor="asthma">Asthma</Label>
-                              <p className="text-sm text-gray-600">I have asthma or breathing difficulties</p>
+                              <p className="text-sm text-gray-600">
+                                I have asthma or breathing difficulties
+                              </p>
                             </div>
                             <Switch
                               id="asthma"
                               checked={formData.sensitivity.asthma}
-                              onCheckedChange={(checked) => 
-                                setFormData(prev => ({
+                              onCheckedChange={(checked) =>
+                                setFormData((prev) => ({
                                   ...prev,
-                                  sensitivity: { ...prev.sensitivity, asthma: checked }
+                                  sensitivity: {
+                                    ...prev.sensitivity,
+                                    asthma: checked,
+                                  },
                                 }))
                               }
                               disabled={!isEditing}
                             />
                           </div>
-                          
+
                           <div className="flex items-center justify-between">
                             <div>
                               <Label htmlFor="pregnant">Pregnant</Label>
-                              <p className="text-sm text-gray-600">I am currently pregnant</p>
+                              <p className="text-sm text-gray-600">
+                                I am currently pregnant
+                              </p>
                             </div>
                             <Switch
                               id="pregnant"
                               checked={formData.sensitivity.pregnant}
-                              onCheckedChange={(checked) => 
-                                setFormData(prev => ({
+                              onCheckedChange={(checked) =>
+                                setFormData((prev) => ({
                                   ...prev,
-                                  sensitivity: { ...prev.sensitivity, pregnant: checked }
+                                  sensitivity: {
+                                    ...prev.sensitivity,
+                                    pregnant: checked,
+                                  },
                                 }))
                               }
                               disabled={!isEditing}
                             />
                           </div>
                         </div>
-                        
+
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
                             <div>
-                              <Label htmlFor="cardiopulmonary">Cardiopulmonary Issues</Label>
-                              <p className="text-sm text-gray-600">I have heart or lung conditions</p>
+                              <Label htmlFor="cardiopulmonary">
+                                Cardiopulmonary Issues
+                              </Label>
+                              <p className="text-sm text-gray-600">
+                                I have heart or lung conditions
+                              </p>
                             </div>
                             <Switch
                               id="cardiopulmonary"
                               checked={formData.sensitivity.cardiopulmonary}
-                              onCheckedChange={(checked) => 
-                                setFormData(prev => ({
+                              onCheckedChange={(checked) =>
+                                setFormData((prev) => ({
                                   ...prev,
-                                  sensitivity: { ...prev.sensitivity, cardiopulmonary: checked }
+                                  sensitivity: {
+                                    ...prev.sensitivity,
+                                    cardiopulmonary: checked,
+                                  },
                                 }))
                               }
                               disabled={!isEditing}
                             />
                           </div>
-                          
+
                           <div className="space-y-2">
                             <Label htmlFor="ageGroup">Age Group</Label>
                             <select
                               id="ageGroup"
                               value={formData.sensitivity.ageGroup}
-                              onChange={(e) => 
-                                setFormData(prev => ({
+                              onChange={(e) =>
+                                setFormData((prev) => ({
                                   ...prev,
-                                  sensitivity: { 
-                                    ...prev.sensitivity, 
-                                    ageGroup: e.target.value as 'child' | 'adult' | 'elderly' 
-                                  }
+                                  sensitivity: {
+                                    ...prev.sensitivity,
+                                    ageGroup: e.target.value as
+                                      | "child"
+                                      | "adult"
+                                      | "elderly",
+                                  },
                                 }))
                               }
                               disabled={!isEditing}
@@ -519,7 +567,9 @@ export default function ProfilePage() {
                       </Button>
                       <Button
                         onClick={handleSave}
-                        disabled={!hasChanges || updateProfileMutation.isPending}
+                        disabled={
+                          !hasChanges || updateProfileMutation.isPending
+                        }
                         className="flex items-center gap-2 transition-all duration-200 hover:scale-105"
                       >
                         {updateProfileMutation.isPending ? (
@@ -544,7 +594,7 @@ export default function ProfilePage() {
 
         {/* Navigation */}
         <Navigation />
-        
+
         {/* Floating Settings Button */}
         <FloatingSettingsButton />
       </div>
