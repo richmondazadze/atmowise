@@ -98,6 +98,86 @@
   @apply border-gray-600;
 }
 
+/* Level buttons dark mode fixes */
+.dark .bg-green-50 {
+  @apply bg-green-900/20;
+}
+
+.dark .text-green-700 {
+  @apply text-green-300;
+}
+
+.dark .border-green-200 {
+  @apply border-green-700;
+}
+
+.dark .bg-yellow-50 {
+  @apply bg-yellow-900/20;
+}
+
+.dark .text-yellow-700 {
+  @apply text-yellow-300;
+}
+
+.dark .border-yellow-200 {
+  @apply border-yellow-700;
+}
+
+.dark .bg-red-50 {
+  @apply bg-red-900/20;
+}
+
+.dark .text-red-700 {
+  @apply text-red-300;
+}
+
+.dark .border-red-200 {
+  @apply border-red-700;
+}
+
+/* Location bar dark mode fixes */
+.dark .bg-\[\#F8FAFC\] {
+  @apply bg-gray-900;
+}
+
+.dark .text-\[\#64748B\] {
+  @apply text-gray-300;
+}
+
+/* Tips card tags dark mode fixes */
+.dark .bg-gray-50.rounded-xl.border.border-gray-100 {
+  @apply bg-gray-800 border-gray-700;
+}
+
+.dark .bg-gray-50.rounded-xl.border.border-gray-100:hover {
+  @apply bg-gray-700 border-gray-600;
+}
+
+.dark .text-gray-600 {
+  @apply text-gray-300;
+}
+
+.dark .text-gray-500 {
+  @apply text-gray-400;
+}
+
+/* Pollutant gauge dark mode fixes */
+.dark .text-gray-600 {
+  @apply text-gray-300;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-gray-700;
+}
+
+.dark .text-gray-800 {
+  @apply text-gray-200;
+}
+
+.dark .text-gray-900 {
+  @apply text-white;
+}
+
 .dark .border-gray-300 {
   @apply border-gray-500;
 }

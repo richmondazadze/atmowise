@@ -535,10 +535,10 @@ export default function Dashboard() {
       </header>
 
       {/* Mobile Location Status */}
-      <div className="lg:hidden bg-[#F8FAFC] border-b border-[#E2E8F0] px-4 py-3">
+      <div className="lg:hidden bg-[#F8FAFC] dark:bg-gray-900 border-b border-[#E2E8F0] dark:border-gray-700 px-4 py-3">
         <div className="flex items-center space-x-2 text-sm">
-          <MapPin className="h-4 w-4 text-[#6200D9] flex-shrink-0" />
-          <span className="text-[#64748B] truncate flex-1 min-w-0">
+          <MapPin className="h-4 w-4 text-[#6200D9] dark:text-purple-400 flex-shrink-0" />
+          <span className="text-[#64748B] dark:text-gray-300 truncate flex-1 min-w-0">
                   {locationLoading && !selectedLocation
                     ? "Getting location..."
                     : locationError && !selectedLocation
@@ -546,7 +546,7 @@ export default function Dashboard() {
                     : currentLocationLabel}
                 </span>
                 {selectedLocation && (
-            <span className="text-xs bg-[#6200D9] text-white px-2 py-1 rounded-full font-medium flex-shrink-0">
+            <span className="text-xs bg-[#6200D9] dark:bg-purple-600 text-white px-2 py-1 rounded-full font-medium flex-shrink-0">
                     Selected
                   </span>
                 )}

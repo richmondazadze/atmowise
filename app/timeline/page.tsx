@@ -245,7 +245,7 @@ export default function TimelinePage() {
                   className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap touch-target ${
                     selectedPeriod === period.value
                       ? 'bg-gradient-to-r from-[#6200D9] to-[#7C3AED] text-white shadow-lg'
-                      : 'bg-white text-[#64748B] hover:bg-gray-50 border border-gray-200'
+                      : 'bg-white dark:bg-gray-800 text-[#64748B] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
                   }`}
                 >
                   {period.label}

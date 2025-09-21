@@ -82,19 +82,19 @@ const categoryIcons = {
 };
 
 const categoryColors = {
-  immediate: "bg-red-50 text-red-700 border-red-200",
-  prevention: "bg-blue-50 text-blue-700 border-blue-200",
-  lifestyle: "bg-green-50 text-green-700 border-green-200",
-  medical: "bg-purple-50 text-purple-700 border-purple-200",
-  general: "bg-gray-50 text-gray-700 border-gray-200",
+  immediate: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700",
+  prevention: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-700",
+  lifestyle: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700",
+  medical: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-700",
+  general: "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600",
 };
 
 const categoryIconsBg = {
-  immediate: "bg-red-100",
-  prevention: "bg-blue-100",
-  lifestyle: "bg-green-100",
-  medical: "bg-purple-100",
-  general: "bg-gray-100",
+  immediate: "bg-red-100 dark:bg-red-900/30",
+  prevention: "bg-blue-100 dark:bg-blue-900/30",
+  lifestyle: "bg-green-100 dark:bg-green-900/30",
+  medical: "bg-purple-100 dark:bg-purple-900/30",
+  general: "bg-gray-100 dark:bg-gray-800",
 };
 
 export function TipsCard({
@@ -198,19 +198,13 @@ export function TipsCard({
     <>
       <Card className={`bg-white shadow-sm border-0 ${className}`}>
         <CardHeader className="px-4 py-4 sm:px-6 sm:py-5">
-          <CardTitle className="flex items-center justify-between text-lg font-semibold text-gray-900">
+          <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Lightbulb className="h-4 w-4 text-blue-600" />
               </div>
               <span>Health Tips</span>
             </div>
-            <Badge
-              variant="secondary"
-              className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-medium"
-            >
-              {filteredAndSortedTips.length}
-            </Badge>
           </CardTitle>
 
           {/* Mobile-Optimized Filtering UI */}
@@ -315,7 +309,7 @@ export function TipsCard({
                   return (
                     <div
                       key={tip.id}
-                      className="mx-4 mb-2 bg-gray-50 rounded-xl border border-gray-100 hover:bg-gray-100 hover:border-gray-200 transition-all duration-200 cursor-pointer group"
+                      className="mx-4 mb-2 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-all duration-200 cursor-pointer group"
                       onClick={() => handleTipClick(tip)}
                     >
                       <div className="p-4">
@@ -324,14 +318,14 @@ export function TipsCard({
                           <div
                             className={`w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}
                           >
-                            <IconComponent className="h-5 w-5 text-gray-600" />
+                            <IconComponent className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                           </div>
 
                           {/* Content */}
                           <div className="flex-1 min-w-0">
                             {/* Header with title and badges */}
                             <div className="flex items-start justify-between mb-2">
-                              <h4 className="font-semibold text-gray-900 text-sm leading-tight pr-2">
+                              <h4 className="font-semibold text-gray-900 dark:text-white text-sm leading-tight pr-2">
                                 {title}
                               </h4>
                               <div className="flex items-center gap-1 flex-shrink-0">
@@ -374,7 +368,7 @@ export function TipsCard({
                               </Badge>
                               <Badge
                                 variant="outline"
-                                className="text-xs px-2 py-1 text-gray-600 border-gray-300"
+                                className="text-xs px-2 py-1 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600"
                               >
                                 {timeCategory === "today"
                                   ? "Today"
@@ -384,13 +378,13 @@ export function TipsCard({
                                   ? "This Month"
                                   : "Older"}
                               </Badge>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
                                 {new Date(tip.createdAt).toLocaleDateString()}
                               </span>
                             </div>
 
                             {/* Description */}
-                            <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
+                            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
                               {description}
                             </p>
                           </div>

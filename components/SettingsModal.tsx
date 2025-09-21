@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Settings, Moon, Sun, Type, Palette, Bell, Shield, HelpCircle, LogOut } from 'lucide-react';
+import { Settings, Moon, Sun, Type, Palette, Bell, Shield, LogOut } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -129,42 +129,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   onCheckedChange={setDataPrivacy}
                 />
               </div>
-            </div>
-          </div>
-
-          <Separator className="bg-gray-200 dark:bg-gray-700" />
-
-          {/* Help Section */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-              <HelpCircle className="h-4 w-4" />
-              Support
-            </h3>
-            
-            <div className="space-y-2">
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-10 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => {
-                  // TODO: Implement help functionality
-                  console.log('Help clicked');
-                }}
-              >
-                <HelpCircle className="h-4 w-4 mr-3" />
-                Help Center
-              </Button>
-              
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-10 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => {
-                  // TODO: Implement feedback functionality
-                  console.log('Feedback clicked');
-                }}
-              >
-                <Settings className="h-4 w-4 mr-3" />
-                Send Feedback
-              </Button>
             </div>
           </div>
 

@@ -158,9 +158,9 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
           <Badge 
             variant="outline" 
             className={`text-sm font-semibold px-4 py-2 ${
-              severity[0] <= 2 ? 'bg-green-50 text-green-700 border-green-200' :
-              severity[0] <= 3 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-              'bg-red-50 text-red-700 border-red-200'
+              severity[0] <= 2 ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-700' :
+              severity[0] <= 3 ? 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-700' :
+              'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700'
             }`} 
             data-testid="badge-severity"
           >
