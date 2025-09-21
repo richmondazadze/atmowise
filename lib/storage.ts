@@ -30,7 +30,7 @@ export class StorageManager {
     if (typeof window === 'undefined') {
       throw new Error('Storage is not available in server-side environment');
     }
-    return this.config.type === 'localStorage' ? localStorage : sessionStorage;
+    return this.config.type === 'localStorage' ? window.localStorage : window.sessionStorage;
   }
 
   private getKey(key: string): string {
@@ -232,6 +232,9 @@ export interface AppState {
   sidebarCollapsed: boolean;
   welcomeShown: boolean;
 }
+
+// Import migration system
+import './storage-migration';
 
 // Convenience functions for common storage operations
 export const storage = {

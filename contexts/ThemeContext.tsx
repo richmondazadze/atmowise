@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { storage } from '@/lib/storage';
 
 interface ThemeContextType {
   isDarkMode: boolean;
@@ -12,9 +13,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Load theme preferences from localStorage
+  // Load theme preferences from storage
   useEffect(() => {
-    const savedDarkMode = localStorage.getItem('atmowise-dark-mode') === 'true';
+    const savedDarkMode = storage.getDarkMode();
     setIsDarkMode(savedDarkMode);
   }, []);
 
@@ -31,7 +32,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode;
     setIsDarkMode(newDarkMode);
-    localStorage.setItem('atmowise-dark-mode', newDarkMode.toString());
+    storage.setDarkMode(newDarkMode);
   };
 
 

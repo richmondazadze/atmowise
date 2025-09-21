@@ -14,6 +14,7 @@ import { PageLayout } from '@/components/PageLayout';
 import { EnhancedTimelineChart } from '@/components/EnhancedTimelineChart';
 import { FloatingSettingsButton } from '@/components/FloatingSettingsButton';
 import { useToast } from '@/hooks/use-toast';
+import { storage } from '@/lib/storage';
 
 interface TimelineData {
   id: string;
@@ -34,8 +35,17 @@ export default function TimelinePage() {
   const { user } = useAuth();
   const { selectedLocation } = useLocation();
   const { toast } = useToast();
-  const [selectedPeriod, setSelectedPeriod] = useState('7d');
-  const [selectedMetric, setSelectedMetric] = useState('aqi');
+  const [selectedPeriod, setSelectedPeriod] = useState(storage.getTimelinePeriod());
+  const [selectedMetric, setSelectedMetric] = useState(storage.getTimelineMetric());
+
+  // Save preferences when they change
+  useEffect(() => {
+    storage.setTimelinePeriod(selectedPeriod);
+  }, [selectedPeriod]);
+
+  useEffect(() => {
+    storage.setTimelineMetric(selectedMetric);
+  }, [selectedMetric]);
 
   // Convert period to days
   const getDaysFromPeriod = (period: string) => {

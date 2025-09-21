@@ -10,8 +10,6 @@ import {
   LifeBuoy,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   Wind,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -43,7 +41,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
 
   const mainNavItems: NavItem[] = [
     {
-      path: "/",
+      path: "/dashboard",
       icon: Home,
       label: "Dashboard",
       description: "Overview & insights",
@@ -188,36 +186,21 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
             </div>
           </div>
 
-          {/* Collapse Toggle Button - Only show when not collapsed */}
-          {!isCollapsed && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className="h-7 w-7 p-0 text-gray-500 hover:text-[#0A1C40] hover:bg-gray-100 rounded-md flex-shrink-0"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </Button>
-          )}
         </div>
       </div>
 
       {/* Navigation Content */}
       <div className="flex-1 overflow-y-auto py-4">
         {/* Main Navigation */}
-        <nav className={cn("space-y-2", isCollapsed ? "px-2" : "px-4")}>
-          {!isCollapsed && (
-            <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2">
-              Navigation
-            </h2>
-          )}
+        <nav className={cn("space-y-3 mt-16", isCollapsed ? "px-2" : "px-4")}>
+          
           {mainNavItems.map((item) => (
             <NavItemComponent
               key={item.path}
               item={item}
               isActive={
-                item.path === "/"
-                  ? pathname === "/"
+                item.path === "/dashboard"
+                  ? pathname === "/dashboard"
                   : pathname === item.path ||
                     pathname.startsWith(item.path + "/")
               }

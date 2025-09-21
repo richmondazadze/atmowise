@@ -130,8 +130,8 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
   }
 
   return (
-    <Card className="card-solid rounded-xl lg:rounded-2xl p-3 lg:p-4 hover:shadow-xl transition-all duration-300">
-      <CardHeader className="pb-4">
+    <Card className="card-solid rounded-xl lg:rounded-2xl p-1 lg:p-1 hover:shadow-xl transition-all duration-300">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg lg:text-xl font-bold text-[#0A1C40] flex items-center gap-2">
             <MapPin className="h-5 w-5 text-[#6200D9]" />
@@ -264,7 +264,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                   key={place.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#6200D9]/30 hover:shadow-md transition-all duration-200 cursor-pointer group touch-target"
+                  className="p-1.5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#6200D9]/30 hover:shadow-md transition-all duration-200 cursor-pointer group touch-target"
                   onClick={() => handlePlaceSelect(place)}
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -276,9 +276,11 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                         <h4 className="font-semibold text-[#0A1C40] dark:text-white group-hover:text-[#6200D9] transition-colors truncate">
                           {place.name}
                         </h4>
-                        <Badge variant="outline" className="text-xs mt-1 dark:border-gray-600 dark:text-gray-300">
-                          {typeInfo.label}
-                        </Badge>
+                        {place.name !== typeInfo.label && (
+                          <Badge variant="outline" className="text-xs mt-1 dark:border-gray-600 dark:text-gray-300">
+                            {typeInfo.label}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <Button

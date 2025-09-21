@@ -20,6 +20,8 @@ import { LLMResponseCard } from '@/components/LLMResponseCard'
 import { TipsCard } from '@/components/TipsCard'
 import { ExportShareButton } from '@/components/ExportShareButton'
 import { apiRequest } from '@/lib/queryClient'
+import { Button } from '@/components/ui/button'
+import { MapPin, RefreshCw } from 'lucide-react'
 import type { Profile } from "@shared/schema"
 
 export default function DashboardPage() {
@@ -179,6 +181,25 @@ export default function DashboardPage() {
     }
   };
 
+  // Handle location refresh
+  const handleLocationRefresh = async () => {
+    try {
+      await refetchLocation();
+      await refetchAirQuality();
+      toast({
+        title: "Location & Air Quality Refreshed",
+        description: "Latest data has been fetched.",
+      });
+    } catch (error) {
+      console.error('Location refresh error:', error);
+      toast({
+        title: "Refresh Failed",
+        description: "Could not refresh location data. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Profile data
   const {
     data: profile,
@@ -295,38 +316,57 @@ export default function DashboardPage() {
               <h1 className="heading-1 text-[#0A1C40]">Dashboard</h1>
               <p className="body-large text-[#64748B]">Your personalized air quality health overview</p>
             </div>
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowLocationPicker(true)}
+                className="flex items-center gap-2 h-9 px-4 text-sm"
+              >
+                <MapPin className="h-4 w-4" />
+                {selectedLocation ? selectedLocation.label : "Select Location"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleLocationRefresh}
+                disabled={locationLoading || airQualityLoading}
+                className="flex items-center gap-2 h-9 px-4 text-sm"
+              >
+                <RefreshCw className={`h-4 w-4 ${locationLoading || airQualityLoading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content - Mobile Optimized */}
-      <div className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8">
+      <div className="px-4 lg:px-8 py-2 lg:py-8 pb-32 lg:pb-12">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Left Column - Main Content - Mobile Optimized */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Location Picker - Mobile Optimized */}
-              <div className="lg:hidden sticky top-20 z-30 bg-white/98 backdrop-blur-xl border border-gray-100/50 rounded-2xl p-4 shadow-sm">
+              {/* Location Picker - Mobile & Desktop */}
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 mb-4">
                 <button
                   onClick={() => setShowLocationPicker(true)}
-                  className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="w-full flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg"
                 >
                   <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-semibold text-sm">📍</span>
+                    <div className="w-8 h-8 bg-[#6200D9] rounded-lg flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-semibold text-xs">📍</span>
                     </div>
                     <div className="min-w-0 flex-1 text-left">
                       <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {currentLocationLabel}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Tap to change location</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Click to change location</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="px-2 py-1 bg-[#6200D9] text-white text-xs font-medium rounded-full">
                       Selected
                     </span>
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
