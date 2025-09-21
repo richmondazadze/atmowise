@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { TrendingUp, TrendingDown, Minus, Info, AlertTriangle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Info, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface EnhancedRiskCardProps {
   aqi: number;
@@ -12,6 +14,11 @@ interface EnhancedRiskCardProps {
   dominantPollutant: string;
   previousAqi?: number;
   className?: string;
+  // Detailed pollutant data
+  pm25?: number;
+  pm10?: number;
+  o3?: number;
+  no2?: number;
 }
 
 const AQI_SCALE = [
@@ -32,15 +39,134 @@ const POLLUTANT_INFO = {
   'SO2': 'Sulfur dioxide that can cause breathing problems'
 };
 
+// Pollutant health levels based on WHO guidelines
+const POLLUTANT_LEVELS = {
+  'PM2.5': [
+    { min: 0, max: 15, level: 'Good', color: 'text-green-600', bgColor: 'bg-green-50' },
+    { min: 15, max: 25, level: 'Moderate', color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+    { min: 25, max: 50, level: 'Unhealthy for Sensitive', color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { min: 50, max: 75, level: 'Unhealthy', color: 'text-red-600', bgColor: 'bg-red-50' },
+    { min: 75, max: 100, level: 'Very Unhealthy', color: 'text-purple-600', bgColor: 'bg-purple-50' },
+    { min: 100, max: Infinity, level: 'Hazardous', color: 'text-red-800', bgColor: 'bg-red-100' }
+  ],
+  'PM10': [
+    { min: 0, max: 30, level: 'Good', color: 'text-green-600', bgColor: 'bg-green-50' },
+    { min: 30, max: 50, level: 'Moderate', color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+    { min: 50, max: 100, level: 'Unhealthy for Sensitive', color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { min: 100, max: 150, level: 'Unhealthy', color: 'text-red-600', bgColor: 'bg-red-50' },
+    { min: 150, max: 200, level: 'Very Unhealthy', color: 'text-purple-600', bgColor: 'bg-purple-50' },
+    { min: 200, max: Infinity, level: 'Hazardous', color: 'text-red-800', bgColor: 'bg-red-100' }
+  ],
+  'O3': [
+    { min: 0, max: 50, level: 'Good', color: 'text-green-600', bgColor: 'bg-green-50' },
+    { min: 50, max: 100, level: 'Moderate', color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+    { min: 100, max: 150, level: 'Unhealthy for Sensitive', color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { min: 150, max: 200, level: 'Unhealthy', color: 'text-red-600', bgColor: 'bg-red-50' },
+    { min: 200, max: 300, level: 'Very Unhealthy', color: 'text-purple-600', bgColor: 'bg-purple-50' },
+    { min: 300, max: Infinity, level: 'Hazardous', color: 'text-red-800', bgColor: 'bg-red-100' }
+  ],
+  'NO2': [
+    { min: 0, max: 40, level: 'Good', color: 'text-green-600', bgColor: 'bg-green-50' },
+    { min: 40, max: 80, level: 'Moderate', color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+    { min: 80, max: 150, level: 'Unhealthy for Sensitive', color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { min: 150, max: 200, level: 'Unhealthy', color: 'text-red-600', bgColor: 'bg-red-50' },
+    { min: 200, max: 300, level: 'Very Unhealthy', color: 'text-purple-600', bgColor: 'bg-purple-50' },
+    { min: 300, max: Infinity, level: 'Hazardous', color: 'text-red-800', bgColor: 'bg-red-100' }
+  ]
+};
+
+// Animated Gauge Component
+function AnimatedGauge({ 
+  value, 
+  maxValue, 
+  color, 
+  size = 60 
+}: { 
+  value: number; 
+  maxValue: number; 
+  color: string; 
+  size?: number;
+}) {
+  const [animatedValue, setAnimatedValue] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  const percentage = Math.min((value / maxValue) * 100, 100);
+  const circumference = 2 * Math.PI * (size / 2 - 4);
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  useEffect(() => {
+    // Start loading animation
+    setIsLoaded(false);
+    setAnimatedValue(0);
+    
+    // Animate to actual value
+    const timer = setTimeout(() => {
+      setAnimatedValue(value);
+      setIsLoaded(true);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [value]);
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg
+        width={size}
+        height={size}
+        className="transform -rotate-90"
+      >
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={size / 2 - 4}
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          className="text-gray-200"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={size / 2 - 4}
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+          className={`transition-all duration-1000 ease-out ${color}`}
+          style={{
+            strokeDasharray,
+            strokeDashoffset: isLoaded ? strokeDashoffset : circumference,
+            opacity: isLoaded ? 1 : 0.3
+          }}
+        />
+      </svg>
+      {/* Value text */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className={`text-sm font-bold transition-all duration-1000 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+          {animatedValue.toFixed(1)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function EnhancedRiskCard({ 
   aqi, 
   category, 
   dominantPollutant, 
   previousAqi,
+  pm25,
+  pm10,
+  o3,
+  no2,
   className = '' 
 }: EnhancedRiskCardProps) {
   const [animatedAqi, setAnimatedAqi] = useState(previousAqi || aqi);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   // Get AQI scale info
   const aqiInfo = AQI_SCALE.find(scale => aqi >= scale.min && aqi <= scale.max) || AQI_SCALE[0];
@@ -92,6 +218,18 @@ export function EnhancedRiskCard({
     if (change < 0) return 'text-green-600';
     return 'text-gray-600';
   };
+
+  // Get pollutant health level
+  const getPollutantLevel = (pollutant: string, value: number) => {
+    const levels = POLLUTANT_LEVELS[pollutant as keyof typeof POLLUTANT_LEVELS];
+    if (!levels) return { level: 'Unknown', color: 'text-gray-600', bgColor: 'bg-gray-50' };
+    
+    const level = levels.find(l => value >= l.min && value < l.max) || levels[levels.length - 1];
+    return level;
+  };
+
+  // Check if we have detailed pollutant data
+  const hasDetailedData = pm25 !== undefined || pm10 !== undefined || o3 !== undefined || no2 !== undefined;
 
   return (
     <TooltipProvider>
@@ -179,6 +317,153 @@ export function EnhancedRiskCard({
             </Tooltip>
           </div>
 
+          {/* View Details Button - Only show if we have detailed data */}
+          {hasDetailedData && (
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDetails(!showDetails)}
+                className="flex items-center gap-2 text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                <motion.div
+                  animate={{ rotate: showDetails ? 180 : 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </motion.div>
+                {showDetails ? 'Hide Details' : 'View Details'}
+              </Button>
+            </div>
+          )}
+
+          {/* Detailed Pollutant Data with smooth slide animation */}
+          <AnimatePresence>
+            {showDetails && hasDetailedData && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ 
+                  duration: 0.4, 
+                  ease: "easeInOut",
+                  opacity: { duration: 0.2 }
+                }}
+                className="overflow-hidden"
+              >
+                <motion.div
+                  initial={{ y: -20 }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200"
+                >
+                  <h4 className="text-sm font-semibold text-[#0A1C40] mb-3 text-center">Individual Pollutant Levels</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {pm25 !== undefined && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: 0.2 }}
+                        className="p-3 bg-white rounded-lg border border-gray-200"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">PM2.5</span>
+                          <AnimatedGauge
+                            value={pm25}
+                            maxValue={100}
+                            color="text-blue-500"
+                            size={40}
+                          />
+                        </div>
+                        <div className="text-xs text-gray-500 mb-1">μg/m³</div>
+                        <div className={`text-xs font-medium ${getPollutantLevel('PM2.5', pm25).color}`}>
+                          {getPollutantLevel('PM2.5', pm25).level}
+                        </div>
+                      </motion.div>
+                    )}
+                    
+                    {pm10 !== undefined && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: 0.3 }}
+                        className="p-3 bg-white rounded-lg border border-gray-200"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">PM10</span>
+                          <AnimatedGauge
+                            value={pm10}
+                            maxValue={200}
+                            color="text-green-500"
+                            size={40}
+                          />
+                        </div>
+                        <div className="text-xs text-gray-500 mb-1">μg/m³</div>
+                        <div className={`text-xs font-medium ${getPollutantLevel('PM10', pm10).color}`}>
+                          {getPollutantLevel('PM10', pm10).level}
+                        </div>
+                      </motion.div>
+                    )}
+                    
+                    {o3 !== undefined && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: 0.4 }}
+                        className="p-3 bg-white rounded-lg border border-gray-200"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">O₃</span>
+                          <AnimatedGauge
+                            value={o3}
+                            maxValue={200}
+                            color="text-yellow-500"
+                            size={40}
+                          />
+                        </div>
+                        <div className="text-xs text-gray-500 mb-1">μg/m³</div>
+                        <div className={`text-xs font-medium ${getPollutantLevel('O3', o3).color}`}>
+                          {getPollutantLevel('O3', o3).level}
+                        </div>
+                      </motion.div>
+                    )}
+                    
+                    {no2 !== undefined && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: 0.5 }}
+                        className="p-3 bg-white rounded-lg border border-gray-200"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-gray-700">NO₂</span>
+                          <AnimatedGauge
+                            value={no2}
+                            maxValue={200}
+                            color="text-red-500"
+                            size={40}
+                          />
+                        </div>
+                        <div className="text-xs text-gray-500 mb-1">μg/m³</div>
+                        <div className={`text-xs font-medium ${getPollutantLevel('NO2', no2).color}`}>
+                          {getPollutantLevel('NO2', no2).level}
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.6 }}
+                    className="mt-3 text-xs text-gray-500 text-center"
+                  >
+                    Values based on WHO air quality guidelines
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Health Recommendations */}
           <div className="text-center">
             <div className="text-sm text-gray-600">
@@ -195,4 +480,3 @@ export function EnhancedRiskCard({
     </TooltipProvider>
   );
 }
-

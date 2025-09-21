@@ -413,6 +413,10 @@ export default function DashboardPage() {
                 category={airQualityData?.category || 'Unknown'}
                 dominantPollutant={airQualityData?.dominantPollutant || 'PM2.5'}
                 previousAqi={airQualityData?.previousAqi}
+                pm25={airQualityData?.pm25}
+                pm10={airQualityData?.pm10}
+                o3={airQualityData?.o3}
+                no2={airQualityData?.no2}
                 className="animate-fade-in"
               />
 
