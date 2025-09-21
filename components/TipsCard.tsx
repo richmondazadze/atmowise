@@ -223,10 +223,10 @@ export function TipsCard({
             {/* Filter Controls - Mobile Stack */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="h-10 text-sm border-gray-200 focus:border-blue-300">
-                  <div className="flex items-center gap-2 w-full">
-                    <Filter className="h-4 w-4 text-gray-500" />
-                    <span className="truncate overflow-hidden whitespace-nowrap flex-1">
+                <SelectTrigger className="h-10 text-sm border-gray-200 focus:border-blue-300 min-w-0">
+                  <div className="flex items-center gap-2 w-full min-w-0">
+                    <Filter className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                    <span className="truncate overflow-hidden whitespace-nowrap flex-1 min-w-0">
                       {categoryFilter === "all"
                         ? "All Categories"
                         : categoryFilter}
@@ -283,7 +283,7 @@ export function TipsCard({
         
         <CardContent className="px-0 pb-2">
           {/* Scrollable Tips Container */}
-          <div className="max-h-96 overflow-y-auto overscroll-contain scroll-smooth">
+          <div className="max-h-[500px] overflow-y-auto overscroll-contain scroll-smooth">
             {filteredAndSortedTips.length === 0 ? (
               <div className="text-center py-8 px-6">
                 <Search className="h-8 w-8 mx-auto mb-3 text-gray-300" />
@@ -384,7 +384,7 @@ export function TipsCard({
                             </div>
 
                             {/* Description */}
-                            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-2">
+                            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
                               {description}
                             </p>
                           </div>

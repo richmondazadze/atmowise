@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { storage, type SelectedLocation } from '@/lib/storage';
 
 interface LocationContextType {
   currentLocation: { lat: number; lon: number; label: string } | null;
@@ -20,23 +21,18 @@ export function LocationProvider({ children }: { children: ReactNode }) {
   const [locationPermission, setLocationPermission] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
 
-  // Load saved location from localStorage on mount
+  // Load saved location from storage on mount
   useEffect(() => {
-    const savedLocation = localStorage.getItem('atmowise-selected-location');
+    const savedLocation = storage.getSelectedLocation();
     if (savedLocation) {
-      try {
-        const location = JSON.parse(savedLocation);
-        setSelectedLocation(location);
-      } catch (error) {
-        console.warn('Failed to parse saved location:', error);
-      }
+      setSelectedLocation(savedLocation);
     }
   }, []);
 
-  // Save location to localStorage when it changes
+  // Save location to storage when it changes
   useEffect(() => {
     if (selectedLocation) {
-      localStorage.setItem('atmowise-selected-location', JSON.stringify(selectedLocation));
+      storage.setSelectedLocation(selectedLocation);
     }
   }, [selectedLocation]);
 
