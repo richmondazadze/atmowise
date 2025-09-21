@@ -21,7 +21,7 @@ import { TipsCard } from '@/components/TipsCard'
 import { ExportShareButton } from '@/components/ExportShareButton'
 import { apiRequest } from '@/lib/queryClient'
 import { Button } from '@/components/ui/button'
-import { MapPin, RefreshCw, ChevronDown } from 'lucide-react'
+import { MapPin, RefreshCw, ChevronDown, LogOut } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Profile } from "@shared/schema"
 
@@ -400,6 +400,34 @@ export default function DashboardPage() {
                   <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">Dashboard</h1>
                   <p className="text-xs text-[#64748B] font-medium truncate">Air Quality Health</p>
                 </div>
+              </motion.div>
+              
+              {/* Sign Out Button */}
+              <motion.div
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      await signOut();
+                      router.push('/auth');
+                    } catch (error) {
+                      console.error('Sign out error:', error);
+                      toast({
+                        title: "Sign out failed",
+                        description: "Please try again.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                  className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors duration-200 touch-target"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
               </motion.div>
             </div>
           </div>

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Home, Briefcase, Dumbbell, GraduationCap, Plus, Minus, Wind, Activity } from 'lucide-react';
+import { MapPin, Home, Briefcase, GraduationCap, Plus, Minus, Wind, Activity, Navigation } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { SavedPlace } from '@shared/schema';
 
@@ -18,9 +18,9 @@ interface SavedPlacesProps {
 const PLACE_TYPES = {
   home: { icon: Home, label: 'Home', color: 'bg-blue-100 text-blue-800' },
   work: { icon: Briefcase, label: 'Work', color: 'bg-green-100 text-green-800' },
-  gym: { icon: Dumbbell, label: 'Gym', color: 'bg-purple-100 text-purple-800' },
   school: { icon: GraduationCap, label: 'School', color: 'bg-orange-100 text-orange-800' },
-  custom: { icon: MapPin, label: 'Custom', color: 'bg-gray-100 text-gray-800' }
+  custom: { icon: MapPin, label: 'Custom', color: 'bg-gray-100 text-gray-800' },
+  current: { icon: Navigation, label: 'Current Location', color: 'bg-purple-100 text-purple-800' }
 };
 
 export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
@@ -85,6 +85,62 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
     
     // Scroll to top when location is selected
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation not supported",
+        description: "Your browser doesn't support geolocation. Please enter coordinates manually.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Getting your location...",
+      description: "Please allow location access to use your current position.",
+    });
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        onLocationSelect({
+          lat: latitude,
+          lon: longitude,
+          label: "Current Location"
+        });
+        
+        // Scroll to top when location is selected
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        toast({
+          title: "Location found!",
+          description: "Using your current location for air quality data.",
+        });
+      },
+      (error) => {
+        let errorMessage = "Unable to get your location. Please try again.";
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMessage = "Location access denied. Please enable location permissions and try again.";
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMessage = "Location information unavailable. Please try again.";
+        } else if (error.code === error.TIMEOUT) {
+          errorMessage = "Location request timed out. Please try again.";
+        }
+        
+        toast({
+          title: "Location error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    );
   };
 
   const handleAddPlace = async () => {
@@ -333,6 +389,23 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
             })}
           </div>
         )}
+
+        {/* Use Current Location Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="pt-2"
+        >
+          <Button
+            variant="outline"
+            onClick={handleUseCurrentLocation}
+            className="w-full h-12 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100 hover:border-purple-300 transition-all duration-200"
+          >
+            <Navigation className="h-5 w-5 mr-2 text-purple-600" />
+            <span className="font-medium text-purple-700">Use Current Location</span>
+          </Button>
+        </motion.div>
       </CardContent>
     </Card>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Wind, Sun, Cloud, AlertTriangle, CheckCircle, Navigation } from 'lucide-react';
+import { MapPin, Clock, Wind, Sun, Cloud, AlertTriangle, CheckCircle, Navigation, X } from 'lucide-react';
 
 interface RunCoachProps {
   currentAqi: number;
@@ -239,9 +239,9 @@ export function RunCoach({ currentAqi, currentLocation, savedPlaces, forecastDat
                 variant="ghost"
                 size="sm"
                 onClick={() => setSelectedRecommendation(null)}
-                className="h-8 w-8 p-0"
+                className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors duration-200 touch-target"
               >
-                ×
+                <X className="h-5 w-5" />
               </Button>
             </div>
             

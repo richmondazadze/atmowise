@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Trash2, RefreshCw, Database, Activity } from 'lucide-react';
+import { Trash2, RefreshCw, Database, Activity, X } from 'lucide-react';
 import { storage } from '@/lib/storage';
 
 interface CacheStats {
@@ -80,9 +80,9 @@ export function CacheManager() {
             variant="ghost"
             size="sm"
             onClick={() => setIsVisible(false)}
-            className="h-6 w-6 p-0"
+            className="h-8 w-8 p-0 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors duration-200 touch-target"
           >
-            ×
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </CardHeader>

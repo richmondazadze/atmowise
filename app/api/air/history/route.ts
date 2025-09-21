@@ -39,9 +39,22 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const supabaseUserId = searchParams.get('userId');
-    const days = parseInt(searchParams.get('days') || '7');
+    const period = searchParams.get('period') || '7d';
     const lat = parseFloat(searchParams.get('lat') || '0');
     const lon = parseFloat(searchParams.get('lon') || '0');
+
+    // Convert period to days
+    let days = 7; // default
+    if (period === '7d') days = 7;
+    else if (period === '30d') days = 30;
+    else if (period === '90d') days = 90;
+    else if (period.includes('d')) {
+      // Handle other day formats like '14d', '60d', etc.
+      const parsedDays = parseInt(period.replace('d', ''));
+      if (!isNaN(parsedDays) && parsedDays > 0) {
+        days = parsedDays;
+      }
+    }
 
     if (!supabaseUserId) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });

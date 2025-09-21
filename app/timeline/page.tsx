@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLocation } from '@/contexts/LocationContext'
 import { PageLayout } from '@/components/PageLayout'
 import { Navigation } from '@/components/Navigation'
 import { FloatingSettingsButton } from '@/components/FloatingSettingsButton'
@@ -30,6 +31,7 @@ interface AirQualityReading {
 export default function TimelinePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { selectedLocation } = useLocation();
   const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d'>('7d');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -47,17 +49,17 @@ export default function TimelinePage() {
     error: historyError,
     refetch: refetchHistory
   } = useQuery({
-    queryKey: ['air-quality-history', selectedPeriod, user?.id],
+    queryKey: ['air-quality-history', selectedPeriod, user?.id, selectedLocation?.lat, selectedLocation?.lon],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id || !selectedLocation) return [];
       
-      const response = await fetch(`/api/air/history?period=${selectedPeriod}&userId=${user.id}`);
+      const response = await fetch(`/api/air/history?period=${selectedPeriod}&userId=${user.id}&lat=${selectedLocation.lat}&lon=${selectedLocation.lon}`);
       if (!response.ok) {
         throw new Error('Failed to fetch air quality history');
       }
       return response.json();
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && !!selectedLocation,
     retry: 1,
   });
 
@@ -128,6 +130,37 @@ export default function TimelinePage() {
           </motion.p>
         </div>
       </motion.div>
+    );
+  }
+
+  // Show message if no location is selected
+  if (!selectedLocation) {
+    return (
+      <PageLayout>
+        <div className="min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center max-w-md mx-auto px-4"
+          >
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MapPin className="h-8 w-8 text-gray-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No Location Selected
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Please select a location from the dashboard to view air quality history.
+            </p>
+            <Button 
+              onClick={() => router.push('/dashboard')}
+              className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
+            >
+              Go to Dashboard
+            </Button>
+          </motion.div>
+        </div>
+      </PageLayout>
     );
   }
 
