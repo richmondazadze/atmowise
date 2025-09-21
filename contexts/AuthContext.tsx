@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isSigningIn: boolean;
   signUp: (email: string, password: string, firstName?: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -58,7 +60,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
+        
+        // Only set loading to false on initial load or when we have a definitive state
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          setLoading(false);
+        }
+        
+        // Reset signing in state when auth state changes
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          setIsSigningIn(false);
+        }
       }
     });
 
@@ -147,15 +158,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
+      setIsSigningIn(true);
+      
+      // Get the current origin and port
+      const currentOrigin = window.location.origin;
+      console.log("OAuth redirect to:", `${currentOrigin}/dashboard`);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${currentOrigin}/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
-      return { error };
+      
+      if (error) {
+        console.error("OAuth error:", error);
+        setIsSigningIn(false);
+        return { error };
+      }
+      
+      // Don't reset isSigningIn here - let the auth state change handler do it
+      // This prevents the loading state from flickering during OAuth redirect
+      return { error: null };
     } catch (error) {
       console.error("Google sign in error:", error);
+      setIsSigningIn(false);
       return {
         error: {
           message: "An unexpected error occurred during Google sign in",
@@ -168,6 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     session,
     loading,
+    isSigningIn,
     signUp,
     signIn,
     signOut,

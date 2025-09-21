@@ -22,6 +22,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Filter out contentFairAds errors from console
+              const originalError = console.error;
+              console.error = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('contentFairAds') || message.includes('fairAdsPaymentType')) {
+                  return; // Suppress these errors
+                }
+                originalError.apply(console, args);
+              };
+            `,
+          }}
+        />
+      </head>
       <body className={bricolageGrotesque.className}>
         <GlobalErrorHandler />
               <Providers>

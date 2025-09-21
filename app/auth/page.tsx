@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,17 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { user, signIn, signUp, signInWithGoogle, isSigningIn, loading: authLoading } = useAuth();
   const router = useRouter();
+  const hasRedirected = useRef(false);
+
+  // Redirect to dashboard if user is already authenticated
+  useEffect(() => {
+    if (user && !authLoading && !hasRedirected.current) {
+      hasRedirected.current = true;
+      router.push("/dashboard");
+    }
+  }, [user, authLoading]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,11 +67,25 @@ export default function AuthPage() {
     const { error } = await signInWithGoogle();
     if (error) {
       setError(error.message);
-    } else {
-      router.push("/dashboard");
+      setLoading(false);
     }
-    setLoading(false);
+    // Don't redirect here - OAuth will handle the redirect
+    // The useEffect above will handle redirecting to dashboard when user is authenticated
   };
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-[#6200D9] rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -95,11 +118,11 @@ export default function AuthPage() {
             {/* Google Sign In */}
             <Button
               onClick={handleGoogleSignIn}
-              disabled={loading}
+              disabled={loading || isSigningIn}
               variant="outline"
               className="w-full h-11"
             >
-              {loading ? (
+              {(loading || isSigningIn) ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -121,7 +144,7 @@ export default function AuthPage() {
                   />
                 </svg>
               )}
-              Continue with Google
+              {isSigningIn ? 'Signing in...' : 'Continue with Google'}
             </Button>
 
             <div className="relative">

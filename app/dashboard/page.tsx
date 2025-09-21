@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/contexts/AuthContext'
@@ -26,7 +26,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { Profile } from "@shared/schema"
 
 export default function DashboardPage() {
-  const { user: supabaseUser, signOut } = useAuth();
+  const { user: supabaseUser, signOut, isSigningIn, loading: authLoading } = useAuth();
+  const hasRedirected = useRef(false);
+  const [oauthError, setOauthError] = useState<string | null>(null);
   const {
     selectedLocation,
     setSelectedLocation,
@@ -75,17 +77,20 @@ export default function DashboardPage() {
     refetch: refetchAirQuality,
     error: airQualityError,
   } = useQuery({
-    queryKey: ['air-quality', airQualityLat, airQualityLon],
+    queryKey: ['air-quality', airQualityLat, airQualityLon, supabaseUser?.id],
     queryFn: async () => {
+      if (!supabaseUser?.id) {
+        throw new Error('User not authenticated');
+      }
       const response = await fetch(
-        `/api/air?lat=${airQualityLat}&lon=${airQualityLon}&userId=${supabaseUser?.id || ''}`
+        `/api/air?lat=${airQualityLat}&lon=${airQualityLon}&userId=${supabaseUser.id}`
       );
       if (!response.ok) {
         throw new Error('Failed to fetch air quality data');
       }
       return response.json();
     },
-    enabled: !!(airQualityLat && airQualityLon),
+    enabled: !!(airQualityLat && airQualityLon && supabaseUser?.id && !isSigningIn),
     retry: 1,
     retryDelay: 1000,
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
@@ -106,7 +111,7 @@ export default function DashboardPage() {
       }
       return response.json();
     },
-    enabled: !!supabaseUser?.id,
+    enabled: !!supabaseUser?.id && !isSigningIn,
     retry: 1,
   });
 
@@ -125,7 +130,7 @@ export default function DashboardPage() {
       }
       return response.json();
     },
-    enabled: !!supabaseUser?.id,
+    enabled: !!supabaseUser?.id && !isSigningIn,
     retry: 1,
   });
 
@@ -267,15 +272,27 @@ export default function DashboardPage() {
   //   }
   // }, [needsProfileSetup, showProfileSetup, profileSetupShown]);
 
-  // Redirect to auth if not logged in
+  // Check for OAuth errors in URL
   useEffect(() => {
-    if (!supabaseUser) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const errorDescription = urlParams.get('error_description');
+    
+    if (error) {
+      setOauthError(`OAuth Error: ${error}${errorDescription ? ` - ${decodeURIComponent(errorDescription)}` : ''}`);
+    }
+  }, []);
+
+  // Redirect to auth if not logged in (but wait for auth to load)
+  useEffect(() => {
+    if (!authLoading && !supabaseUser && !hasRedirected.current) {
+      hasRedirected.current = true;
       router.push('/auth');
     }
-  }, [supabaseUser, router]);
+  }, [supabaseUser, authLoading]);
 
   // Show loading state
-  if (!supabaseUser) {
+  if (authLoading || !supabaseUser || isSigningIn) {
     return (
       <motion.div 
         initial={{ opacity: 0 }}
@@ -297,7 +314,15 @@ export default function DashboardPage() {
             transition={{ duration: 0.3, delay: 0.2 }}
             className="text-gray-600 dark:text-gray-300"
           >
-            Loading...
+            {authLoading ? 'Loading...' : isSigningIn ? 'Signing in with Google...' : 'Authenticating...'}
+          </motion.p>
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.4 }}
+            className="text-sm text-gray-500 dark:text-gray-400 mt-2"
+          >
+            {authLoading ? 'Checking authentication status...' : isSigningIn ? 'Please complete the sign-in process' : 'Please sign in to access your dashboard'}
           </motion.p>
         </div>
       </motion.div>
@@ -307,6 +332,45 @@ export default function DashboardPage() {
   return (
     <PageLayout>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        {/* OAuth Error Display */}
+        {oauthError && (
+          <div className="fixed top-4 left-4 right-4 z-50">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <h3 className="text-sm font-medium text-red-800">Authentication Error</h3>
+                    <p className="text-sm text-red-700 mt-1">{oauthError}</p>
+                    <div className="mt-2">
+                      <button
+                        onClick={() => {
+                          setOauthError(null);
+                          window.location.href = '/auth';
+                        }}
+                        className="text-xs bg-red-100 hover:bg-red-200 text-red-800 px-2 py-1 rounded"
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setOauthError(null)}
+                  className="text-red-400 hover:text-red-600 ml-2"
+                >
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Mobile Header */}
         <motion.header
           initial={{ y: -50, opacity: 0 }}
@@ -479,17 +543,49 @@ export default function DashboardPage() {
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.4, delay: 0.4 }}
                 >
-                  <EnhancedRiskCard
-                    aqi={airQualityData?.aqi || 0}
-                    category={airQualityData?.category || 'Unknown'}
-                    dominantPollutant={airQualityData?.dominantPollutant || 'PM2.5'}
-                    previousAqi={airQualityData?.previousAqi}
-                    pm25={airQualityData?.pm25}
-                    pm10={airQualityData?.pm10}
-                    o3={airQualityData?.o3}
-                    no2={airQualityData?.no2}
-                    className="shadow-lg hover:shadow-xl transition-all duration-300"
-                  />
+                  {airQualityLoading ? (
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-lg">
+                      <div className="flex items-center justify-center">
+                        <div className="text-center">
+                          <div className="w-12 h-12 border-4 border-[#6200D9] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                          <p className="text-gray-600 dark:text-gray-300">Loading air quality data...</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : airQualityError ? (
+                    <div className="bg-white dark:bg-gray-800 border border-red-200 dark:border-red-700 rounded-2xl p-8 shadow-lg">
+                      <div className="text-center">
+                        <div className="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <RefreshCw className="h-6 w-6 text-red-600 dark:text-red-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          Failed to load air quality data
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 mb-4">
+                          {airQualityError.message || 'An error occurred while fetching data'}
+                        </p>
+                        <Button
+                          onClick={() => refetchAirQuality()}
+                          className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
+                        >
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Try Again
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <EnhancedRiskCard
+                      aqi={airQualityData?.aqi || 0}
+                      category={airQualityData?.category || 'Unknown'}
+                      dominantPollutant={airQualityData?.dominantPollutant || 'PM2.5'}
+                      previousAqi={airQualityData?.previousAqi}
+                      pm25={airQualityData?.pm25}
+                      pm10={airQualityData?.pm10}
+                      o3={airQualityData?.o3}
+                      no2={airQualityData?.no2}
+                      className="shadow-lg hover:shadow-xl transition-all duration-300"
+                    />
+                  )}
                 </motion.div>
 
                 {/* AI QA Explainer */}
