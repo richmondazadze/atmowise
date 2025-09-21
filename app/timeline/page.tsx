@@ -12,6 +12,7 @@ import { TrendingUp, MapPin, Calendar, Activity, RefreshCw, Download, Filter, Wi
 import { Navigation } from '@/components/Navigation';
 import { PageLayout } from '@/components/PageLayout';
 import { EnhancedTimelineChart } from '@/components/EnhancedTimelineChart';
+import { FloatingSettingsButton } from '@/components/FloatingSettingsButton';
 import { useToast } from '@/hooks/use-toast';
 
 interface TimelineData {
@@ -205,13 +206,13 @@ export default function TimelinePage() {
       <header className="lg:hidden sticky top-0 z-40 bg-white/98 backdrop-blur-xl border-b border-gray-100/50 shadow-sm">
         <div className="px-4 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-11 h-11 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
+            <div className="flex items-center space-x-3 min-w-0 flex-1">
+              <div className="w-11 h-11 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20 flex-shrink-0">
                 <TrendingUp className="h-5 w-5 text-white drop-shadow-sm" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight">Timeline</h1>
-                <p className="text-xs text-[#64748B] font-medium">Air Quality History</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">Timeline</h1>
+                <p className="text-xs text-[#64748B] font-medium truncate">Air Quality History</p>
               </div>
             </div>
           </div>
@@ -451,6 +452,9 @@ export default function TimelinePage() {
 
       {/* Navigation */}
       <Navigation />
+      
+      {/* Floating Settings Button */}
+      <FloatingSettingsButton />
     </PageLayout>
   );
 }

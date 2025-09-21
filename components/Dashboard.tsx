@@ -12,14 +12,13 @@ import { SavedPlaces } from "@/components/SavedPlaces";
 import { SymptomForm } from "@/components/SymptomForm";
 import { LLMResponseCard } from "@/components/LLMResponseCard";
 import { TipsCard } from "@/components/TipsCard";
-import { CrisisModal } from "@/components/CrisisModal";
 import { Navigation } from "@/components/Navigation";
 import { PageLayout } from "@/components/PageLayout";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { AIQAExplainer } from "@/components/AIQAExplainer";
 import { RunCoach } from "@/components/RunCoach";
 import { ExportShareButton } from "@/components/ExportShareButton";
-import { SettingsToggle } from "@/components/SettingsToggle";
+import { FloatingSettingsButton } from "@/components/FloatingSettingsButton";
 import {
   MapPin,
   RefreshCw,
@@ -347,8 +346,6 @@ export default function Dashboard() {
   } | null>(null);
   const [showLlmResponse, setShowLlmResponse] = useState(false);
 
-  // Crisis modal
-  const [showCrisisModal, setShowCrisisModal] = useState(false);
 
   // Handle location selection
   const handleLocationSelect = (location: {
@@ -532,7 +529,6 @@ export default function Dashboard() {
                 <MapPin className="h-4 w-4" />
                 {selectedLocation ? selectedLocation.label : "Select Location"}
               </Button>
-              <SettingsToggle />
             </div>
           </div>
         </div>
@@ -676,7 +672,6 @@ export default function Dashboard() {
                 profile={profile}
                 airData={airQualityData}
                 onSymptomLogged={setLlmResponse}
-                onEmergency={() => setShowCrisisModal(true)}
                 embedded
               />
             </div>
@@ -732,7 +727,6 @@ export default function Dashboard() {
             <LLMResponseCard
               response={llmResponse}
               isVisible={showLlmResponse}
-              onEmergency={() => setShowCrisisModal(true)}
             />
 
             {/* Personalized Health Tips */}
@@ -741,11 +735,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Crisis Modal */}
-      <CrisisModal
-        isOpen={showCrisisModal}
-        onClose={() => setShowCrisisModal(false)}
-      />
 
       {/* Profile Setup Modal - Disabled for now */}
       {/* <ProfileSetupModal
@@ -774,12 +763,15 @@ export default function Dashboard() {
               location: selectedLocation?.label || 'Unknown Location',
               timestamp: airQualityData.timestamp || new Date().toISOString()
             }}
-          />
-        </div>
+      />
+    </div>
       )}
 
       {/* Navigation */}
-      <Navigation onCrisis={() => setShowCrisisModal(true)} />
+      <Navigation />
+      
+      {/* Floating Settings Button */}
+      <FloatingSettingsButton />
     </PageLayout>
   );
 }

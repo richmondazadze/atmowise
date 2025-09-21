@@ -8,15 +8,6 @@
 @layer base {
   :root {
     --font-bricolage-grotesque: 'Bricolage Grotesque', sans-serif;
-  }
-  
-  body {
-    font-family: var(--font-bricolage-grotesque);
-  }
-}
-
-@layer base {
-  :root {
     /* Design System Colors - High Contrast Implementation */
     --background: 248 250 252; /* #F8FAFC - Light background */
     --foreground: 10 28 64; /* #0A1C40 - Deep dark blue for maximum contrast */
@@ -47,26 +38,26 @@
     --chart-5: 245 158 11; /* #F59E0B - Amber */
   }
 
-/* Dark mode colors - High contrast for accessibility */
+/* Dark mode colors - Simple and effective */
 .dark {
-  --background: 15 23 42; /* #0F172A - Dark background */
-  --foreground: 248 250 252; /* #F8FAFC - Light text */
-  --card: 30 41 59; /* #1E293B - Dark cards */
-  --card-foreground: 248 250 252; /* #F8FAFC - Light text on cards */
-  --popover: 30 41 59; /* #1E293B - Dark popovers */
-  --popover-foreground: 248 250 252; /* #F8FAFC - Light text on popovers */
-  --primary: 124 58 237; /* #7C3AED - Lighter purple for dark mode */
+  --background: 0 0 0; /* #000000 - Pure black background */
+  --foreground: 255 255 255; /* #FFFFFF - Pure white text */
+  --card: 23 23 23; /* #171717 - Dark gray cards */
+  --card-foreground: 255 255 255; /* #FFFFFF - White text on cards */
+  --popover: 23 23 23; /* #171717 - Dark gray popovers */
+  --popover-foreground: 255 255 255; /* #FFFFFF - White text on popovers */
+  --primary: 124 58 237; /* #7C3AED - Purple primary */
   --primary-foreground: 255 255 255; /* #FFFFFF - White text on primary */
-  --secondary: 34 197 94; /* #22C55E - Brighter green for dark mode */
-  --secondary-foreground: 15 23 42; /* #0F172A - Dark text on secondary */
-  --muted: 51 65 85; /* #334155 - Dark gray background */
-  --muted-foreground: 148 163 184; /* #94A3B8 - Light gray text */
-  --accent: 168 85 247; /* #A855F7 - Lighter purple accent */
+  --secondary: 34 197 94; /* #22C55E - Green secondary */
+  --secondary-foreground: 0 0 0; /* #000000 - Black text on secondary */
+  --muted: 38 38 38; /* #262626 - Muted dark gray */
+  --muted-foreground: 163 163 163; /* #A3A3A3 - Light gray text */
+  --accent: 168 85 247; /* #A855F7 - Purple accent */
   --accent-foreground: 255 255 255; /* #FFFFFF - White text on accent */
   --destructive: 239 68 68; /* #EF4444 - Red for warnings */
   --destructive-foreground: 255 255 255; /* #FFFFFF - White text on destructive */
-  --border: 51 65 85; /* #334155 - Dark borders */
-  --input: 30 41 59; /* #1E293B - Dark inputs */
+  --border: 38 38 38; /* #262626 - Dark borders */
+  --input: 23 23 23; /* #171717 - Dark inputs */
   --ring: 124 58 237; /* #7C3AED - Purple focus ring */
 }
 
@@ -156,17 +147,6 @@
 }
 
 /* Dark mode for cards and modals */
-.dark .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-}
-
-.dark .shadow-lg {
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -2px rgb(0 0 0 / 0.1);
-}
-
-.dark .shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
-}
 
 /* Dark mode for badges */
 .dark .bg-green-100 {
@@ -251,34 +231,375 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Large font support */
-.large-font {
-  font-size: 1.125rem; /* 18px base font size */
+/* ===== COMPREHENSIVE DARK MODE - SIMPLE RULE: WHITE → DARK, BLACK → WHITE ===== */
+
+/* Base page styling */
+.dark body {
+  @apply bg-black text-white;
 }
 
-  .large-font h1 {
-    font-size: 2.5rem; /* 40px */
-  }
+.dark .min-h-screen {
+  @apply bg-black;
+}
 
-  .large-font h2 {
-    font-size: 2rem; /* 32px */
-  }
+/* All white backgrounds become dark */
+.dark .bg-white {
+  @apply bg-gray-900;
+}
 
-  .large-font h3 {
-    font-size: 1.75rem; /* 28px */
-  }
+.dark .bg-white\/98 {
+  background-color: rgb(23 23 23 / 0.98);
+}
 
-  .large-font h4 {
-    font-size: 1.5rem; /* 24px */
-  }
+.dark .bg-white\/95 {
+  background-color: rgb(23 23 23 / 0.95);
+}
 
-  .large-font .text-sm {
-    font-size: 1rem; /* 16px */
-  }
+.dark .bg-gray-50 {
+  @apply bg-gray-800;
+}
 
-  .large-font .text-xs {
-    font-size: 0.875rem; /* 14px */
+.dark .bg-gray-100 {
+  @apply bg-gray-800;
+}
+
+.dark .bg-gray-200 {
+  @apply bg-gray-700;
+}
+
+/* All black/dark text becomes white */
+.dark .text-black {
+  @apply text-white;
+}
+
+.dark .text-gray-900 {
+  @apply text-white;
+}
+
+.dark .text-gray-800 {
+  @apply text-white;
+}
+
+.dark .text-gray-700 {
+  @apply text-gray-200;
+}
+
+.dark .text-gray-600 {
+  @apply text-gray-300;
+}
+
+.dark .text-gray-500 {
+  @apply text-gray-400;
+}
+
+.dark .text-[#0A1C40] {
+  @apply text-white;
+}
+
+.dark .text-[#64748B] {
+  @apply text-gray-300;
+}
+
+/* Borders become visible in dark mode */
+.dark .border-gray-200 {
+  @apply border-gray-700;
+}
+
+.dark .border-gray-300 {
+  @apply border-gray-600;
+}
+
+.dark .border-gray-100\/50 {
+  border-color: rgb(38 38 38 / 0.5);
+}
+
+/* Hover states work in dark mode */
+.dark .hover\:bg-gray-50:hover {
+  @apply hover:bg-gray-800;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  @apply hover:bg-gray-700;
+}
+
+.dark .hover\:bg-white:hover {
+  @apply hover:bg-gray-900;
+}
+
+/* Form elements */
+.dark input {
+  @apply bg-gray-900 border-gray-700 text-white;
+}
+
+.dark input::placeholder {
+  @apply text-gray-400;
+}
+
+.dark textarea {
+  @apply bg-gray-900 border-gray-700 text-white;
+}
+
+.dark textarea::placeholder {
+  @apply text-gray-400;
+}
+
+/* Select and dropdown components */
+.dark [data-radix-select-content] {
+  @apply bg-gray-900 border-gray-700;
+}
+
+.dark [data-radix-select-item] {
+  @apply text-white hover:bg-gray-800;
+}
+
+.dark [data-radix-select-trigger] {
+  @apply bg-gray-900 border-gray-700 text-white;
+}
+
+/* Navigation */
+.dark .header-premium {
+  background-color: rgb(23 23 23 / 0.95);
+  border-color: rgb(38 38 38 / 0.5);
+}
+
+.dark nav {
+  @apply bg-black border-gray-800;
+}
+
+/* Active states */
+.dark .text-[#6200D9] {
+  @apply text-purple-400;
+}
+
+/* Cards and containers - Clean dark mode with outlines */
+.dark .bg-white {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+.dark .bg-white.rounded-2xl {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+.dark .bg-white.rounded-xl {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+.dark .bg-white.rounded-lg {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+.dark .bg-white.rounded-md {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Specific card components */
+.dark .card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -1px rgb(0 0 0 / 0.2);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
+}
+
+/* Timeline period buttons */
+.dark .bg-white.text-[#64748B] {
+  @apply bg-gray-800 text-gray-300 border border-gray-600;
+}
+
+/* Specific card types for better mobile dark mode */
+.dark .bg-white.shadow-sm {
+  @apply bg-gray-900 border border-gray-700;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
+}
+
+.dark .bg-white.shadow-lg {
+  @apply bg-gray-900 border border-gray-700;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 10px 10px -5px rgb(0 0 0 / 0.4);
+}
+
+/* Air quality cards */
+.dark .air-quality-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Symptom form cards */
+.dark .symptom-form-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Tips cards */
+.dark .tips-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Statistics cards */
+.dark .stats-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Profile cards */
+.dark .profile-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Resource cards */
+.dark .resource-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Modal cards */
+.dark .modal-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Settings modal */
+.dark .settings-modal {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Chart containers */
+.dark .chart-container {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Data visualization cards */
+.dark .data-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Modals and overlays */
+.dark .modal-overlay {
+  background-color: rgb(0 0 0 / 0.8);
+}
+
+/* Floating elements */
+.dark .fixed.bottom-20 {
+  @apply bg-gray-800 hover:bg-gray-700;
+}
+
+
+/* Ensure all headings are white */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  @apply text-white;
+}
+
+/* Ensure all paragraphs and spans inherit proper color */
+.dark p, .dark span, .dark div {
+  color: inherit;
+}
+
+/* Focus states */
+.dark .focus\:ring-2:focus {
+  --tw-ring-color: rgb(124 58 237 / 0.5);
+}
+
+/* Disabled states */
+.dark .disabled\:opacity-50:disabled {
+  @apply opacity-50;
+}
+
+/* ===== MOBILE DARK MODE ENHANCEMENTS ===== */
+
+/* Mobile-specific card improvements */
+@media (max-width: 768px) {
+  .dark .bg-white {
+    @apply bg-gray-900 border border-gray-700;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
   }
+  
+  .dark .bg-white.rounded-2xl {
+    @apply bg-gray-900 border border-gray-700;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
+  }
+  
+  .dark .bg-white.rounded-xl {
+    @apply bg-gray-900 border border-gray-700;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
+  }
+  
+  .dark .bg-white.rounded-lg {
+    @apply bg-gray-900 border border-gray-700;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* Enhanced card visibility for dark mode */
+.dark .bg-white\/98 {
+  background-color: rgb(23 23 23 / 0.98);
+  border: 1px solid rgb(55 65 81);
+}
+
+.dark .bg-white\/95 {
+  background-color: rgb(23 23 23 / 0.95);
+  border: 1px solid rgb(55 65 81);
+}
+
+/* Ensure all card content is visible */
+.dark .bg-white * {
+  color: inherit;
+}
+
+/* Card headers in dark mode */
+.dark .bg-white h1,
+.dark .bg-white h2,
+.dark .bg-white h3,
+.dark .bg-white h4,
+.dark .bg-white h5,
+.dark .bg-white h6 {
+  @apply text-white;
+}
+
+.dark .bg-white p,
+.dark .bg-white span,
+.dark .bg-white div {
+  @apply text-gray-200;
+}
+
+/* Card buttons and interactive elements */
+.dark .bg-white button {
+  @apply text-white;
+}
+
+.dark .bg-white a {
+  @apply text-blue-400;
+}
+
+/* Card borders and separators */
+.dark .bg-white hr {
+  @apply border-gray-700;
+}
+
+.dark .bg-white .border-t {
+  @apply border-gray-700;
+}
+
+.dark .bg-white .border-b {
+  @apply border-gray-700;
+}
+
+.dark .bg-white .border-l {
+  @apply border-gray-700;
+}
+
+.dark .bg-white .border-r {
+  @apply border-gray-700;
+}
+
+/* Card shadows for better depth */
+.dark .bg-white {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -1px rgb(0 0 0 / 0.2);
+}
+
+.dark .bg-white.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
+}
+
+.dark .bg-white.shadow-xl {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 10px 10px -5px rgb(0 0 0 / 0.4);
 }
 
 @layer base {
@@ -427,30 +748,112 @@
     border: 2px solid #EF4444 !important;
   }
   
-  /* Force Solid Backgrounds for All Cards */
-  .card-solid,
-  .card-premium,
-  .card-glass,
-  [class*="card-"] {
-    background-color: #FFFFFF !important;
-    opacity: 1 !important;
-  }
-  
-  /* Ensure proper text contrast */
-  .card-solid h1,
-  .card-solid h2,
-  .card-solid h3,
-  .card-solid h4,
-  .card-solid h5,
-  .card-solid h6,
-  .card-solid p,
-  .card-solid span {
-    color: #0A1C40 !important;
-  }
-  
-  .card-solid .text-muted-foreground {
-    color: #64748B !important;
-  }
+/* Force Solid Backgrounds for All Cards */
+.card-solid,
+.card-premium,
+.card-glass,
+[class*="card-"] {
+  background-color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+/* Dark mode overrides for card classes */
+.dark .card-solid,
+.dark .card-premium,
+.dark .card-glass,
+.dark [class*="card-"] {
+  background-color: #171717 !important;
+  border-color: #374151 !important;
+  opacity: 1 !important;
+}
+
+/* Ensure proper text contrast */
+.card-solid h1,
+.card-solid h2,
+.card-solid h3,
+.card-solid h4,
+.card-solid h5,
+.card-solid h6,
+.card-solid p,
+.card-solid span {
+  color: #0A1C40 !important;
+}
+
+.card-solid .text-muted-foreground {
+  color: #64748B !important;
+}
+
+/* Dark mode text contrast for card classes */
+.dark .card-solid h1,
+.dark .card-solid h2,
+.dark .card-solid h3,
+.dark .card-solid h4,
+.dark .card-solid h5,
+.dark .card-solid h6,
+.dark .card-solid p,
+.dark .card-solid span {
+  color: #FFFFFF !important;
+}
+
+.dark .card-solid .text-muted-foreground {
+  color: #9CA3AF !important;
+}
+
+/* Dark mode overrides for gradient backgrounds */
+.dark .bg-gradient-to-r.from-gray-50.to-gray-100\/50 {
+  background: linear-gradient(to right, #374151, #4B5563) !important;
+  border-color: #4B5563 !important;
+}
+
+.dark .bg-gradient-to-r.from-gray-100.to-gray-200\/50 {
+  background: linear-gradient(to right, #4B5563, #6B7280) !important;
+  border-color: #6B7280 !important;
+}
+
+/* Dark mode overrides for specific gradient classes */
+.dark .from-gray-50 {
+  --tw-gradient-from: #374151 !important;
+}
+
+.dark .to-gray-100\/50 {
+  --tw-gradient-to: rgb(75 85 99 / 0.5) !important;
+}
+
+.dark .from-gray-100 {
+  --tw-gradient-from: #4B5563 !important;
+}
+
+.dark .to-gray-200\/50 {
+  --tw-gradient-to: rgb(107 114 128 / 0.5) !important;
+}
+
+/* Dark mode overrides for blue gradient backgrounds */
+.dark .bg-gradient-to-br.from-white.to-blue-50\/30 {
+  background: linear-gradient(to bottom right, #171717, #1E3A8A) !important;
+  border-color: #374151 !important;
+}
+
+.dark .from-white {
+  --tw-gradient-from: #171717 !important;
+}
+
+.dark .to-blue-50\/30 {
+  --tw-gradient-to: rgb(30 58 138 / 0.3) !important;
+}
+
+/* Dark mode overrides for red gradient backgrounds */
+.dark .bg-gradient-to-br.from-red-50.to-red-100\/50 {
+  background: linear-gradient(to bottom right, #7F1D1D, #991B1B) !important;
+  border-color: #DC2626 !important;
+}
+
+.dark .from-red-50 {
+  --tw-gradient-from: #7F1D1D !important;
+}
+
+.dark .to-red-100\/50 {
+  --tw-gradient-to: rgb(153 27 27 / 0.5) !important;
+}
   
   /* Gauge Animations */
   .gauge-fill {
@@ -662,7 +1065,8 @@
   }
   
   .nav-item-active {
-    @apply bg-[#6200D9] text-white shadow-lg;
+    @apply bg-[#6200D9] text-white;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -2px rgb(0 0 0 / 0.3);
   }
   
   .nav-item-inactive {
@@ -795,4 +1199,5 @@
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
 }

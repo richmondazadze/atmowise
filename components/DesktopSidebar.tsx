@@ -22,11 +22,10 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface DesktopSidebarProps {
-  onCrisis?: () => void;
   className?: string;
 }
 
-export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
+export function DesktopSidebar({ className }: DesktopSidebarProps) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
