@@ -19,15 +19,15 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-100">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <div className="text-center max-w-lg mx-auto p-8">
             <div className="mb-8">
               <div className="w-20 h-20 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle className="h-10 w-10 text-red-600" />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Error</h1>
-              <p className="text-lg text-gray-600 mb-2">A critical error occurred</p>
-              <p className="text-gray-500 text-sm">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Application Error</h1>
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-2">A critical error occurred</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
                 {error.message || 'An unknown error occurred'}
               </p>
             </div>

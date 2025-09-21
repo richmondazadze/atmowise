@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TrendingUp, Activity, Download, Clock, Sun, Moon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface EnhancedTimelineChartProps {
   airData: any[];
@@ -100,6 +100,7 @@ export function EnhancedTimelineChart({
   const chartRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showForecast, setShowForecast] = useState(false);
+  const isMobile = useIsMobile();
 
   // Memoize chart data calculations for performance
   const chartData = useMemo(() => {
@@ -131,23 +132,30 @@ export function EnhancedTimelineChart({
     if (chartData.length === 0)
       return { points: [], dataPoints: [], colorStreaks: [] };
 
+    // Responsive chart dimensions
+    const chartWidth = isMobile ? 320 : 400;
+    const chartHeight = isMobile ? 160 : 200;
+    const padding = isMobile ? 20 : 40;
+    const chartAreaWidth = chartWidth - (padding * 2);
+    const chartAreaHeight = chartHeight - (padding * 2);
+
     const points = chartData.map((d, i) => {
       const x =
         chartData.length === 1
-          ? 40 + 170
-          : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
+          ? padding + chartAreaWidth / 2
+          : padding + (i / Math.max(chartData.length - 1, 1)) * chartAreaWidth;
       const value = (d[selectedMetric as keyof typeof d] as number) || 0;
-      const y = 170 - (value / Math.max(maxValue, 1)) * 120;
+      const y = padding + chartAreaHeight - (value / Math.max(maxValue, 1)) * chartAreaHeight;
       return { x, y, value, data: d, color: getAQIColor(value) };
     });
 
     const dataPoints = chartData.map((d, i) => {
       const x =
         chartData.length === 1
-          ? 40 + 170
-          : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
+          ? padding + chartAreaWidth / 2
+          : padding + (i / Math.max(chartData.length - 1, 1)) * chartAreaWidth;
       const value = (d[selectedMetric as keyof typeof d] as number) || 0;
-      const y = 170 - (value / Math.max(maxValue, 1)) * 120;
+      const y = padding + chartAreaHeight - (value / Math.max(maxValue, 1)) * chartAreaHeight;
       return { x, y, value, data: d, color: getAQIColor(value), index: i };
     });
 
@@ -170,7 +178,7 @@ export function EnhancedTimelineChart({
     }
     colorStreaks.push({ ...currentStreak });
 
-    return { points, dataPoints, colorStreaks };
+    return { points, dataPoints, colorStreaks, chartWidth, chartHeight, padding, chartAreaWidth, chartAreaHeight };
   }, [chartData, selectedMetric, maxValue]);
 
   // Memoize forecast calculations
@@ -178,19 +186,25 @@ export function EnhancedTimelineChart({
     if (!showForecast || forecastData.length === 0)
       return { points: [], dataPoints: [] };
 
+    const chartWidth = isMobile ? 320 : 400;
+    const chartHeight = isMobile ? 160 : 200;
+    const padding = isMobile ? 20 : 40;
+    const chartAreaWidth = chartWidth - (padding * 2);
+    const chartAreaHeight = chartHeight - (padding * 2);
+
     const forecastPoints = forecastData.map((d, i) => {
       const x =
-        40 +
+        padding +
         ((chartData.length + i) /
           Math.max(chartData.length + forecastData.length - 1, 1)) *
-          340;
+          chartAreaWidth;
       const value = d.aqi;
-      const y = 170 - (value / Math.max(maxValue, 1)) * 120;
+      const y = padding + chartAreaHeight - (value / Math.max(maxValue, 1)) * chartAreaHeight;
       return { x, y, value, data: d, color: getAQIColor(value) };
     });
 
     return { points: forecastPoints, dataPoints: forecastPoints };
-  }, [forecastData, showForecast, chartData.length, maxValue]);
+  }, [forecastData, showForecast, chartData.length, maxValue, isMobile]);
 
   // Memoize statistics
   const statistics = useMemo(() => {
@@ -291,68 +305,56 @@ export function EnhancedTimelineChart({
   // Safety check for empty data
   if (chartData.length === 0) {
     return (
-      <Card className="card-solid rounded-xl lg:rounded-2xl p-4 lg:p-6 hover:shadow-xl transition-all duration-300">
-        <CardContent className="flex items-center justify-center h-64">
-          <div className="text-center text-gray-500">
-            <TrendingUp className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-            <p>No data available</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center text-gray-500">
+          <TrendingUp className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <p>No data available</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="card-solid rounded-xl lg:rounded-2xl p-4 lg:p-6 hover:shadow-xl transition-all duration-300">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg lg:text-xl font-bold text-[#0A1C40] flex items-center gap-3">
-            <div className="w-8 h-8 lg:w-10 lg:h-10 bg-gradient-to-br from-[#6200D9] to-[#4C00A8] rounded-lg flex items-center justify-center shadow-lg">
-              <TrendingUp className="h-4 w-4 lg:h-5 lg:w-5 text-white" />
-            </div>
-            Air Quality Trends
-            {isLoading && (
-              <div className="ml-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#6200D9]"></div>
-              </div>
-            )}
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Select value={selectedMetric} onValueChange={onMetricChange}>
-              <SelectTrigger className="w-24 lg:w-32 text-xs lg:text-sm h-8 lg:h-9 min-h-[36px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="min-w-[120px]">
-                <SelectItem value="aqi">AQI</SelectItem>
-                <SelectItem value="pm25">PM2.5</SelectItem>
-                <SelectItem value="pm10">PM10</SelectItem>
-                <SelectItem value="o3">O₃</SelectItem>
-                <SelectItem value="no2">NO₂</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={exportData}
-              className="border-[#E2E8F0] hover:bg-gray-50 h-8 lg:h-9"
-            >
-              <Download className="h-3 w-3 lg:h-4 lg:w-4" />
-            </Button>
-          </div>
+    <div>
+      {/* Chart Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-3 mb-4">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <Select value={selectedMetric} onValueChange={onMetricChange}>
+            <SelectTrigger className={`${isMobile ? 'w-20 text-xs h-8' : 'w-24 lg:w-32 text-xs lg:text-sm h-8 lg:h-9'} min-h-[32px]`}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="min-w-[120px]">
+              <SelectItem value="aqi">AQI</SelectItem>
+              <SelectItem value="pm25">PM2.5</SelectItem>
+              <SelectItem value="pm10">PM10</SelectItem>
+              <SelectItem value="o3">O₃</SelectItem>
+              <SelectItem value="no2">NO₂</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportData}
+            className={`border-[#E2E8F0] hover:bg-gray-50 ${isMobile ? 'h-8 px-2' : 'h-8 lg:h-9'}`}
+          >
+            <Download className={`${isMobile ? 'h-3 w-3' : 'h-3 w-3 lg:h-4 lg:w-4'}`} />
+          </Button>
         </div>
-      </CardHeader>
-      <CardContent className="p-0">
+      </div>
+
+      {/* Chart Content */}
+      <div>
         {/* Chart Visualization */}
-        <div className="h-48 lg:h-64 relative" ref={chartRef}>
-          <svg className="w-full h-full" viewBox="0 0 400 200">
+        <div className={`${isMobile ? 'h-40' : 'h-48 lg:h-64'} relative`} ref={chartRef}>
+          <svg className="w-full h-full" viewBox={`0 0 ${chartCalculations.chartWidth || 400} ${chartCalculations.chartHeight || 200}`}>
             {/* Grid lines */}
             {[0, 1, 2, 3, 4].map((i) => (
               <line
                 key={i}
-                x1="40"
-                y1={40 + i * 30}
-                x2="380"
-                y2={40 + i * 30}
+                x1={chartCalculations.padding || 40}
+                y1={(chartCalculations.padding || 40) + i * ((chartCalculations.chartAreaHeight || 120) / 4)}
+                x2={(chartCalculations.padding || 40) + (chartCalculations.chartAreaWidth || 340)}
+                y2={(chartCalculations.padding || 40) + i * ((chartCalculations.chartAreaHeight || 120) / 4)}
                 stroke="#E2E8F0"
                 strokeWidth="1"
               />
@@ -360,22 +362,24 @@ export function EnhancedTimelineChart({
 
             {/* Color streaks for AQI visualization */}
             {chartCalculations.colorStreaks.map((streak, i) => {
+              const padding = chartCalculations.padding || 40;
+              const chartAreaWidth = chartCalculations.chartAreaWidth || 340;
+              const chartAreaHeight = chartCalculations.chartAreaHeight || 120;
               const startX =
                 chartData.length === 1
-                  ? 40 + 170
-                  : 40 +
-                    (streak.start / Math.max(chartData.length - 1, 1)) * 340;
+                  ? padding + chartAreaWidth / 2
+                  : padding + (streak.start / Math.max(chartData.length - 1, 1)) * chartAreaWidth;
               const endX =
                 chartData.length === 1
-                  ? 40 + 170
-                  : 40 + (streak.end / Math.max(chartData.length - 1, 1)) * 340;
+                  ? padding + chartAreaWidth / 2
+                  : padding + (streak.end / Math.max(chartData.length - 1, 1)) * chartAreaWidth;
               return (
                 <rect
                   key={i}
                   x={startX}
-                  y="40"
+                  y={padding}
                   width={endX - startX}
-                  height="120"
+                  height={chartAreaHeight}
                   fill={streak.color}
                   opacity="0.1"
                 />
@@ -448,30 +452,30 @@ export function EnhancedTimelineChart({
               ))}
 
             {/* Y-axis labels */}
-            <text x="10" y="45" fontSize="10" fill="#64748B">
+            <text x="5" y={(chartCalculations.padding || 40) + 5} fontSize={isMobile ? "8" : "10"} fill="#64748B">
               High
             </text>
-            <text x="10" y="105" fontSize="10" fill="#64748B">
+            <text x="5" y={(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120) / 2 + 5} fontSize={isMobile ? "8" : "10"} fill="#64748B">
               Med
             </text>
-            <text x="10" y="165" fontSize="10" fill="#64748B">
+            <text x="5" y={(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120) + 5} fontSize={isMobile ? "8" : "10"} fill="#64748B">
               Low
             </text>
 
             {/* X-axis labels */}
             <text
-              x="40"
-              y="195"
-              fontSize="10"
+              x={chartCalculations.padding || 40}
+              y={(chartCalculations.chartHeight || 200) - 5}
+              fontSize={isMobile ? "8" : "10"}
               fill="#64748B"
               textAnchor="middle"
             >
               {chartData[chartData.length - 1]?.date || ""}
             </text>
             <text
-              x="380"
-              y="195"
-              fontSize="10"
+              x={(chartCalculations.padding || 40) + (chartCalculations.chartAreaWidth || 340)}
+              y={(chartCalculations.chartHeight || 200) - 5}
+              fontSize={isMobile ? "8" : "10"}
               fill="#64748B"
               textAnchor="middle"
             >
@@ -480,9 +484,9 @@ export function EnhancedTimelineChart({
           </svg>
 
           {/* Legend */}
-          <div className="absolute bottom-2 left-4 flex items-center gap-4 text-xs">
+          <div className={`absolute bottom-1 left-2 sm:bottom-2 sm:left-4 flex flex-wrap items-center gap-2 sm:gap-4 ${isMobile ? 'text-xs' : 'text-xs'}`}>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-[#6200D9] rounded-full"></div>
+              <div className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} bg-[#6200D9] rounded-full`}></div>
               <span className="text-[#64748B]">
                 {getMetricLabel(selectedMetric)}
               </span>
@@ -490,7 +494,7 @@ export function EnhancedTimelineChart({
             {showForecast && (
               <div className="flex items-center gap-1">
                 <div
-                  className="w-3 h-3 bg-[#7C3AED] rounded-full"
+                  className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} bg-[#7C3AED] rounded-full`}
                   style={{
                     background:
                       "repeating-linear-gradient(45deg, #7C3AED, #7C3AED 2px, transparent 2px, transparent 4px)",
@@ -500,38 +504,38 @@ export function EnhancedTimelineChart({
               </div>
             )}
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-[#EF4444] rounded-full animate-pulse"></div>
+              <div className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} bg-[#EF4444] rounded-full animate-pulse`}></div>
               <span className="text-[#64748B]">Symptoms</span>
             </div>
           </div>
         </div>
 
         {/* Chart Summary with smooth transitions */}
-        <div className="mt-4 p-3 lg:p-4 bg-gray-50 rounded-lg transition-all duration-300">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-center">
+        <div className={`mt-3 lg:mt-4 ${isMobile ? 'p-3' : 'p-3 lg:p-4'} bg-gray-50 rounded-lg transition-all duration-300`}>
+          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'} gap-3 text-center`}>
             <div className="transition-all duration-300">
-              <div className="text-lg lg:text-xl font-bold text-[#0A1C40]">
+              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
                 {Math.round(statistics.average)}
               </div>
-              <div className="text-xs text-[#64748B]">Average</div>
+              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Average</div>
             </div>
             <div className="transition-all duration-300">
-              <div className="text-lg lg:text-xl font-bold text-[#0A1C40]">
+              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
                 {statistics.peak}
               </div>
-              <div className="text-xs text-[#64748B]">Peak</div>
+              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Peak</div>
             </div>
             <div className="transition-all duration-300">
-              <div className="text-lg lg:text-xl font-bold text-[#0A1C40]">
+              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
                 {statistics.symptoms}
               </div>
-              <div className="text-xs text-[#64748B]">Symptoms</div>
+              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Symptoms</div>
             </div>
             <div className="transition-all duration-300">
-              <div className="text-lg lg:text-xl font-bold text-[#0A1C40]">
+              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
                 {statistics.days}
               </div>
-              <div className="text-xs text-[#64748B]">Readings</div>
+              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Readings</div>
             </div>
           </div>
         </div>
@@ -541,14 +545,14 @@ export function EnhancedTimelineChart({
           !isNaN(statistics.bestTime.hour) &&
           statistics.bestTime.hour >= 0 &&
           statistics.bestTime.hour <= 23 && (
-            <div className="mt-4 p-3 lg:p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+            <div className={`mt-3 lg:mt-4 ${isMobile ? 'p-3' : 'p-3 lg:p-4'} bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700`}>
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-semibold text-green-800 dark:text-green-200">
+                <Clock className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-green-600 dark:text-green-400`} />
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-green-800 dark:text-green-200`}>
                   Best Time for Outdoor Activities
                 </span>
               </div>
-              <div className="text-sm text-green-700 dark:text-green-300">
+              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-green-700 dark:text-green-300`}>
                 {statistics.bestTime.hour.toString().padStart(2, "0")}:00 - AQI{" "}
                 {statistics.bestTime.value} (Lowest pollution)
               </div>
@@ -557,18 +561,18 @@ export function EnhancedTimelineChart({
 
         {/* Forecast Toggle */}
         {forecastData.length > 0 && (
-          <div className="mt-4 flex justify-center">
+          <div className={`${isMobile ? 'mt-3' : 'mt-4'} flex justify-center`}>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowForecast(!showForecast)}
-              className="text-xs"
+              className={`${isMobile ? 'text-xs h-8 px-3' : 'text-xs'}`}
             >
               {showForecast ? "Hide Forecast" : "Show Forecast"}
             </Button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

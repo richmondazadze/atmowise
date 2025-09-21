@@ -21,18 +21,23 @@ import {
   Filter,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AirQualityReading {
   id: string;
   aqi: number;
   category: string;
-  dominantPollutant: string;
+  dominantPollutant?: string;
   pm25?: number;
   pm10?: number;
   o3?: number;
   no2?: number;
-  timestamp: string;
+  timestamp?: string;
+  date?: string;
+  time?: string;
   location?: string;
+  source?: string;
+  createdAt?: string;
 }
 
 export default function TimelinePage() {
@@ -42,7 +47,9 @@ export default function TimelinePage() {
   const [selectedPeriod, setSelectedPeriod] = useState<"7d" | "30d" | "90d">(
     "7d"
   );
+  const [selectedMetric, setSelectedMetric] = useState<"aqi" | "pm25" | "pm10" | "o3" | "no2">("aqi");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const isMobile = useIsMobile();
 
   // Redirect to auth if not logged in
   useEffect(() => {
@@ -68,7 +75,8 @@ export default function TimelinePage() {
       if (!response.ok) {
         throw new Error("Failed to fetch air quality history");
       }
-      return response.json();
+      const result = await response.json();
+      return result.data || [];
     },
     enabled: !!user?.id && !!selectedLocation,
     retry: 1,
@@ -103,10 +111,10 @@ export default function TimelinePage() {
         "Location",
       ],
       ...airQualityHistory.map((reading: AirQualityReading) => [
-        new Date(reading.timestamp).toLocaleDateString(),
+        new Date(reading.timestamp || reading.date || reading.createdAt || Date.now()).toLocaleDateString(),
         reading.aqi,
         reading.category,
-        reading.dominantPollutant,
+        reading.dominantPollutant || "Unknown",
         reading.pm25 || "",
         reading.pm10 || "",
         reading.o3 || "",
@@ -189,7 +197,7 @@ export default function TimelinePage() {
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
         {/* Mobile Header */}
         <motion.header
           initial={{ y: -50, opacity: 0 }}
@@ -280,15 +288,17 @@ export default function TimelinePage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.3 }}
-              className="mb-6"
+              className="mb-4 lg:mb-6"
             >
-              <Card className="p-4 shadow-sm">
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Filter className="h-5 w-5 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-700">
-                      Time Period:
-                    </span>
+              <Card className={`${isMobile ? 'p-3' : 'p-4'} shadow-sm`}>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center justify-between">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2">
+                    <div className="flex items-center gap-2">
+                      <Filter className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-gray-500`} />
+                      <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium text-gray-700`}>
+                        Time Period:
+                      </span>
+                    </div>
                     <div className="flex gap-2">
                       {(["7d", "30d", "90d"] as const).map((period) => (
                         <Button
@@ -298,19 +308,19 @@ export default function TimelinePage() {
                           }
                           size="sm"
                           onClick={() => setSelectedPeriod(period)}
-                          className="transition-all duration-200 hover:scale-105"
+                          className={`${isMobile ? 'text-xs h-8 px-2' : ''} transition-all duration-200 hover:scale-105`}
                         >
                           {period === "7d"
-                            ? "7 Days"
+                            ? isMobile ? "7d" : "7 Days"
                             : period === "30d"
-                            ? "30 Days"
-                            : "90 Days"}
+                            ? isMobile ? "30d" : "30 Days"
+                            : isMobile ? "90d" : "90 Days"}
                         </Button>
                       ))}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Button
                       variant="outline"
                       size="sm"
@@ -318,10 +328,10 @@ export default function TimelinePage() {
                       disabled={
                         !airQualityHistory || airQualityHistory.length === 0
                       }
-                      className="flex items-center gap-2 transition-all duration-200 hover:scale-105"
+                      className={`${isMobile ? 'text-xs h-8 px-3 flex-1 sm:flex-none' : ''} flex items-center gap-2 transition-all duration-200 hover:scale-105`}
                     >
-                      <Download className="h-4 w-4" />
-                      Export CSV
+                      <Download className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                      {isMobile ? 'Export' : 'Export CSV'}
                     </Button>
                   </div>
                 </div>
@@ -333,16 +343,16 @@ export default function TimelinePage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.4 }}
-              className="mb-6"
+              className="mb-4 lg:mb-6"
             >
-              <Card className="p-6 shadow-sm">
-                <CardHeader className="pb-4">
+              <Card className={`${isMobile ? 'p-4' : 'p-6'} shadow-sm`}>
+                <CardHeader className="pb-3 lg:pb-4">
                   <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-[#6200D9]" />
-                    Air Quality Trends
+                    <TrendingUp className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-[#6200D9]`} />
+                    <span className={isMobile ? 'text-base' : 'text-lg'}>Air Quality Trends</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className={isMobile ? 'p-0' : ''}>
                   {historyLoading ? (
                     <div className="flex items-center justify-center h-64">
                       <div className="text-center">
@@ -375,8 +385,10 @@ export default function TimelinePage() {
                     <EnhancedTimelineChart
                       airData={airQualityHistory}
                       symptomData={[]}
-                      selectedMetric="aqi"
-                      onMetricChange={() => {}}
+                      selectedMetric={selectedMetric}
+                      onMetricChange={(metric: string) =>
+                        setSelectedMetric(metric as "aqi" | "pm25" | "pm10" | "o3" | "no2")
+                      }
                       selectedPeriod={selectedPeriod}
                       onPeriodChange={(period: string) =>
                         setSelectedPeriod(period as "7d" | "30d" | "90d")
@@ -425,7 +437,7 @@ export default function TimelinePage() {
                   ) : (
                     <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                       <div className="space-y-3">
-                        {airQualityHistory
+                        {airQualityHistory && Array.isArray(airQualityHistory) && airQualityHistory
                           .slice(0, 20)
                           .map((reading: AirQualityReading, index: number) => {
                             const aqiInfo = getAQIInfo(reading.aqi);
@@ -454,7 +466,7 @@ export default function TimelinePage() {
                                     <div className="flex items-center gap-2 mb-1">
                                       <span className="font-medium text-gray-900">
                                         {new Date(
-                                          reading.timestamp
+                                          reading.timestamp || reading.date || reading.createdAt || Date.now()
                                         ).toLocaleDateString()}
                                       </span>
                                       <Badge
@@ -469,14 +481,14 @@ export default function TimelinePage() {
                                         {reading.location || "Unknown Location"}
                                       </span>
                                       <span>•</span>
-                                      <span>{reading.dominantPollutant}</span>
+                                      <span>{reading.dominantPollutant || "Unknown"}</span>
                                     </div>
                                   </div>
                                 </div>
                                 <div className="text-right">
                                   <div className="text-sm text-gray-500">
-                                    {new Date(
-                                      reading.timestamp
+                                    {reading.time || new Date(
+                                      reading.timestamp || reading.date || reading.createdAt || Date.now()
                                     ).toLocaleTimeString([], {
                                       hour: "2-digit",
                                       minute: "2-digit",
