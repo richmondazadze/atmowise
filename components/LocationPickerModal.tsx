@@ -55,6 +55,14 @@ export function LocationPickerModal({
     lon: number;
     label: string;
   } | null>(null);
+
+  // Clean up state when main modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setShowSaveModal(false);
+      setSelectedLocationForSave(null);
+    }
+  }, [isOpen]);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -367,7 +375,7 @@ export function LocationPickerModal({
           isOpen={showSaveModal}
           onClose={() => {
             setShowSaveModal(false);
-            setSelectedLocationForSave(null);
+            // Don't reset selectedLocationForSave here to prevent parent modal from closing
           }}
           location={selectedLocationForSave}
           userId={userId}

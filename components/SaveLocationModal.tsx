@@ -117,7 +117,7 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent className="w-[95vw] max-w-md mx-auto rounded-2xl p-0">
         <DialogHeader className="px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
