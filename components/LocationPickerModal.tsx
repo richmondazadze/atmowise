@@ -91,6 +91,24 @@ export function LocationPickerModal({
     return () => clearTimeout(timeoutId);
   }, [address]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showSuggestions || suggestions.length === 0) return;
@@ -121,7 +139,7 @@ export function LocationPickerModal({
 
   const handleSuggestionSelect = async (suggestion: any) => {
     setAddress(suggestion.formatted);
-    setShowSuggestions(false);
+    setShowSuggestions(false); // Add this line to hide the dropdown
     setSelectedIndex(-1);
     setSuggestions([]); // Clear suggestions
 
@@ -240,7 +258,6 @@ export function LocationPickerModal({
                   onChange={(e) => setAddress(e.target.value)}
                   onKeyDown={handleKeyDown}
                   onFocus={() => setShowSuggestions(true)}
-                  onBlur={() => setShowSuggestions(false)}
                   className="pl-10 h-12 text-base rounded-2xl"
                   autoComplete="off"
                 />

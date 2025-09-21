@@ -188,7 +188,7 @@ export default function Dashboard() {
         }
 
         // If profile doesn't exist (404), create a default one
-      if (response.status === 404) {
+        if (response.status === 404) {
           console.log(
             "Profile not found, creating default profile for user:",
             supabaseUser.id
@@ -211,7 +211,7 @@ export default function Dashboard() {
           });
 
           if (createResponse.ok) {
-        return createResponse.json();
+            return createResponse.json();
           }
         }
 
@@ -346,7 +346,6 @@ export default function Dashboard() {
   } | null>(null);
   const [showLlmResponse, setShowLlmResponse] = useState(false);
 
-
   // Handle location selection
   const handleLocationSelect = (location: {
     lat: number;
@@ -456,8 +455,8 @@ export default function Dashboard() {
         <div className="px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 min-w-0 flex-1">
-              <div className="w-11 h-11 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
-                <Wind className="h-5 w-5 text-white drop-shadow-sm" />
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
+                <img src="/icon.svg" alt="" />
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl font-bold text-[#0A1C40] truncate tracking-tight">
@@ -515,7 +514,9 @@ export default function Dashboard() {
         <div className="px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Dashboard
+              </h1>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Monitor air quality and your health insights
               </p>
@@ -535,7 +536,11 @@ export default function Dashboard() {
                 disabled={locationLoading || airQualityLoading}
                 className="flex items-center gap-2 h-9 px-4 text-sm"
               >
-                <RefreshCw className={`h-4 w-4 ${locationLoading || airQualityLoading ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${
+                    locationLoading || airQualityLoading ? "animate-spin" : ""
+                  }`}
+                />
                 Refresh
               </Button>
             </div>
@@ -548,17 +553,17 @@ export default function Dashboard() {
         <div className="flex items-center space-x-2 text-sm">
           <MapPin className="h-4 w-4 text-[#6200D9] dark:text-purple-400 flex-shrink-0" />
           <span className="text-[#64748B] dark:text-gray-300 truncate flex-1 min-w-0">
-                  {locationLoading && !selectedLocation
-                    ? "Getting location..."
-                    : locationError && !selectedLocation
-                    ? "Location unavailable"
-                    : currentLocationLabel}
-                </span>
-                {selectedLocation && (
+            {locationLoading && !selectedLocation
+              ? "Getting location..."
+              : locationError && !selectedLocation
+              ? "Location unavailable"
+              : currentLocationLabel}
+          </span>
+          {selectedLocation && (
             <span className="text-xs bg-[#6200D9] dark:bg-purple-600 text-white px-2 py-1 rounded-full font-medium flex-shrink-0">
-                    Selected
-                  </span>
-                )}
+              Selected
+            </span>
+          )}
         </div>
       </div>
 
@@ -589,8 +594,8 @@ export default function Dashboard() {
             <LocationPickerModal
               isOpen={showLocationPicker}
               onClose={() => setShowLocationPicker(false)}
-                onLocationSelect={handleLocationSelect}
-                currentLocation={selectedLocation || undefined}
+              onLocationSelect={handleLocationSelect}
+              currentLocation={selectedLocation || undefined}
               userId={supabaseUser?.id}
               onUseCurrentLocation={async () => {
                 if (currentLat && currentLon) {
@@ -645,8 +650,8 @@ export default function Dashboard() {
             {/* Enhanced Air Quality Risk Card */}
             <EnhancedRiskCard
               aqi={airQualityData?.aqi || 0}
-              category={airQualityData?.category || 'Unknown'}
-              dominantPollutant={airQualityData?.dominantPollutant || 'PM2.5'}
+              category={airQualityData?.category || "Unknown"}
+              dominantPollutant={airQualityData?.dominantPollutant || "PM2.5"}
               previousAqi={airQualityData?.previousAqi}
               className="animate-fade-in"
             />
@@ -657,7 +662,7 @@ export default function Dashboard() {
                 currentAqi={airQualityData.aqi}
                 dominantPollutant={airQualityData.dominantPollutant}
                 category={airQualityData.category}
-                userId={supabaseUser?.id || ''}
+                userId={supabaseUser?.id || ""}
               />
             )}
 
@@ -670,7 +675,6 @@ export default function Dashboard() {
                 forecastData={[]} // TODO: Add forecast data
               />
             )}
-
 
             {/* Symptom Form - Mobile Optimized */}
             <div className="bg-white rounded-2xl p-5 lg:p-8 animate-fade-in shadow-sm border border-gray-100/50">
@@ -745,7 +749,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-
       {/* Profile Setup Modal - Disabled for now */}
       {/* <ProfileSetupModal
         isOpen={showProfileSetup}
@@ -770,16 +773,16 @@ export default function Dashboard() {
               aqi: airQualityData.aqi,
               category: airQualityData.category,
               dominantPollutant: airQualityData.dominantPollutant,
-              location: selectedLocation?.label || 'Unknown Location',
-              timestamp: airQualityData.timestamp || new Date().toISOString()
+              location: selectedLocation?.label || "Unknown Location",
+              timestamp: airQualityData.timestamp || new Date().toISOString(),
             }}
-      />
-    </div>
+          />
+        </div>
       )}
 
       {/* Navigation */}
       <Navigation />
-      
+
       {/* Floating Settings Button */}
       <FloatingSettingsButton />
     </PageLayout>

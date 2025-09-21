@@ -347,17 +347,6 @@ export default function LandingPage() {
                 healthcare providers and patients worldwide for respiratory
                 health management.
               </p>
-              <div className="flex space-x-3 sm:space-x-4">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-800 rounded-lg flex items-center justify-center">
-                  <Globe className="h-3 w-3 sm:h-4 sm:w-4" />
-                </div>
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-800 rounded-lg flex items-center justify-center">
-                  <Heart className="h-3 w-3 sm:h-4 sm:w-4" />
-                </div>
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-800 rounded-lg flex items-center justify-center">
-                  <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
-                </div>
-              </div>
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
