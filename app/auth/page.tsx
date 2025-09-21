@@ -1,68 +1,68 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Shield, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Shield, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function AuthPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
-  const [isSignUp, setIsSignUp] = useState(false)
-  const { signIn, signUp, signInWithGoogle } = useAuth()
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setMessage(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
 
-    const { error } = await signIn(email, password)
+    const { error } = await signIn(email, password);
     if (error) {
-      setError(error.message)
+      setError(error.message);
     } else {
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setMessage(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
 
-    const { error } = await signUp(email, password, firstName)
+    const { error } = await signUp(email, password, firstName);
     if (error) {
-      setError(error.message)
+      setError(error.message);
     } else {
-      setMessage('Check your email for the confirmation link!')
+      setMessage("Check your email for the confirmation link!");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true)
-    setError(null)
-    const { error } = await signInWithGoogle()
+    setLoading(true);
+    setError(null);
+    const { error } = await signInWithGoogle();
     if (error) {
-      setError(error.message)
+      setError(error.message);
     } else {
-      router.push('/dashboard')
+      router.push("/dashboard");
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -75,13 +75,12 @@ export default function AuthPage() {
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
-            {isSignUp ? 'Create your account' : 'Sign in to your account'}
+            {isSignUp ? "Create your account" : "Sign in to your account"}
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {isSignUp 
-              ? 'Join AtmoWise for clinical-grade air quality monitoring'
-              : 'Access your personalized air quality health dashboard'
-            }
+            {isSignUp
+              ? "Join AtmoWise for clinical-grade air quality monitoring"
+              : "Access your personalized air quality health dashboard"}
           </p>
         </div>
 
@@ -89,7 +88,7 @@ export default function AuthPage() {
         <Card className="border-0 shadow-xl">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">
-              {isSignUp ? 'Sign Up' : 'Sign In'}
+              {isSignUp ? "Sign Up" : "Sign In"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -130,12 +129,17 @@ export default function AuthPage() {
                 <div className="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-50 dark:bg-slate-900 text-gray-500">Or continue with email</span>
+                <span className="px-2 bg-gray-50 dark:bg-slate-900 text-gray-500">
+                  Or continue with email
+                </span>
               </div>
             </div>
 
             {/* Email/Password Form */}
-            <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-4">
+            <form
+              onSubmit={isSignUp ? handleSignUp : handleSignIn}
+              className="space-y-4"
+            >
               {isSignUp && (
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
@@ -169,7 +173,7 @@ export default function AuthPage() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -210,9 +214,9 @@ export default function AuthPage() {
                 className="w-full h-11 bg-[#6200D9] hover:bg-[#4C00A8]"
               >
                 {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="text-white mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                {isSignUp ? 'Create Account' : 'Sign In'}
+                {isSignUp ? "Create Account" : "Sign In"}
               </Button>
             </form>
 
@@ -221,16 +225,15 @@ export default function AuthPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setIsSignUp(!isSignUp)
-                  setError(null)
-                  setMessage(null)
+                  setIsSignUp(!isSignUp);
+                  setError(null);
+                  setMessage(null);
                 }}
                 className="text-sm text-[#6200D9] hover:text-[#4C00A8] font-medium"
               >
-                {isSignUp 
-                  ? 'Already have an account? Sign in'
-                  : "Don't have an account? Sign up"
-                }
+                {isSignUp
+                  ? "Already have an account? Sign in"
+                  : "Don't have an account? Sign up"}
               </button>
             </div>
           </CardContent>
@@ -239,7 +242,7 @@ export default function AuthPage() {
         {/* Back to Landing */}
         <div className="text-center">
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
           >
             ← Back to AtmoWise
@@ -247,5 +250,5 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,20 +1,37 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLocation } from '@/contexts/LocationContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TrendingUp, MapPin, Calendar, Activity, RefreshCw, Download, Filter, Wind, AlertCircle } from 'lucide-react';
-import { Navigation } from '@/components/Navigation';
-import { PageLayout } from '@/components/PageLayout';
-import { EnhancedTimelineChart } from '@/components/EnhancedTimelineChart';
-import { FloatingSettingsButton } from '@/components/FloatingSettingsButton';
-import { useToast } from '@/hooks/use-toast';
-import { storage } from '@/lib/storage';
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLocation } from "@/contexts/LocationContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  TrendingUp,
+  MapPin,
+  Calendar,
+  Activity,
+  RefreshCw,
+  Download,
+  Filter,
+  Wind,
+  AlertCircle,
+} from "lucide-react";
+import { Navigation } from "@/components/Navigation";
+import { PageLayout } from "@/components/PageLayout";
+import { EnhancedTimelineChart } from "@/components/EnhancedTimelineChart";
+import { FloatingSettingsButton } from "@/components/FloatingSettingsButton";
+import { useToast } from "@/hooks/use-toast";
+import { storage } from "@/lib/storage";
+import { useRouter } from "next/navigation";
 
 interface TimelineData {
   id: string;
@@ -32,11 +49,16 @@ interface TimelineData {
 }
 
 export default function TimelinePage() {
+  const router = useRouter();
   const { user } = useAuth();
   const { selectedLocation } = useLocation();
   const { toast } = useToast();
-  const [selectedPeriod, setSelectedPeriod] = useState(storage.getTimelinePeriod());
-  const [selectedMetric, setSelectedMetric] = useState(storage.getTimelineMetric());
+  const [selectedPeriod, setSelectedPeriod] = useState(
+    storage.getTimelinePeriod()
+  );
+  const [selectedMetric, setSelectedMetric] = useState(
+    storage.getTimelineMetric()
+  );
 
   // Save preferences when they change
   useEffect(() => {
@@ -50,17 +72,33 @@ export default function TimelinePage() {
   // Convert period to days
   const getDaysFromPeriod = (period: string) => {
     switch (period) {
-      case '1d': return 1;
-      case '7d': return 7;
-      case '30d': return 30;
-      case '90d': return 90;
-      default: return 7;
+      case "1d":
+        return 1;
+      case "7d":
+        return 7;
+      case "30d":
+        return 30;
+      case "90d":
+        return 90;
+      default:
+        return 7;
     }
   };
 
   // Fetch historical air quality data
-  const { data: timelineResponse, isLoading, error, refetch } = useQuery({
-    queryKey: ['timeline-data', user?.id, selectedPeriod, selectedLocation?.lat, selectedLocation?.lon],
+  const {
+    data: timelineResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "timeline-data",
+      user?.id,
+      selectedPeriod,
+      selectedLocation?.lat,
+      selectedLocation?.lon,
+    ],
     queryFn: async () => {
       if (!user?.id || !selectedLocation) {
         return { data: [], period: 0, totalReadings: 0, location: null };
@@ -68,12 +106,14 @@ export default function TimelinePage() {
 
       const days = getDaysFromPeriod(selectedPeriod);
       const url = `/api/air/history?userId=${user.id}&days=${days}&lat=${selectedLocation.lat}&lon=${selectedLocation.lon}`;
-      
+
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(`Failed to fetch timeline data: ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch timeline data: ${response.statusText}`
+        );
       }
-      
+
       return response.json();
     },
     enabled: !!user?.id && !!selectedLocation,
@@ -84,50 +124,62 @@ export default function TimelinePage() {
   const timelineData: TimelineData[] = timelineResponse?.data || [];
 
   const periods = [
-    { value: '1d', label: '1 Day' },
-    { value: '7d', label: '7 Days' },
-    { value: '30d', label: '30 Days' },
-    { value: '90d', label: '90 Days' },
+    { value: "1d", label: "1 Day" },
+    { value: "7d", label: "7 Days" },
+    { value: "30d", label: "30 Days" },
+    { value: "90d", label: "90 Days" },
   ];
 
   const metrics = [
-    { value: 'aqi', label: 'AQI' },
-    { value: 'pm25', label: 'PM2.5' },
-    { value: 'pm10', label: 'PM10' },
-    { value: 'o3', label: 'O₃' },
-    { value: 'no2', label: 'NO₂' },
+    { value: "aqi", label: "AQI" },
+    { value: "pm25", label: "PM2.5" },
+    { value: "pm10", label: "PM10" },
+    { value: "o3", label: "O₃" },
+    { value: "no2", label: "NO₂" },
   ];
 
   const getAQIColor = (aqi: number) => {
-    if (aqi <= 50) return 'bg-green-500';
-    if (aqi <= 100) return 'bg-yellow-500';
-    if (aqi <= 150) return 'bg-orange-500';
-    if (aqi <= 200) return 'bg-red-500';
-    if (aqi <= 300) return 'bg-purple-500';
-    return 'bg-red-800';
+    if (aqi <= 50) return "bg-green-500";
+    if (aqi <= 100) return "bg-yellow-500";
+    if (aqi <= 150) return "bg-orange-500";
+    if (aqi <= 200) return "bg-red-500";
+    if (aqi <= 300) return "bg-purple-500";
+    return "bg-red-800";
   };
 
   const getAQILabel = (aqi: number) => {
-    if (aqi <= 50) return 'Good';
-    if (aqi <= 100) return 'Moderate';
-    if (aqi <= 150) return 'Unhealthy for Sensitive Groups';
-    if (aqi <= 200) return 'Unhealthy';
-    if (aqi <= 300) return 'Very Unhealthy';
-    return 'Hazardous';
+    if (aqi <= 50) return "Good";
+    if (aqi <= 100) return "Moderate";
+    if (aqi <= 150) return "Unhealthy for Sensitive Groups";
+    if (aqi <= 200) return "Unhealthy";
+    if (aqi <= 300) return "Very Unhealthy";
+    return "Hazardous";
   };
 
   // Calculate stats from real data
-  const stats = timelineData.length > 0 ? {
-    averageAQI: Math.round(timelineData.reduce((sum, item) => sum + item.aqi, 0) / timelineData.length),
-    bestDay: timelineData.reduce((min, item) => item.aqi < min.aqi ? item : min, timelineData[0]),
-    worstDay: timelineData.reduce((max, item) => item.aqi > max.aqi ? item : max, timelineData[0]),
-    totalReadings: timelineData.length
-  } : {
-    averageAQI: 0,
-    bestDay: { aqi: 0, date: '', time: '' },
-    worstDay: { aqi: 0, date: '', time: '' },
-    totalReadings: 0
-  };
+  const stats =
+    timelineData.length > 0
+      ? {
+          averageAQI: Math.round(
+            timelineData.reduce((sum, item) => sum + item.aqi, 0) /
+              timelineData.length
+          ),
+          bestDay: timelineData.reduce(
+            (min, item) => (item.aqi < min.aqi ? item : min),
+            timelineData[0]
+          ),
+          worstDay: timelineData.reduce(
+            (max, item) => (item.aqi > max.aqi ? item : max),
+            timelineData[0]
+          ),
+          totalReadings: timelineData.length,
+        }
+      : {
+          averageAQI: 0,
+          bestDay: { aqi: 0, date: "", time: "" },
+          worstDay: { aqi: 0, date: "", time: "" },
+          totalReadings: 0,
+        };
 
   // Handle refresh
   const handleRefresh = () => {
@@ -150,8 +202,18 @@ export default function TimelinePage() {
     }
 
     const csvContent = [
-      ['Date', 'Time', 'AQI', 'PM2.5', 'PM10', 'O3', 'NO2', 'Category', 'Source'],
-      ...timelineData.map(item => [
+      [
+        "Date",
+        "Time",
+        "AQI",
+        "PM2.5",
+        "PM10",
+        "O3",
+        "NO2",
+        "Category",
+        "Source",
+      ],
+      ...timelineData.map((item) => [
         item.date,
         item.time,
         item.aqi,
@@ -160,15 +222,19 @@ export default function TimelinePage() {
         item.o3,
         item.no2,
         item.category,
-        item.source
-      ])
-    ].map(row => row.join(',')).join('\n');
+        item.source,
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `atmowise-timeline-${selectedPeriod}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `atmowise-timeline-${selectedPeriod}-${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
 
@@ -195,10 +261,15 @@ export default function TimelinePage() {
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center max-w-md mx-auto p-6">
             <MapPin className="h-16 w-16 text-[#64748B] mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-[#0A1C40] mb-2">No Location Selected</h2>
-            <p className="text-[#64748B] mb-6">Please select a location from the Dashboard to view your air quality timeline.</p>
-            <Button 
-              onClick={() => window.history.back()}
+            <h2 className="text-xl font-bold text-[#0A1C40] mb-2">
+              No Location Selected
+            </h2>
+            <p className="text-[#64748B] mb-6">
+              Please select a location from the Dashboard to view your air
+              quality timeline.
+            </p>
+            <Button
+              onClick={() => router.push("/dashboard")}
               className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
             >
               Go to Dashboard
@@ -221,8 +292,12 @@ export default function TimelinePage() {
                 <TrendingUp className="h-5 w-5 text-white drop-shadow-sm" />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">Timeline</h1>
-                <p className="text-xs text-[#64748B] font-medium truncate">Air Quality History</p>
+                <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">
+                  Timeline
+                </h1>
+                <p className="text-xs text-[#64748B] font-medium truncate">
+                  Air Quality History
+                </p>
               </div>
             </div>
           </div>
@@ -235,7 +310,9 @@ export default function TimelinePage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="heading-1 text-[#0A1C40]">Timeline</h1>
-              <p className="body-large text-[#64748B]">Track your air quality history and trends</p>
+              <p className="body-large text-[#64748B]">
+                Track your air quality history and trends
+              </p>
             </div>
           </div>
         </div>
@@ -254,15 +331,15 @@ export default function TimelinePage() {
                   onClick={() => setSelectedPeriod(period.value)}
                   className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap touch-target ${
                     selectedPeriod === period.value
-                      ? 'bg-gradient-to-r from-[#6200D9] to-[#7C3AED] text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-[#64748B] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+                      ? "bg-gradient-to-r from-[#6200D9] to-[#7C3AED] text-white shadow-lg"
+                      : "bg-white dark:bg-gray-800 text-[#64748B] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600"
                   }`}
                 >
                   {period.label}
                 </button>
               ))}
             </div>
-            
+
             {/* Action Buttons - Mobile Optimized */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 px-1">
               <Select value={selectedMetric} onValueChange={setSelectedMetric}>
@@ -277,21 +354,23 @@ export default function TimelinePage() {
                   ))}
                 </SelectContent>
               </Select>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleRefresh}
                 disabled={isLoading}
                 className="h-10 px-3 border-gray-200 hover:bg-gray-50 rounded-xl text-sm font-medium touch-target"
               >
-                <RefreshCw className={`h-4 w-4 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
-                {isLoading ? 'Loading...' : 'Refresh'}
+                <RefreshCw
+                  className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`}
+                />
+                {isLoading ? "Loading..." : "Refresh"}
               </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleExport}
                 disabled={timelineData.length === 0}
                 className="h-10 px-3 border-gray-200 hover:bg-gray-50 rounded-xl text-sm font-medium touch-target"
@@ -311,44 +390,60 @@ export default function TimelinePage() {
                 <Activity className="h-5 w-5 text-white drop-shadow-sm" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">Average AQI</p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">{stats.averageAQI}</p>
+                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
+                  Average AQI
+                </p>
+                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
+                  {stats.averageAQI}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100/50">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-[#BA5FFF] to-[#A847E6] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
                 <TrendingUp className="h-5 w-5 text-white drop-shadow-sm" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">Best Day</p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">{stats.bestDay.aqi}</p>
+                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
+                  Best Day
+                </p>
+                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
+                  {stats.bestDay.aqi}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100/50">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-[#EF4444] to-[#DC2626] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
                 <Activity className="h-5 w-5 text-white drop-shadow-sm" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">Worst Day</p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">{stats.worstDay.aqi}</p>
+                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
+                  Worst Day
+                </p>
+                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
+                  {stats.worstDay.aqi}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100/50">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
                 <Wind className="h-5 w-5 text-white drop-shadow-sm" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">Total Readings</p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">{stats.totalReadings}</p>
+                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
+                  Total Readings
+                </p>
+                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
+                  {stats.totalReadings}
+                </p>
               </div>
             </div>
           </div>
@@ -370,9 +465,16 @@ export default function TimelinePage() {
             <div className="flex items-center justify-center text-center">
               <div>
                 <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-[#0A1C40] mb-2">Failed to Load Data</h3>
-                <p className="text-[#64748B] mb-4">Unable to fetch timeline data. Please try again.</p>
-                <Button onClick={handleRefresh} className="bg-[#6200D9] hover:bg-[#4C00A8] text-white">
+                <h3 className="text-lg font-bold text-[#0A1C40] mb-2">
+                  Failed to Load Data
+                </h3>
+                <p className="text-[#64748B] mb-4">
+                  Unable to fetch timeline data. Please try again.
+                </p>
+                <Button
+                  onClick={handleRefresh}
+                  className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
+                >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Retry
                 </Button>
@@ -387,12 +489,14 @@ export default function TimelinePage() {
             <div className="flex items-center justify-center text-center">
               <div>
                 <TrendingUp className="h-12 w-12 text-[#64748B] mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-[#0A1C40] mb-2">No Data Available</h3>
+                <h3 className="text-lg font-bold text-[#0A1C40] mb-2">
+                  No Data Available
+                </h3>
                 <p className="text-[#64748B] mb-4">
-                  No air quality data found for the selected period. 
-                  Data will appear here as you check air quality from the Dashboard.
+                  No air quality data found for the selected period. Data will
+                  appear here as you check air quality from the Dashboard.
                 </p>
-                <Button 
+                <Button
                   onClick={() => window.history.back()}
                   className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
                 >
@@ -420,7 +524,9 @@ export default function TimelinePage() {
         {!isLoading && !error && timelineData.length > 0 && (
           <div className="bg-white rounded-2xl p-5 lg:p-8 shadow-sm border border-gray-100/50">
             <div className="flex items-center justify-between mb-5 lg:mb-6">
-              <h3 className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">Recent Readings</h3>
+              <h3 className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
+                Recent Readings
+              </h3>
               <div className="flex items-center space-x-2">
                 <span className="text-xs text-[#64748B] font-medium">
                   {selectedLocation.label}
@@ -432,12 +538,20 @@ export default function TimelinePage() {
             </div>
             <div className="space-y-3 lg:space-y-4">
               {timelineData.slice(0, 10).map((reading) => (
-                <div key={reading.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border border-gray-100 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200/50 transition-all duration-200 touch-target">
+                <div
+                  key={reading.id}
+                  className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border border-gray-100 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200/50 transition-all duration-200 touch-target"
+                >
                   <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <div className={`w-3 h-3 rounded-full ${getAQIColor(reading.aqi)} shadow-sm flex-shrink-0`} />
+                    <div
+                      className={`w-3 h-3 rounded-full ${getAQIColor(
+                        reading.aqi
+                      )} shadow-sm flex-shrink-0`}
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm lg:text-base text-[#0A1C40] font-bold truncate">
-                        {new Date(reading.date).toLocaleDateString()} at {reading.time}
+                        {new Date(reading.date).toLocaleDateString()} at{" "}
+                        {reading.time}
                       </p>
                       <p className="text-xs lg:text-sm text-[#64748B] font-medium truncate">
                         {reading.location} • {reading.source}
@@ -446,10 +560,18 @@ export default function TimelinePage() {
                   </div>
                   <div className="flex items-center space-x-3 flex-shrink-0">
                     <div className="text-right">
-                      <p className="text-lg lg:text-xl text-[#0A1C40] font-bold tracking-tight">{reading.aqi}</p>
-                      <p className="text-xs lg:text-sm text-[#64748B] font-semibold">{getAQILabel(reading.aqi)}</p>
+                      <p className="text-lg lg:text-xl text-[#0A1C40] font-bold tracking-tight">
+                        {reading.aqi}
+                      </p>
+                      <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
+                        {getAQILabel(reading.aqi)}
+                      </p>
                     </div>
-                    <Badge className={`${getAQIColor(reading.aqi)} text-white text-xs px-2 py-1 rounded-full font-bold shadow-sm`}>
+                    <Badge
+                      className={`${getAQIColor(
+                        reading.aqi
+                      )} text-white text-xs px-2 py-1 rounded-full font-bold shadow-sm`}
+                    >
                       {reading.category}
                     </Badge>
                   </div>
@@ -462,7 +584,7 @@ export default function TimelinePage() {
 
       {/* Navigation */}
       <Navigation />
-      
+
       {/* Floating Settings Button */}
       <FloatingSettingsButton />
     </PageLayout>
