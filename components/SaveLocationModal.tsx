@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { ModalActions } from './ui/modal-actions';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { MapPin, Home, Briefcase, Dumbbell, GraduationCap, Save, X } from 'lucide-react';
@@ -25,8 +26,8 @@ const PLACE_TYPES = [
 ];
 
 export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLocationModalProps) {
-  const [placeName, setPlaceName] = useState('');
-  const [selectedType, setSelectedType] = useState<'home' | 'work' | 'gym' | 'school' | 'custom'>('custom');
+  const [placeName, setPlaceName] = useState('Home');
+  const [selectedType, setSelectedType] = useState<'home' | 'work' | 'gym' | 'school' | 'custom'>('home');
   const [customName, setCustomName] = useState('');
   
   const queryClient = useQueryClient();
@@ -125,10 +126,10 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
           </DialogTitle>
         </DialogHeader>
         
-        <div className="px-6 pb-6 space-y-6">
+        <div className="px-6 pb-6 space-y-4">
           {/* Authentication Warning */}
           {!userId && (
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
               <div className="flex items-center gap-2 text-yellow-800">
                 <X className="h-4 w-4" />
                 <span className="text-sm font-medium">Sign in required to save locations</span>
@@ -137,7 +138,7 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
           )}
 
           {/* Location Preview */}
-          <div className="p-4 bg-gray-50 rounded-xl">
+          <div className="p-3 bg-gray-50 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
               <MapPin className="h-4 w-4 text-gray-500" />
               <span className="font-medium text-gray-900">{location.label}</span>
@@ -148,7 +149,7 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
           </div>
 
           {/* Place Type Selection */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <Label className="text-sm font-semibold text-gray-700">Type</Label>
             <div className="grid grid-cols-2 gap-2">
               {PLACE_TYPES.map((type) => {
@@ -157,16 +158,24 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
                   <button
                     key={type.key}
                     type="button"
-                    onClick={() => userId && setSelectedType(type.key as any)}
+                    onClick={() => {
+                      if (userId) {
+                        setSelectedType(type.key as any);
+                        // Set default name based on type
+                        if (type.key !== 'custom') {
+                          setPlaceName(type.label);
+                        }
+                      }
+                    }}
                     disabled={!userId}
-                    className={`p-3 rounded-2xl border-2 transition-all duration-200 touch-target ${
+                    className={`p-2 rounded-xl border-2 transition-all duration-200 touch-target ${
                       selectedType === type.key
                         ? 'border-[#6200D9] bg-[#6200D9]/5'
                         : 'border-gray-200 hover:border-gray-300'
                     } ${!userId ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    <div className="flex flex-col items-center space-y-2">
-                      <Icon className="h-5 w-5 text-gray-600" />
+                    <div className="flex flex-col items-center space-y-1">
+                      <Icon className="h-4 w-4 text-gray-600" />
                       <span className="text-xs font-medium text-gray-700">{type.label}</span>
                     </div>
                   </button>
@@ -175,47 +184,42 @@ export function SaveLocationModal({ isOpen, onClose, location, userId }: SaveLoc
             </div>
           </div>
 
-          {/* Name Input */}
-          <div className="space-y-2">
-            <Label htmlFor="place-name" className="text-sm font-semibold text-gray-700">
-              {selectedType === 'custom' ? 'Custom Name' : 'Name'}
-            </Label>
-            <Input
-              id="place-name"
-              type="text"
-              value={selectedType === 'custom' ? customName : placeName}
-              onChange={(e) => {
-                if (userId) {
-                  if (selectedType === 'custom') {
+          {/* Name Input - Only show for custom type */}
+          {selectedType === 'custom' && (
+            <div className="space-y-2">
+              <Label htmlFor="place-name" className="text-sm font-semibold text-gray-700">
+                Custom Name
+              </Label>
+              <Input
+                id="place-name"
+                type="text"
+                value={customName}
+                onChange={(e) => {
+                  if (userId) {
                     setCustomName(e.target.value);
-                  } else {
-                    setPlaceName(e.target.value);
                   }
-                }
-              }}
-              placeholder={selectedType === 'custom' ? 'Enter custom name...' : `Enter ${PLACE_TYPES.find(t => t.key === selectedType)?.label.toLowerCase()} name...`}
-              className="h-11 text-sm rounded-2xl"
-              disabled={!userId}
-            />
-          </div>
+                }}
+                placeholder="Enter custom name..."
+                className="h-10 text-sm rounded-xl"
+                disabled={!userId}
+              />
+            </div>
+          )}
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4 border-t border-gray-200">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className="px-4 sm:px-6 py-2 sm:py-3 touch-target order-2 sm:order-1 text-sm sm:text-base rounded-2xl"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!userId || createPlaceMutation.isPending || !(selectedType === 'custom' ? customName.trim() : placeName.trim())}
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {!userId ? 'Sign In Required' : createPlaceMutation.isPending ? 'Saving...' : 'Save Location'}
-            </Button>
-          </div>
+          <ModalActions
+            primaryAction={{
+              label: !userId ? 'Sign In Required' : createPlaceMutation.isPending ? 'Saving...' : 'Save Location',
+              onClick: handleSave,
+              disabled: !userId || createPlaceMutation.isPending || (selectedType === 'custom' && !customName.trim()),
+              loading: createPlaceMutation.isPending
+            }}
+            secondaryAction={{
+              label: 'Cancel',
+              onClick: handleClose
+            }}
+          />
+          
         </div>
       </DialogContent>
     </Dialog>

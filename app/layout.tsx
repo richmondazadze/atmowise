@@ -24,7 +24,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={bricolageGrotesque.className}>
         <GlobalErrorHandler />
-        <Providers>{children}</Providers>
+              <Providers>
+                {children}
+              </Providers>
       </body>
     </html>
   )

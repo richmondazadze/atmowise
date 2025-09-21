@@ -72,11 +72,11 @@ export function RoundedGauge({
 
   const getStatusColor = (value: number, threshold: number) => {
     const ratio = value / threshold;
-    if (ratio <= 0.4) return "bg-green-100 text-green-800";
-    if (ratio <= 0.8) return "bg-yellow-100 text-yellow-800";
-    if (ratio <= 1.2) return "bg-orange-100 text-orange-800";
-    if (ratio <= 2.0) return "bg-red-100 text-red-800";
-    return "bg-red-200 text-red-900";
+    if (ratio <= 0.4) return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
+    if (ratio <= 0.8) return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300";
+    if (ratio <= 1.2) return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300";
+    if (ratio <= 2.0) return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
+    return "bg-red-200 text-red-900 dark:bg-red-900/30 dark:text-red-200";
   };
 
   // Ensure value is a valid number, default to 0 if null/undefined
@@ -93,16 +93,16 @@ export function RoundedGauge({
 
   return (
     <Card
-      className={`bg-white border-2 transition-all duration-300 hover:shadow-lg ${className}`}
+      className={`bg-white dark:bg-gray-900 border-2 transition-all duration-300 hover:shadow-lg ${className}`}
     >
       <CardContent className="p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <div className="p-2 bg-gray-50 rounded-lg">{getIcon(type)}</div>
+            <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">{getIcon(type)}</div>
             <div>
-              <h3 className="font-semibold text-gray-800 text-sm">{type}</h3>
-              <p className="text-xs text-gray-600">{unit}</p>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{type}</h3>
+              <p className="text-xs text-gray-600 dark:text-gray-400">{unit}</p>
             </div>
           </div>
           <div className="flex items-center justify-end">
@@ -217,7 +217,7 @@ export function RoundedGauge({
                 >
                   {displayValue}
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 dark:text-gray-400">
                   {safeValue > 0 ? `${Math.round(ratio * 100)}%` : "N/A"}
                 </div>
               </div>
@@ -225,7 +225,7 @@ export function RoundedGauge({
           </div>
 
           {/* Labels */}
-          <div className="flex justify-between w-full max-w-28 xs:max-w-32 sm:max-w-36 lg:max-w-36 text-xs text-gray-500 mt-2">
+          <div className="flex justify-between w-full max-w-28 xs:max-w-32 sm:max-w-36 lg:max-w-36 text-xs text-gray-500 dark:text-gray-400 mt-2">
             <span>0</span>
             <span className="font-medium">{threshold}</span>
             <span>{Math.round(threshold * 1.5)}</span>

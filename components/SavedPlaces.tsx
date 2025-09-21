@@ -255,7 +255,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
           </div>
         ) : (
           <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
-            {savedPlaces.map((place) => {
+            {savedPlaces.map((place: any) => {
               const typeInfo = PLACE_TYPES[place.type as keyof typeof PLACE_TYPES] || PLACE_TYPES.custom;
               const TypeIcon = typeInfo.icon;
               

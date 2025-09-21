@@ -134,39 +134,61 @@ export function SymptomForm({ userId = "", profile = null, airData = null, onSym
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#0A1C40] mb-3">
+        <label className="block text-sm font-semibold text-[#0A1C40] dark:text-white mb-4">
           Severity Level
         </label>
-        <div className="space-y-3">
-          <Slider
-            value={severity}
-            onValueChange={setSeverity}
-            max={5}
-            min={1}
-            step={1}
-            className="w-full [&>span:first-child]:h-3 [&>span:first-child]:bg-[#E2E8F0] [&>span:first-child>span]:bg-gradient-to-r [&>span:first-child>span]:from-[#6200D9] [&>span:first-child>span]:to-[#4C00A8]"
-            thumbClassName="h-6 w-6 bg-white border-2 border-[#6200D9] shadow-lg"
-            disabled={isLoading}
-            data-testid="slider-severity"
-          />
-          <div className="flex justify-between text-xs font-medium text-[#64748B] px-1">
-            <span className="text-green-600">Mild</span>
-            <span className="text-yellow-600">Moderate</span>
-            <span className="text-red-600">Severe</span>
+        
+        {/* Modern Severity Slider */}
+        <div className="space-y-4">
+          {/* Slider Container */}
+          <div className="severity-slider relative px-2">
+            <Slider
+              value={severity}
+              onValueChange={setSeverity}
+              max={5}
+              min={1}
+              step={1}
+              className="w-full [&>span:first-child]:h-2 [&>span:first-child]:bg-gray-200 dark:[&>span:first-child]:bg-gray-700 [&>span:first-child]:rounded-full [&>span:first-child>span]:bg-gradient-to-r [&>span:first-child>span]:from-[#6200D9] [&>span:first-child>span]:to-[#4C00A8] [&>span:first-child>span]:rounded-full [&>span:first-child>span]:shadow-lg"
+              disabled={isLoading}
+              data-testid="slider-severity"
+            />
+            
+            {/* Severity Dots */}
+            <div className="absolute top-0 left-2 right-2 flex justify-between pointer-events-none">
+              {[1, 2, 3, 4, 5].map((level) => (
+                <div
+                  key={level}
+                  className={`severity-dot ${
+                    severity[0] >= level ? 'active' : 'inactive'
+                  }`}
+                  style={{ transform: 'translateY(-2px)' }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="mt-3 text-center">
-          <Badge 
-            variant="outline" 
-            className={`text-sm font-semibold px-4 py-2 ${
-              severity[0] <= 2 ? 'bg-green-50 text-green-700 border-green-200' :
-              severity[0] <= 3 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-              'bg-red-50 text-red-700 border-red-200'
-            }`} 
-            data-testid="badge-severity"
-          >
-            Level {severity[0]} - {severity[0] <= 2 ? 'Mild' : severity[0] <= 3 ? 'Moderate' : 'Severe'}
-          </Badge>
+          
+          {/* Severity Labels */}
+          <div className="flex justify-between text-xs font-medium text-gray-600 dark:text-gray-400 px-1">
+            <span className="text-green-600 dark:text-green-400">Mild</span>
+            <span className="text-yellow-600 dark:text-yellow-400">Moderate</span>
+            <span className="text-red-600 dark:text-red-400">Severe</span>
+          </div>
+          
+          {/* Current Level Display */}
+          <div className="text-center">
+            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+              severity[0] <= 2 
+                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700' 
+                : severity[0] <= 3 
+                ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700'
+                : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700'
+            }`}>
+              <div className={`w-2 h-2 rounded-full mr-2 ${
+                severity[0] <= 2 ? 'bg-green-500' : severity[0] <= 3 ? 'bg-yellow-500' : 'bg-red-500'
+              }`} />
+              Level {severity[0]} - {severity[0] <= 2 ? 'Mild' : severity[0] <= 3 ? 'Moderate' : 'Severe'}
+            </div>
+          </div>
         </div>
       </div>
 

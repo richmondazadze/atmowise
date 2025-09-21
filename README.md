@@ -4,12 +4,15 @@ A modern air quality tracking application built with Next.js, Supabase, and Type
 
 ## 🚀 Features
 
-- **Air Quality Monitoring**: Real-time air quality data from OpenAQ API
-- **Health Tracking**: Log symptoms and get AI-powered insights
-- **Authentication**: Secure user authentication with Supabase
-- **Responsive Design**: Works on mobile and desktop
-- **AI Integration**: OpenRouter with DeepSeek model for health insights
-- **Database**: PostgreSQL with Drizzle ORM
+- **Multi-Source Air Quality**: Real-time data from OpenWeather, AirNow, and fallback sources
+- **AI-Powered Health Insights**: Personalized recommendations using OpenRouter (DeepSeek model)
+- **Symptom Tracking**: Log symptoms and get AI-generated health tips
+- **Location Management**: Save favorite places and get location-specific air quality
+- **Dark Mode Support**: Complete dark theme implementation
+- **Mobile-First Design**: Optimized for mobile with desktop support
+- **Real-time Chat**: AI assistant for air quality questions
+- **Export & Share**: Download air quality data as images
+- **Exercise Coach**: AI-powered outdoor activity recommendations
 
 ## 🛠️ Tech Stack
 
@@ -20,7 +23,7 @@ A modern air quality tracking application built with Next.js, Supabase, and Type
 - **Styling**: Tailwind CSS, Radix UI
 - **State Management**: TanStack Query
 - **AI**: OpenRouter (DeepSeek model)
-- **APIs**: OpenAQ, OpenWeather
+- **APIs**: OpenWeather, AirNow, OpenRouter, Geocoding services
 
 ## 📁 Project Structure
 
@@ -71,6 +74,9 @@ SUPABASE_SERVICE_ROLE_KEY=[YOUR_SUPABASE_SERVICE_ROLE_KEY]
 OPENROUTER_API_KEY=sk-or-v1-[YOUR_KEY]
 OPENWEATHER_API_KEY=[YOUR_OPENWEATHER_KEY]
 OPENAQ_API_KEY=[YOUR_OPENAQ_KEY]
+
+# Optional: Geocoding API
+GEOCODE_API_KEY=[YOUR_GEOCODE_KEY]
 ```
 
 ### 3. Database Setup
@@ -105,6 +111,7 @@ Visit `http://localhost:3000`
    - `OPENROUTER_API_KEY`
    - `OPENWEATHER_API_KEY`
    - `OPENAQ_API_KEY`
+   - `GEOCODE_API_KEY` (optional)
 
 3. **Deploy**:
    ```bash

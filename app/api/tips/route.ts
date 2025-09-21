@@ -20,7 +20,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
-    const tips = await storage.getTips(tag ?? undefined, userId);
+    const tagParam = tag !== null ? tag : undefined;
+    const userIdParam = userId || undefined;
+    const tips = await storage.getTips(tagParam, userIdParam);
     return NextResponse.json(tips);
   } catch (error: any) {
     console.error('Get tips error:', error);

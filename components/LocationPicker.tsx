@@ -213,7 +213,7 @@ export function LocationPicker({ onLocationSelect, currentLocation, onUseCurrent
                   {showSuggestions && suggestions.length > 0 && (
                     <div 
                       ref={suggestionsRef}
-                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto backdrop-blur-sm"
+                      className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto backdrop-blur-sm scroll-smooth overscroll-contain"
                     >
                       <div className="p-2">
                         <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2 px-2">

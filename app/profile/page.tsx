@@ -14,6 +14,7 @@ import { User, Settings, Bell, Shield, MapPin, Save, Edit3, X, Check, Wind } fro
 import { useToast } from '@/hooks/use-toast';
 import { Navigation } from '@/components/Navigation';
 import { PageLayout } from '@/components/PageLayout';
+import { FloatingSettingsButton } from '@/components/FloatingSettingsButton';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -147,13 +148,16 @@ export default function ProfilePage() {
   };
 
   const handleNestedChange = (parent: string, field: string, value: any) => {
-    setProfileData(prev => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent as keyof typeof prev],
-        [field]: value
-      }
-    }));
+    setProfileData(prev => {
+      const currentParent = prev[parent as keyof typeof prev];
+      return {
+        ...prev,
+        [parent]: {
+          ...(currentParent && typeof currentParent === 'object' ? currentParent : {}),
+          [field]: value
+        }
+      };
+    });
   };
 
   if (!user) {
@@ -186,16 +190,16 @@ export default function ProfilePage() {
       <header className="lg:hidden sticky top-0 z-40 bg-white/98 backdrop-blur-xl border-b border-gray-100/50 shadow-sm">
         <div className="px-4 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-11 h-11 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
+            <div className="flex items-center space-x-3 min-w-0 flex-1">
+              <div className="w-11 h-11 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20 flex-shrink-0">
                 <User className="h-5 w-5 text-white drop-shadow-sm" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight">Profile</h1>
-                <p className="text-xs text-[#64748B] font-medium">Account & preferences</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">Profile</h1>
+                <p className="text-xs text-[#64748B] font-medium truncate">Account & preferences</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {hasChanges && (
                 <Badge variant="outline" className="text-orange-600 border-orange-200 text-xs px-2 py-1 rounded-full font-medium">
                   Unsaved
@@ -469,6 +473,9 @@ export default function ProfilePage() {
 
       {/* Navigation */}
       <Navigation />
+      
+      {/* Floating Settings Button */}
+      <FloatingSettingsButton />
     </PageLayout>
   );
 }

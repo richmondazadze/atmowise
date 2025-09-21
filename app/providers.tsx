@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { LocationProvider } from '@/contexts/LocationContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -23,12 +24,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <AuthProvider>
-            <LocationProvider>
-              {children}
-              <Toaster />
-            </LocationProvider>
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <LocationProvider>
+                {children}
+                <Toaster />
+              </LocationProvider>
+            </AuthProvider>
+          </ThemeProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
