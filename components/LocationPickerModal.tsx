@@ -278,10 +278,10 @@ export function LocationPickerModal({
               <Button
                 type="submit"
                 disabled={loading || !address.trim()}
-                className="h-12 px-6 bg-[#6200D9] hover:bg-[#4C00A8] rounded-2xl"
+                className="text-white h-12 px-6 bg-[#6200D9] hover:bg-[#4C00A8] rounded-2xl"
               >
                 {loading ? (
-                  <Loader2 className="text-white h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   "Search"
                 )}

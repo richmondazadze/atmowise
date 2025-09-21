@@ -211,10 +211,10 @@ export default function AuthPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 bg-[#6200D9] hover:bg-[#4C00A8]"
+                className="text-white w-full h-11 bg-[#6200D9] hover:bg-[#4C00A8]"
               >
                 {loading ? (
-                  <Loader2 className="text-white mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
                 {isSignUp ? "Create Account" : "Sign In"}
               </Button>
