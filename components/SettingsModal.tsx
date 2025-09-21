@@ -1,14 +1,28 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Settings, Moon, Sun, Type, Palette, Bell, Shield, LogOut } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {
+  Settings,
+  Moon,
+  Sun,
+  Type,
+  Palette,
+  Bell,
+  Shield,
+  LogOut,
+} from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -31,7 +45,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
       <DialogContent className="w-[95vw] max-w-md mx-auto rounded-2xl p-0 overflow-hidden">
         <DialogHeader className="px-6 py-6 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#6200D9] rounded-full flex items-center justify-center">
               <Settings className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -52,7 +66,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <Palette className="h-4 w-4" />
               Appearance
             </h3>
-            
+
             <div className="space-y-4">
               {/* Dark Mode Toggle */}
               <div className="flex items-center justify-between">
@@ -62,7 +76,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   ) : (
                     <Sun className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                   )}
-                  <Label htmlFor="dark-mode" className="text-sm font-medium text-gray-900 dark:text-white">
+                  <Label
+                    htmlFor="dark-mode"
+                    className="text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Dark Mode
                   </Label>
                 </div>
@@ -72,7 +89,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                   onCheckedChange={toggleDarkMode}
                 />
               </div>
-
             </div>
           </div>
 
@@ -84,11 +100,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <Bell className="h-4 w-4" />
               Notifications
             </h3>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label htmlFor="notifications" className="text-sm font-medium text-gray-900 dark:text-white">
+                  <Label
+                    htmlFor="notifications"
+                    className="text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Push Notifications
                   </Label>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -112,11 +131,14 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               <Shield className="h-4 w-4" />
               Privacy & Security
             </h3>
-            
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <Label htmlFor="data-privacy" className="text-sm font-medium text-gray-900 dark:text-white">
+                  <Label
+                    htmlFor="data-privacy"
+                    className="text-sm font-medium text-gray-900 dark:text-white"
+                  >
                     Data Privacy
                   </Label>
                   <p className="text-xs text-gray-600 dark:text-gray-400">

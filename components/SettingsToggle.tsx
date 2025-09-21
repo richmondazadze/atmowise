@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
-import { SettingsModal } from './SettingsModal';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
+import { SettingsModal } from "./SettingsModal";
 
 export function SettingsToggle() {
   const [isModalOpen, setIsModalOpen] = useState(false);
