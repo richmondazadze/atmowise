@@ -319,15 +319,6 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-4">
               <Button
                 variant="outline"
-                onClick={() => setShowLocationPicker(true)}
-                className="flex items-center gap-3 h-11 px-5 text-sm font-medium border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 rounded-xl transition-all duration-200"
-              >
-                <MapPin className="h-4 w-4" />
-                {selectedLocation ? selectedLocation.label : "Select Location"}
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
                 onClick={handleLocationRefresh}
                 disabled={locationLoading || airQualityLoading}
                 className="flex items-center gap-2 h-11 px-4 text-sm font-medium rounded-xl transition-all duration-200"
