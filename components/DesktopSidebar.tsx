@@ -3,14 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home,
-  TrendingUp,
-  User,
-  LifeBuoy,
-  LogOut,
-  Wind,
-} from "lucide-react";
+import { Home, TrendingUp, User, LifeBuoy, LogOut, Wind } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -41,7 +34,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
 
   const mainNavItems: NavItem[] = [
     {
-      path: "/",
+      path: "/dashboard",
       icon: Home,
       label: "Dashboard",
       description: "Overview & insights",
@@ -65,7 +58,6 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
       description: "Health & safety",
     },
   ];
-
 
   const NavItemComponent = React.useCallback(
     ({ item, isActive }: { item: NavItem; isActive: boolean }) => {
@@ -197,9 +189,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
         {/* Main Navigation */}
         <nav className={cn("space-y-2", isCollapsed ? "px-2" : "px-4")}>
           {!isCollapsed && (
-            <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2">
-              
-            </h2>
+            <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2"></h2>
           )}
           {mainNavItems.map((item) => (
             <NavItemComponent
@@ -214,7 +204,6 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
             />
           ))}
         </nav>
-
 
         {/* Crisis Button */}
         {onCrisis && (
