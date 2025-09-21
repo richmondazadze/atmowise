@@ -84,7 +84,6 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
     },
   ];
 
-
   const NavItemComponent = React.useCallback(
     ({ item, isActive }: { item: NavItem; isActive: boolean }) => {
       const Icon = item.icon;
@@ -188,8 +187,6 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
             />
           ))}
         </nav>
-
-
       </div>
 
       {/* Footer */}
