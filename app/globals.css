@@ -818,6 +818,29 @@
       scroll-behavior: smooth;
       overscroll-behavior: contain;
     }
+    
+    /* Ensure bottom navigation stays fixed */
+    .fixed.bottom-0 {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 60 !important;
+    }
+    
+    /* Bottom navigation specific styling */
+    [data-testid="nav-bottom"] {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 60 !important;
+    }
+    
+    /* Prevent content from going behind bottom nav */
+    .pb-20 {
+      padding-bottom: 5rem !important;
+    }
   }
   
   /* Mobile Typography */
