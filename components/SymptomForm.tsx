@@ -154,7 +154,7 @@ export function SymptomForm({
           {/* Slider Container */}
           <div className="severity-slider relative px-2">
             {/* Severity Dots */}
-            <div className="absolute top-0 left-2 right-2 flex justify-between pointer-events-none z-0">
+            <div className="absolute top-0 left-2 right-2 flex justify-between pointer-events-none z-9">
               {[1, 2, 3, 4, 5].map((level) => (
                 <div
                   key={level}

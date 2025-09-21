@@ -1,10 +1,16 @@
-'use client'
+"use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { TrendingUp, Activity, Download, Clock, Sun, Moon } from "lucide-react";
 
 interface EnhancedTimelineChartProps {
@@ -14,35 +20,82 @@ interface EnhancedTimelineChartProps {
   onMetricChange: (metric: string) => void;
   selectedPeriod: string;
   onPeriodChange: (period: string) => void;
-  forecastData?: Array<{ time: string; aqi: number; windSpeed: number; windDirection: number }>;
+  forecastData?: Array<{
+    time: string;
+    aqi: number;
+    windSpeed: number;
+    windDirection: number;
+  }>;
 }
 
 const AQI_COLORS = {
-  0: '#71E07E',    // Good - Green
-  50: '#F59E0B',   // Moderate - Yellow
-  100: '#EF4444',  // Unhealthy for Sensitive - Orange
-  150: '#DC2626',  // Unhealthy - Red
-  200: '#7C3AED',  // Very Unhealthy - Purple
-  300: '#4C1D95'   // Hazardous - Dark Purple
+  0: "#71E07E", // Good - Green
+  50: "#F59E0B", // Moderate - Yellow
+  100: "#EF4444", // Unhealthy for Sensitive - Orange
+  150: "#DC2626", // Unhealthy - Red
+  200: "#7C3AED", // Very Unhealthy - Purple
+  300: "#4C1D95", // Hazardous - Dark Purple
 };
 
 const TIME_WINDOWS = [
-  { start: 6, end: 9, label: '6-9 AM', icon: Sun, color: 'text-yellow-500', description: 'Best time for outdoor activities' },
-  { start: 9, end: 12, label: '9 AM-12 PM', icon: Sun, color: 'text-orange-500', description: 'Good time for outdoor activities' },
-  { start: 12, end: 16, label: '12-4 PM', icon: Sun, color: 'text-red-500', description: 'Avoid outdoor activities' },
-  { start: 16, end: 18, label: '4-6 PM', icon: Sun, color: 'text-orange-500', description: 'Moderate outdoor activities' },
-  { start: 18, end: 21, label: '6-9 PM', icon: Moon, color: 'text-blue-500', description: 'Good time for outdoor activities' },
-  { start: 21, end: 6, label: '9 PM-6 AM', icon: Moon, color: 'text-indigo-500', description: 'Best time for outdoor activities' }
+  {
+    start: 6,
+    end: 9,
+    label: "6-9 AM",
+    icon: Sun,
+    color: "text-yellow-500",
+    description: "Best time for outdoor activities",
+  },
+  {
+    start: 9,
+    end: 12,
+    label: "9 AM-12 PM",
+    icon: Sun,
+    color: "text-orange-500",
+    description: "Good time for outdoor activities",
+  },
+  {
+    start: 12,
+    end: 16,
+    label: "12-4 PM",
+    icon: Sun,
+    color: "text-red-500",
+    description: "Avoid outdoor activities",
+  },
+  {
+    start: 16,
+    end: 18,
+    label: "4-6 PM",
+    icon: Sun,
+    color: "text-orange-500",
+    description: "Moderate outdoor activities",
+  },
+  {
+    start: 18,
+    end: 21,
+    label: "6-9 PM",
+    icon: Moon,
+    color: "text-blue-500",
+    description: "Good time for outdoor activities",
+  },
+  {
+    start: 21,
+    end: 6,
+    label: "9 PM-6 AM",
+    icon: Moon,
+    color: "text-indigo-500",
+    description: "Best time for outdoor activities",
+  },
 ];
 
-export function EnhancedTimelineChart({ 
-  airData, 
-  symptomData, 
-  selectedMetric, 
+export function EnhancedTimelineChart({
+  airData,
+  symptomData,
+  selectedMetric,
   onMetricChange,
   selectedPeriod,
   onPeriodChange,
-  forecastData = []
+  forecastData = [],
 }: EnhancedTimelineChartProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +110,9 @@ export function EnhancedTimelineChart({
   // Memoize max value calculation
   const maxValue = useMemo(() => {
     if (chartData.length === 0) return 100;
-    const values = chartData.map(d => d[selectedMetric as keyof typeof d] as number || 0);
+    const values = chartData.map(
+      (d) => (d[selectedMetric as keyof typeof d] as number) || 0
+    );
     return Math.max(...values) || 100;
   }, [chartData, selectedMetric]);
 
@@ -73,26 +128,37 @@ export function EnhancedTimelineChart({
 
   // Memoize chart calculations with color streaks
   const chartCalculations = useMemo(() => {
-    if (chartData.length === 0) return { points: [], dataPoints: [], colorStreaks: [] };
+    if (chartData.length === 0)
+      return { points: [], dataPoints: [], colorStreaks: [] };
 
     const points = chartData.map((d, i) => {
-      const x = chartData.length === 1 ? 40 + 170 : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
-      const value = d[selectedMetric as keyof typeof d] as number || 0;
-      const y = 170 - ((value / Math.max(maxValue, 1)) * 120);
+      const x =
+        chartData.length === 1
+          ? 40 + 170
+          : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
+      const value = (d[selectedMetric as keyof typeof d] as number) || 0;
+      const y = 170 - (value / Math.max(maxValue, 1)) * 120;
       return { x, y, value, data: d, color: getAQIColor(value) };
     });
 
     const dataPoints = chartData.map((d, i) => {
-      const x = chartData.length === 1 ? 40 + 170 : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
-      const value = d[selectedMetric as keyof typeof d] as number || 0;
-      const y = 170 - ((value / Math.max(maxValue, 1)) * 120);
+      const x =
+        chartData.length === 1
+          ? 40 + 170
+          : 40 + (i / Math.max(chartData.length - 1, 1)) * 340;
+      const value = (d[selectedMetric as keyof typeof d] as number) || 0;
+      const y = 170 - (value / Math.max(maxValue, 1)) * 120;
       return { x, y, value, data: d, color: getAQIColor(value), index: i };
     });
 
     // Create color streaks for AQI visualization
     const colorStreaks = [];
-    let currentStreak = { start: 0, end: 0, color: getAQIColor(chartData[0]?.aqi || 0) };
-    
+    let currentStreak = {
+      start: 0,
+      end: 0,
+      color: getAQIColor(chartData[0]?.aqi || 0),
+    };
+
     for (let i = 1; i < chartData.length; i++) {
       const currentColor = getAQIColor(chartData[i]?.aqi || 0);
       if (currentColor === currentStreak.color) {
@@ -109,12 +175,17 @@ export function EnhancedTimelineChart({
 
   // Memoize forecast calculations
   const forecastCalculations = useMemo(() => {
-    if (!showForecast || forecastData.length === 0) return { points: [], dataPoints: [] };
+    if (!showForecast || forecastData.length === 0)
+      return { points: [], dataPoints: [] };
 
     const forecastPoints = forecastData.map((d, i) => {
-      const x = 40 + ((chartData.length + i) / Math.max(chartData.length + forecastData.length - 1, 1)) * 340;
+      const x =
+        40 +
+        ((chartData.length + i) /
+          Math.max(chartData.length + forecastData.length - 1, 1)) *
+          340;
       const value = d.aqi;
-      const y = 170 - ((value / Math.max(maxValue, 1)) * 120);
+      const y = 170 - (value / Math.max(maxValue, 1)) * 120;
       return { x, y, value, data: d, color: getAQIColor(value) };
     });
 
@@ -123,19 +194,29 @@ export function EnhancedTimelineChart({
 
   // Memoize statistics
   const statistics = useMemo(() => {
-    if (chartData.length === 0) return { 
-      average: 0, 
-      peak: 0, 
-      symptoms: 0, 
-      days: 0, 
-      bestTime: null as { hour: number; value: number; index: number } | null, 
-      worstTime: null as { hour: number; value: number; index: number } | null 
-    };
+    if (chartData.length === 0)
+      return {
+        average: 0,
+        peak: 0,
+        symptoms: 0,
+        days: 0,
+        bestTime: null as { hour: number; value: number; index: number } | null,
+        worstTime: null as {
+          hour: number;
+          value: number;
+          index: number;
+        } | null,
+      };
 
-    const values = chartData.map(d => d[selectedMetric as keyof typeof d] as number || 0);
-    const average = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
+    const values = chartData.map(
+      (d) => (d[selectedMetric as keyof typeof d] as number) || 0
+    );
+    const average =
+      values.length > 0
+        ? values.reduce((sum, val) => sum + val, 0) / values.length
+        : 0;
     const peak = values.length > 0 ? Math.max(...values) : 0;
-    const symptoms = chartData.filter(d => d.symptom).length;
+    const symptoms = chartData.filter((d) => d.symptom).length;
     const days = chartData.length;
 
     // Find best and worst times
@@ -145,9 +226,9 @@ export function EnhancedTimelineChart({
     let worstValue = -Infinity;
 
     chartData.forEach((d, i) => {
-      const value = d[selectedMetric as keyof typeof d] as number || 0;
+      const value = (d[selectedMetric as keyof typeof d] as number) || 0;
       const hour = new Date(d.timestamp).getHours();
-      
+
       if (value < bestValue) {
         bestValue = value;
         bestTime = { hour, value, index: i };
@@ -173,34 +254,36 @@ export function EnhancedTimelineChart({
 
   const getMetricLabel = (metric: string) => {
     switch (metric) {
-      case 'aqi': return 'AQI';
-      case 'pm25': return 'PM2.5 (µg/m³)';
-      case 'pm10': return 'PM10 (µg/m³)';
-      case 'o3': return 'O₃ (ppb)';
-      case 'no2': return 'NO₂ (ppb)';
-      default: return 'AQI';
+      case "aqi":
+        return "AQI";
+      case "pm25":
+        return "PM2.5 (µg/m³)";
+      case "pm10":
+        return "PM10 (µg/m³)";
+      case "o3":
+        return "O₃ (ppb)";
+      case "no2":
+        return "NO₂ (ppb)";
+      default:
+        return "AQI";
     }
   };
 
   const exportData = () => {
     const csvContent = [
-      ['Date', 'AQI', 'PM2.5', 'PM10', 'O3', 'NO2', 'Symptom Severity'].join(','),
-      ...chartData.map(d => [
-        d.date,
-        d.aqi,
-        d.pm25,
-        d.pm10,
-        d.o3,
-        d.no2,
-        d.symptom || ''
-      ].join(','))
-    ].join('\n');
+      ["Date", "AQI", "PM2.5", "PM10", "O3", "NO2", "Symptom Severity"].join(
+        ","
+      ),
+      ...chartData.map((d) =>
+        [d.date, d.aqi, d.pm25, d.pm10, d.o3, d.no2, d.symptom || ""].join(",")
+      ),
+    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `atmowise-data-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `atmowise-data-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -263,7 +346,7 @@ export function EnhancedTimelineChart({
         <div className="h-48 lg:h-64 relative" ref={chartRef}>
           <svg className="w-full h-full" viewBox="0 0 400 200">
             {/* Grid lines */}
-            {[0, 1, 2, 3, 4].map(i => (
+            {[0, 1, 2, 3, 4].map((i) => (
               <line
                 key={i}
                 x1="40"
@@ -274,11 +357,18 @@ export function EnhancedTimelineChart({
                 strokeWidth="1"
               />
             ))}
-            
+
             {/* Color streaks for AQI visualization */}
             {chartCalculations.colorStreaks.map((streak, i) => {
-              const startX = chartData.length === 1 ? 40 + 170 : 40 + (streak.start / Math.max(chartData.length - 1, 1)) * 340;
-              const endX = chartData.length === 1 ? 40 + 170 : 40 + (streak.end / Math.max(chartData.length - 1, 1)) * 340;
+              const startX =
+                chartData.length === 1
+                  ? 40 + 170
+                  : 40 +
+                    (streak.start / Math.max(chartData.length - 1, 1)) * 340;
+              const endX =
+                chartData.length === 1
+                  ? 40 + 170
+                  : 40 + (streak.end / Math.max(chartData.length - 1, 1)) * 340;
               return (
                 <rect
                   key={i}
@@ -291,16 +381,18 @@ export function EnhancedTimelineChart({
                 />
               );
             })}
-            
+
             {/* Historical data line with smooth transition */}
             <polyline
               fill="none"
               stroke="#6200D9"
               strokeWidth="2"
-              points={chartCalculations.points.map(p => `${p.x},${p.y}`).join(' ')}
+              points={chartCalculations.points
+                .map((p) => `${p.x},${p.y}`)
+                .join(" ")}
               className="transition-all duration-300 ease-in-out"
             />
-            
+
             {/* Forecast line (dashed) */}
             {showForecast && forecastCalculations.points.length > 0 && (
               <polyline
@@ -308,11 +400,13 @@ export function EnhancedTimelineChart({
                 stroke="#7C3AED"
                 strokeWidth="2"
                 strokeDasharray="5,5"
-                points={forecastCalculations.points.map(p => `${p.x},${p.y}`).join(' ')}
+                points={forecastCalculations.points
+                  .map((p) => `${p.x},${p.y}`)
+                  .join(" ")}
                 className="transition-all duration-300 ease-in-out"
               />
             )}
-            
+
             {/* Data points with hover effects */}
             {chartCalculations.dataPoints.map((point, i) => (
               <g key={i}>
@@ -323,8 +417,8 @@ export function EnhancedTimelineChart({
                   fill={point.color}
                   className="hover:r-6 transition-all cursor-pointer"
                   style={{
-                    transition: 'all 0.3s ease-in-out',
-                    transform: isLoading ? 'scale(0.8)' : 'scale(1)'
+                    transition: "all 0.3s ease-in-out",
+                    transform: isLoading ? "scale(0.8)" : "scale(1)",
                   }}
                 />
                 {point.data.symptom && (
@@ -338,43 +432,70 @@ export function EnhancedTimelineChart({
                 )}
               </g>
             ))}
-            
+
             {/* Forecast data points */}
-            {showForecast && forecastCalculations.dataPoints.map((point, i) => (
-              <g key={`forecast-${i}`}>
-                <circle
-                  cx={point.x}
-                  cy={point.y}
-                  r="3"
-                  fill={point.color}
-                  className="hover:r-5 transition-all cursor-pointer opacity-70"
-                />
-              </g>
-            ))}
-            
+            {showForecast &&
+              forecastCalculations.dataPoints.map((point, i) => (
+                <g key={`forecast-${i}`}>
+                  <circle
+                    cx={point.x}
+                    cy={point.y}
+                    r="3"
+                    fill={point.color}
+                    className="hover:r-5 transition-all cursor-pointer opacity-70"
+                  />
+                </g>
+              ))}
+
             {/* Y-axis labels */}
-            <text x="10" y="45" fontSize="10" fill="#64748B">High</text>
-            <text x="10" y="105" fontSize="10" fill="#64748B">Med</text>
-            <text x="10" y="165" fontSize="10" fill="#64748B">Low</text>
-            
-            {/* X-axis labels */}
-            <text x="40" y="195" fontSize="10" fill="#64748B" textAnchor="middle">
-              {chartData[0]?.date.split('-')[2] || ''}
+            <text x="10" y="45" fontSize="10" fill="#64748B">
+              High
             </text>
-            <text x="380" y="195" fontSize="10" fill="#64748B" textAnchor="middle">
-              {chartData[chartData.length - 1]?.date.split('-')[2] || ''}
+            <text x="10" y="105" fontSize="10" fill="#64748B">
+              Med
+            </text>
+            <text x="10" y="165" fontSize="10" fill="#64748B">
+              Low
+            </text>
+
+            {/* X-axis labels */}
+            <text
+              x="40"
+              y="195"
+              fontSize="10"
+              fill="#64748B"
+              textAnchor="middle"
+            >
+              {chartData[chartData.length - 1]?.date || ""}
+            </text>
+            <text
+              x="380"
+              y="195"
+              fontSize="10"
+              fill="#64748B"
+              textAnchor="middle"
+            >
+              {chartData[0]?.date || ""}
             </text>
           </svg>
-          
+
           {/* Legend */}
           <div className="absolute bottom-2 left-4 flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 bg-[#6200D9] rounded-full"></div>
-              <span className="text-[#64748B]">{getMetricLabel(selectedMetric)}</span>
+              <span className="text-[#64748B]">
+                {getMetricLabel(selectedMetric)}
+              </span>
             </div>
             {showForecast && (
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-[#7C3AED] rounded-full" style={{ background: 'repeating-linear-gradient(45deg, #7C3AED, #7C3AED 2px, transparent 2px, transparent 4px)' }}></div>
+                <div
+                  className="w-3 h-3 bg-[#7C3AED] rounded-full"
+                  style={{
+                    background:
+                      "repeating-linear-gradient(45deg, #7C3AED, #7C3AED 2px, transparent 2px, transparent 4px)",
+                  }}
+                ></div>
                 <span className="text-[#64748B]">Forecast</span>
               </div>
             )}
@@ -410,23 +531,29 @@ export function EnhancedTimelineChart({
               <div className="text-lg lg:text-xl font-bold text-[#0A1C40]">
                 {statistics.days}
               </div>
-              <div className="text-xs text-[#64748B]">Days</div>
+              <div className="text-xs text-[#64748B]">Readings</div>
             </div>
           </div>
         </div>
 
         {/* Best Time Windows */}
-        {statistics.bestTime && !isNaN(statistics.bestTime.hour) && statistics.bestTime.hour >= 0 && statistics.bestTime.hour <= 23 && (
-          <div className="mt-4 p-3 lg:p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-semibold text-green-800 dark:text-green-200">Best Time for Outdoor Activities</span>
+        {statistics.bestTime &&
+          !isNaN(statistics.bestTime.hour) &&
+          statistics.bestTime.hour >= 0 &&
+          statistics.bestTime.hour <= 23 && (
+            <div className="mt-4 p-3 lg:p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-semibold text-green-800 dark:text-green-200">
+                  Best Time for Outdoor Activities
+                </span>
+              </div>
+              <div className="text-sm text-green-700 dark:text-green-300">
+                {statistics.bestTime.hour.toString().padStart(2, "0")}:00 - AQI{" "}
+                {statistics.bestTime.value} (Lowest pollution)
+              </div>
             </div>
-            <div className="text-sm text-green-700 dark:text-green-300">
-              {statistics.bestTime.hour.toString().padStart(2, '0')}:00 - AQI {statistics.bestTime.value} (Lowest pollution)
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Forecast Toggle */}
         {forecastData.length > 0 && (
@@ -437,7 +564,7 @@ export function EnhancedTimelineChart({
               onClick={() => setShowForecast(!showForecast)}
               className="text-xs"
             >
-              {showForecast ? 'Hide Forecast' : 'Show Forecast'}
+              {showForecast ? "Hide Forecast" : "Show Forecast"}
             </Button>
           </div>
         )}
