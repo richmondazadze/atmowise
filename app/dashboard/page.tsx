@@ -21,7 +21,7 @@ import { TipsCard } from '@/components/TipsCard'
 import { ExportShareButton } from '@/components/ExportShareButton'
 import { apiRequest } from '@/lib/queryClient'
 import { Button } from '@/components/ui/button'
-import { MapPin, RefreshCw } from 'lucide-react'
+import { MapPin, RefreshCw, ChevronDown } from 'lucide-react'
 import type { Profile } from "@shared/schema"
 
 export default function DashboardPage() {
@@ -316,20 +316,21 @@ export default function DashboardPage() {
               <h1 className="heading-1 text-[#0A1C40]">Dashboard</h1>
               <p className="body-large text-[#64748B]">Your personalized air quality health overview</p>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-4">
               <Button
                 variant="outline"
                 onClick={() => setShowLocationPicker(true)}
-                className="flex items-center gap-2 h-9 px-4 text-sm"
+                className="flex items-center gap-3 h-11 px-5 text-sm font-medium border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 rounded-xl transition-all duration-200"
               >
                 <MapPin className="h-4 w-4" />
                 {selectedLocation ? selectedLocation.label : "Select Location"}
+                <ChevronDown className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
                 onClick={handleLocationRefresh}
                 disabled={locationLoading || airQualityLoading}
-                className="flex items-center gap-2 h-9 px-4 text-sm"
+                className="flex items-center gap-2 h-11 px-4 text-sm font-medium rounded-xl transition-all duration-200"
               >
                 <RefreshCw className={`h-4 w-4 ${locationLoading || airQualityLoading ? 'animate-spin' : ''}`} />
                 Refresh
@@ -345,30 +346,28 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Left Column - Main Content - Mobile Optimized */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Location Picker - Mobile & Desktop */}
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 mb-4">
+              {/* Location Picker - Clean & Simple */}
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 mb-6 shadow-sm">
                 <button
                   onClick={() => setShowLocationPicker(true)}
-                  className="w-full flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg"
+                  className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 rounded-xl group"
                 >
-                  <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <div className="w-8 h-8 bg-[#6200D9] rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-semibold text-xs">📍</span>
+                  <div className="flex items-center space-x-4 min-w-0 flex-1">
+                    <div className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <MapPin className="h-5 w-5 text-white" />
                     </div>
                     <div className="min-w-0 flex-1 text-left">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-base font-semibold text-gray-900 dark:text-white truncate">
                         {currentLocationLabel}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Click to change location</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Click to change location</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="px-2 py-1 bg-[#6200D9] text-white text-xs font-medium rounded-full">
+                  <div className="flex items-center space-x-3">
+                    <span className="px-3 py-1.5 bg-[#6200D9] text-white text-sm font-medium rounded-lg">
                       Selected
                     </span>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <ChevronDown className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                   </div>
                 </button>
               </div>
