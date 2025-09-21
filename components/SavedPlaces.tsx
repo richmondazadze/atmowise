@@ -20,7 +20,7 @@ const PLACE_TYPES = {
   work: { icon: Briefcase, label: 'Work', color: 'bg-green-100 text-green-800' },
   school: { icon: GraduationCap, label: 'School', color: 'bg-orange-100 text-orange-800' },
   custom: { icon: MapPin, label: 'Custom', color: 'bg-gray-100 text-gray-800' },
-  current: { icon: Navigation, label: 'Current Location', color: 'bg-purple-100 text-purple-800' }
+  
 };
 
 export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
@@ -99,24 +99,25 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
 
     toast({
       title: "Getting your location...",
-      description: "Please allow location access to use your current position.",
+      description: "Please allow location access to get your current position.",
     });
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        onLocationSelect({
+        
+        // Populate the form with current location data
+        setNewPlace(prev => ({
+          ...prev,
           lat: latitude,
           lon: longitude,
-          label: "Current Location"
-        });
-        
-        // Scroll to top when location is selected
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+          name: "Current Location",
+          type: "current" as keyof typeof PLACE_TYPES
+        }));
         
         toast({
           title: "Location found!",
-          description: "Using your current location for air quality data.",
+          description: "Current location has been added to the form. You can edit the name and save it.",
         });
       },
       (error) => {
@@ -233,23 +234,23 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="p-3 bg-gray-50 rounded-xl border border-gray-200"
+            className="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
           >
-            <h4 className="font-semibold text-[#0A1C40] mb-3">Add New Place</h4>
+            <h4 className="font-semibold text-[#0A1C40] dark:text-white mb-3">Add New Place</h4>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-[#0A1C40] mb-1">Place Name</label>
+                <label className="block text-sm font-medium text-[#0A1C40] dark:text-white mb-1">Place Name</label>
                 <input
                   type="text"
                   value={newPlace.name}
                   onChange={(e) => setNewPlace(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., My Home, Office, Gym"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[#0A1C40] mb-1">Type</label>
+                <label className="block text-sm font-medium text-[#0A1C40] dark:text-white mb-1">Type</label>
                 <div className="grid grid-cols-2 gap-2">
                   {Object.entries(PLACE_TYPES).map(([key, { icon: Icon, label, color }]) => (
                     <button
@@ -257,50 +258,63 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                       onClick={() => setNewPlace(prev => ({ ...prev, type: key as any }))}
                       className={`p-2 rounded-lg border-2 transition-all duration-200 ${
                         newPlace.type === key
-                          ? 'border-[#6200D9] bg-[#6200D9]/5'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-[#6200D9] bg-[#6200D9]/5 dark:bg-[#6200D9]/10'
+                          : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-700'
                       }`}
                     >
-                      <Icon className="h-4 w-4 mx-auto mb-1" />
-                      <div className="text-xs font-medium">{label}</div>
+                      <Icon className="h-4 w-4 mx-auto mb-1 text-gray-700 dark:text-gray-300" />
+                      <div className="text-xs font-medium text-gray-700 dark:text-gray-300">{label}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
+              {/* Use Current Location Button */}
+              <div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleUseCurrentLocation}
+                  className="w-full h-10 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-purple-200 dark:border-purple-700 hover:from-purple-100 hover:to-blue-100 dark:hover:from-purple-800/30 dark:hover:to-blue-800/30 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-200"
+                >
+                  <Navigation className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
+                  <span className="font-medium text-purple-700 dark:text-purple-300">Use Current Location</span>
+                </Button>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-[#0A1C40] mb-1">Latitude</label>
+                  <label className="block text-sm font-medium text-[#0A1C40] dark:text-white mb-1">Latitude</label>
                   <input
                     type="number"
                     step="any"
                     value={newPlace.lat || ''}
                     onChange={(e) => setNewPlace(prev => ({ ...prev, lat: parseFloat(e.target.value) || 0 }))}
                     placeholder="40.7128"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#0A1C40] mb-1">Longitude</label>
+                  <label className="block text-sm font-medium text-[#0A1C40] dark:text-white mb-1">Longitude</label>
                   <input
                     type="number"
                     step="any"
                     value={newPlace.lon || ''}
                     onChange={(e) => setNewPlace(prev => ({ ...prev, lon: parseFloat(e.target.value) || 0 }))}
                     placeholder="-74.0060"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[#0A1C40] mb-1">Address (Optional)</label>
+                <label className="block text-sm font-medium text-[#0A1C40] dark:text-white mb-1">Address (Optional)</label>
                 <input
                   type="text"
                   value={newPlace.address}
                   onChange={(e) => setNewPlace(prev => ({ ...prev, address: e.target.value }))}
                   placeholder="e.g., 123 Main St, New York, NY"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#6200D9] focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -308,13 +322,13 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                 <Button
                   variant="outline"
                   onClick={() => setShowAddForm(false)}
-                  className="px-4 py-2"
+                  className="px-4 py-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleAddPlace}
-                  className="px-4 py-2 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold"
+                  className="px-4 py-2 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold hover:from-[#4C00A8] hover:to-[#6200D9]"
                 >
                   Save Place
                 </Button>
@@ -390,22 +404,6 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
           </div>
         )}
 
-        {/* Use Current Location Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="pt-2"
-        >
-          <Button
-            variant="outline"
-            onClick={handleUseCurrentLocation}
-            className="w-full h-12 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200 hover:from-purple-100 hover:to-blue-100 hover:border-purple-300 transition-all duration-200"
-          >
-            <Navigation className="h-5 w-5 mr-2 text-purple-600" />
-            <span className="font-medium text-purple-700">Use Current Location</span>
-          </Button>
-        </motion.div>
       </CardContent>
     </Card>
   );

@@ -130,7 +130,7 @@ export function SymptomForm({
       data-testid="form-symptom"
     >
       <div>
-        <label className="block text-sm font-medium text-card-foreground mb-2">
+        <label className="block text-sm font-medium mb-2">
           How are you feeling?
         </label>
         <Textarea
