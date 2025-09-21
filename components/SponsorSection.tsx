@@ -66,14 +66,16 @@ export function SponsorSection({ className = "" }: SponsorSectionProps) {
               </p>
 
               {/* Sponsor Link Button */}
-              <motion.button
+              <motion.a
+                href="https://www.mdanderson.org/"
+                target="_black"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
               >
                 <ExternalLink className="h-4 w-4" />
                 Learn More
-              </motion.button>
+              </motion.a>
             </motion.div>
           </div>
         </CardContent>
