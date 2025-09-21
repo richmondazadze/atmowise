@@ -44,18 +44,6 @@ export default function ResourcesPage() {
     }
   ];
 
-  // Additional resources
-  const additionalResources = [
-    {
-      title: 'Symptom Tracker',
-      description: 'Track your symptoms and air quality exposure patterns over time',
-      url: '/timeline',
-      type: 'internal',
-      category: 'Personal Health',
-      verified: false,
-      priority: 'medium'
-    }
-  ];
 
   return (
     <PageLayout>
@@ -189,60 +177,6 @@ export default function ResourcesPage() {
           </div>
         </div>
 
-        {/* Additional Resources */}
-        <div className="mb-8 lg:mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <LifeBuoy className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl lg:text-2xl font-bold text-[#0A1C40] tracking-tight">Additional Resources</h2>
-              <p className="text-sm text-[#64748B] font-medium">Personal health tools and features</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {additionalResources.map((resource, index) => (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300 border border-gray-200 group">
-                <CardHeader className="pb-4">
-                  <h3 className="text-lg font-bold text-[#0A1C40] tracking-tight">{resource.title}</h3>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-[#64748B] mb-4 leading-relaxed font-medium">
-                    {resource.description}
-                  </p>
-                  
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs text-purple-600 border-purple-200">
-                      {resource.category}
-                    </Badge>
-                    {resource.url?.startsWith('/') ? (
-                      <Link href={resource.url}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border-0 h-9 px-4 rounded-xl font-medium"
-                        >
-                          View
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white border-0 h-9 px-4 rounded-xl font-medium"
-                        onClick={() => window.open(resource.url, '_blank')}
-                      >
-                        Visit
-                        <ExternalLink className="h-4 w-4 ml-2" />
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Navigation */}
