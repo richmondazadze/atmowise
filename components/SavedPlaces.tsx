@@ -72,11 +72,19 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
   });
 
   const handlePlaceSelect = (place: SavedPlace) => {
+    // Use address if it exists and is different from name, otherwise use name
+    const displayLabel = place.address && place.address !== place.name 
+      ? place.address 
+      : place.name;
+    
     onLocationSelect({
       lat: place.lat,
       lon: place.lon,
-      label: place.address || place.name
+      label: displayLabel
     });
+    
+    // Scroll to top when location is selected
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleAddPlace = async () => {
@@ -84,6 +92,19 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
       toast({
         title: "Invalid data",
         description: "Please provide a name and valid coordinates.",
+        variant: "destructive",
+      });
+      return;
+    }
+    // Check for duplicate names
+    const existingPlace = savedPlaces.find((place: SavedPlace) => 
+      place.name.toLowerCase() === newPlace.name.toLowerCase()
+    );
+    
+    if (existingPlace) {
+      toast({
+        title: "Duplicate place",
+        description: "A place with this name already exists. Please choose a different name.",
         variant: "destructive",
       });
       return;
@@ -276,9 +297,11 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                         <h4 className="font-semibold text-[#0A1C40] dark:text-white group-hover:text-[#6200D9] transition-colors truncate">
                           {place.name}
                         </h4>
-                        <Badge variant="outline" className="text-xs mt-1 dark:border-gray-600 dark:text-gray-300">
-                          {typeInfo.label}
-                        </Badge>
+                        {typeInfo.label !== place.name && (
+                          <Badge variant="outline" className="text-xs mt-1 dark:border-gray-600 dark:text-gray-300">
+                            {typeInfo.label}
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <Button
