@@ -18,7 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
-import icon from "@assets/icon.svg";
+// Logo import removed - using /atmowise.webp directly
 
 interface DesktopSidebarProps {
   className?: string;
@@ -252,7 +252,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md flex-shrink-0"
           >
-            <img src="/icon.svg" alt="" />
+            <img src="/atmowise.webp" alt="AtmoWise" />
           </motion.div>
           <motion.div
             initial={{ x: -20, opacity: 0 }}

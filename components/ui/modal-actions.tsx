@@ -45,7 +45,7 @@ export function ModalActions({
             "w-full sm:w-auto px-6 py-3 font-semibold touch-target text-sm sm:text-base rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2",
             primaryAction.variant === 'destructive' 
               ? "bg-red-600 hover:bg-red-700 text-white" 
-              : "bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white"
+              : "bg-gradient-to-r from-[#6200D9] to-[#BA5FFF] text-white"
           )}
         >
           {primaryAction.loading ? 'Loading...' : primaryAction.label}

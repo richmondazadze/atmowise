@@ -29,12 +29,12 @@ interface EnhancedTimelineChartProps {
 }
 
 const AQI_COLORS = {
-  0: "#71E07E", // Good - Green
-  50: "#F59E0B", // Moderate - Yellow
-  100: "#EF4444", // Unhealthy for Sensitive - Orange
-  150: "#DC2626", // Unhealthy - Red
-  200: "#7C3AED", // Very Unhealthy - Purple
-  300: "#4C1D95", // Hazardous - Dark Purple
+  0: "#71E07E", // Good - Primary teal
+  50: "#F59E0B", // Moderate - Amber
+  100: "#F97316", // Unhealthy for Sensitive - Orange
+  150: "#EF4444", // Unhealthy - Red
+  200: "#BA5FFF", // Very Unhealthy - Accent purple
+  300: "#6200D9", // Hazardous - Primary blue
 };
 
 const TIME_WINDOWS = [
@@ -345,9 +345,9 @@ export function EnhancedTimelineChart({
       {/* Chart Content */}
       <div>
         {/* Chart Visualization */}
-        <div className={`${isMobile ? 'h-40' : 'h-48 lg:h-64'} relative`} ref={chartRef}>
+        <div className={`${isMobile ? 'h-48' : 'h-56 lg:h-72'} relative bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl p-4`} ref={chartRef}>
           <svg className="w-full h-full" viewBox={`0 0 ${chartCalculations.chartWidth || 400} ${chartCalculations.chartHeight || 200}`}>
-            {/* Grid lines */}
+            {/* Subtle grid lines */}
             {[0, 1, 2, 3, 4].map((i) => (
               <line
                 key={i}
@@ -355,81 +355,61 @@ export function EnhancedTimelineChart({
                 y1={(chartCalculations.padding || 40) + i * ((chartCalculations.chartAreaHeight || 120) / 4)}
                 x2={(chartCalculations.padding || 40) + (chartCalculations.chartAreaWidth || 340)}
                 y2={(chartCalculations.padding || 40) + i * ((chartCalculations.chartAreaHeight || 120) / 4)}
-                stroke="#E2E8F0"
-                strokeWidth="1"
+                stroke="currentColor"
+                strokeWidth="0.5"
+                className="text-gray-200 dark:text-gray-700"
               />
             ))}
 
-            {/* Color streaks for AQI visualization */}
-            {chartCalculations.colorStreaks.map((streak, i) => {
-              const padding = chartCalculations.padding || 40;
-              const chartAreaWidth = chartCalculations.chartAreaWidth || 340;
-              const chartAreaHeight = chartCalculations.chartAreaHeight || 120;
-              const startX =
-                chartData.length === 1
-                  ? padding + chartAreaWidth / 2
-                  : padding + (streak.start / Math.max(chartData.length - 1, 1)) * chartAreaWidth;
-              const endX =
-                chartData.length === 1
-                  ? padding + chartAreaWidth / 2
-                  : padding + (streak.end / Math.max(chartData.length - 1, 1)) * chartAreaWidth;
-              return (
-                <rect
-                  key={i}
-                  x={startX}
-                  y={padding}
-                  width={endX - startX}
-                  height={chartAreaHeight}
-                  fill={streak.color}
-                  opacity="0.1"
-                />
-              );
-            })}
+            {/* Area under the curve for modern look */}
+            <defs>
+              <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#6200D9" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="#6200D9" stopOpacity="0.05" />
+              </linearGradient>
+            </defs>
+            
+            {/* Area fill */}
+            <polygon
+              fill="url(#areaGradient)"
+              points={`${chartCalculations.padding || 40},${(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120)} ${chartCalculations.points.map((p) => `${p.x},${p.y}`).join(" ")} ${(chartCalculations.padding || 40) + (chartCalculations.chartAreaWidth || 340)},${(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120)}`}
+            />
 
-            {/* Historical data line with smooth transition */}
+            {/* Main data line - modern and smooth */}
             <polyline
               fill="none"
               stroke="#6200D9"
-              strokeWidth="2"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               points={chartCalculations.points
                 .map((p) => `${p.x},${p.y}`)
                 .join(" ")}
-              className="transition-all duration-300 ease-in-out"
+              className="transition-all duration-500 ease-out"
             />
 
-            {/* Forecast line (dashed) */}
-            {showForecast && forecastCalculations.points.length > 0 && (
-              <polyline
-                fill="none"
-                stroke="#7C3AED"
-                strokeWidth="2"
-                strokeDasharray="5,5"
-                points={forecastCalculations.points
-                  .map((p) => `${p.x},${p.y}`)
-                  .join(" ")}
-                className="transition-all duration-300 ease-in-out"
-              />
-            )}
-
-            {/* Data points with hover effects */}
+            {/* Data points - clean and minimal */}
             {chartCalculations.dataPoints.map((point, i) => (
               <g key={i}>
                 <circle
                   cx={point.x}
                   cy={point.y}
-                  r="4"
-                  fill={point.color}
-                  className="hover:r-6 transition-all cursor-pointer"
+                  r="5"
+                  fill="white"
+                  stroke={point.color}
+                  strokeWidth="3"
+                  className="transition-all duration-300 ease-out hover:r-6 hover:stroke-4"
                   style={{
-                    transition: "all 0.3s ease-in-out",
+                    filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
                     transform: isLoading ? "scale(0.8)" : "scale(1)",
                   }}
                 />
+                {/* Symptom indicator - subtle */}
                 {point.data.symptom && (
                   <circle
                     cx={point.x}
-                    cy={180}
-                    r="3"
+                    cy={point.y + 8}
+                    r="2"
                     fill="#EF4444"
                     className="animate-pulse"
                   />
@@ -437,136 +417,115 @@ export function EnhancedTimelineChart({
               </g>
             ))}
 
-            {/* Forecast data points */}
-            {showForecast &&
-              forecastCalculations.dataPoints.map((point, i) => (
-                <g key={`forecast-${i}`}>
-                  <circle
-                    cx={point.x}
-                    cy={point.y}
-                    r="3"
-                    fill={point.color}
-                    className="hover:r-5 transition-all cursor-pointer opacity-70"
-                  />
-                </g>
-              ))}
-
-            {/* Y-axis labels */}
-            <text x="5" y={(chartCalculations.padding || 40) + 5} fontSize={isMobile ? "8" : "10"} fill="#64748B">
+            {/* Y-axis labels - modern typography */}
+            <text x="8" y={(chartCalculations.padding || 40) + 8} fontSize={isMobile ? "10" : "12"} fill="currentColor" className="text-gray-600 dark:text-gray-400 font-medium">
               High
             </text>
-            <text x="5" y={(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120) / 2 + 5} fontSize={isMobile ? "8" : "10"} fill="#64748B">
+            <text x="8" y={(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120) / 2 + 8} fontSize={isMobile ? "10" : "12"} fill="currentColor" className="text-gray-600 dark:text-gray-400 font-medium">
               Med
             </text>
-            <text x="5" y={(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120) + 5} fontSize={isMobile ? "8" : "10"} fill="#64748B">
+            <text x="8" y={(chartCalculations.padding || 40) + (chartCalculations.chartAreaHeight || 120) + 8} fontSize={isMobile ? "10" : "12"} fill="currentColor" className="text-gray-600 dark:text-gray-400 font-medium">
               Low
             </text>
 
-            {/* X-axis labels */}
+            {/* X-axis labels - clean dates */}
             <text
               x={chartCalculations.padding || 40}
-              y={(chartCalculations.chartHeight || 200) - 5}
-              fontSize={isMobile ? "8" : "10"}
-              fill="#64748B"
+              y={(chartCalculations.chartHeight || 200) - 8}
+              fontSize={isMobile ? "10" : "12"}
+              fill="currentColor"
               textAnchor="middle"
+              className="text-gray-600 dark:text-gray-400 font-medium"
             >
               {chartData[chartData.length - 1]?.date || ""}
             </text>
             <text
               x={(chartCalculations.padding || 40) + (chartCalculations.chartAreaWidth || 340)}
-              y={(chartCalculations.chartHeight || 200) - 5}
-              fontSize={isMobile ? "8" : "10"}
-              fill="#64748B"
+              y={(chartCalculations.chartHeight || 200) - 8}
+              fontSize={isMobile ? "10" : "12"}
+              fill="currentColor"
               textAnchor="middle"
+              className="text-gray-600 dark:text-gray-400 font-medium"
             >
               {chartData[0]?.date || ""}
             </text>
           </svg>
 
-          {/* Legend */}
-          <div className={`absolute bottom-1 left-2 sm:bottom-2 sm:left-4 flex flex-wrap items-center gap-2 sm:gap-4 ${isMobile ? 'text-xs' : 'text-xs'}`}>
-            <div className="flex items-center gap-1">
-              <div className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} bg-[#6200D9] rounded-full`}></div>
-              <span className="text-[#64748B]">
+          {/* Modern Legend */}
+          <div className="absolute top-4 right-4 flex flex-col gap-2">
+            <div className="flex items-center gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
+              <div className="w-3 h-3 bg-[#6200D9] rounded-full"></div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {getMetricLabel(selectedMetric)}
               </span>
             </div>
             {showForecast && (
-              <div className="flex items-center gap-1">
-                <div
-                  className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} bg-[#7C3AED] rounded-full`}
-                  style={{
-                    background:
-                      "repeating-linear-gradient(45deg, #7C3AED, #7C3AED 2px, transparent 2px, transparent 4px)",
-                  }}
-                ></div>
-                <span className="text-[#64748B]">Forecast</span>
+              <div className="flex items-center gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-sm">
+                <div className="w-3 h-3 bg-[#7C3AED] rounded-full opacity-70"></div>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Forecast</span>
               </div>
             )}
-            <div className="flex items-center gap-1">
-              <div className={`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} bg-[#EF4444] rounded-full animate-pulse`}></div>
-              <span className="text-[#64748B]">Symptoms</span>
-            </div>
           </div>
         </div>
 
-        {/* Chart Summary with smooth transitions */}
-        <div className={`mt-3 lg:mt-4 ${isMobile ? 'p-3' : 'p-3 lg:p-4'} bg-gray-50 rounded-lg transition-all duration-300`}>
-          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'} gap-3 text-center`}>
-            <div className="transition-all duration-300">
-              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
-                {Math.round(statistics.average)}
-              </div>
-              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Average</div>
+        {/* Modern Chart Summary */}
+        <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {Math.round(statistics.average)}
             </div>
-            <div className="transition-all duration-300">
-              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
-                {statistics.peak}
-              </div>
-              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Peak</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">Average</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {statistics.peak}
             </div>
-            <div className="transition-all duration-300">
-              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
-                {statistics.symptoms}
-              </div>
-              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Symptoms</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">Peak</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {statistics.symptoms}
             </div>
-            <div className="transition-all duration-300">
-              <div className={`${isMobile ? 'text-base' : 'text-lg lg:text-xl'} font-bold text-[#0A1C40]`}>
-                {statistics.days}
-              </div>
-              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-[#64748B]`}>Readings</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">Symptoms</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              {statistics.days}
             </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">Readings</div>
           </div>
         </div>
 
-        {/* Best Time Windows */}
+        {/* Best Time Recommendation */}
         {statistics.bestTime &&
           !isNaN(statistics.bestTime.hour) &&
           statistics.bestTime.hour >= 0 &&
           statistics.bestTime.hour <= 23 && (
-            <div className={`mt-3 lg:mt-4 ${isMobile ? 'p-3' : 'p-3 lg:p-4'} bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700`}>
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'} text-green-600 dark:text-green-400`} />
-                <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-semibold text-green-800 dark:text-green-200`}>
-                  Best Time for Outdoor Activities
-                </span>
-              </div>
-              <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-green-700 dark:text-green-300`}>
-                {statistics.bestTime.hour.toString().padStart(2, "0")}:00 - AQI{" "}
-                {statistics.bestTime.value} (Lowest pollution)
+            <div className="mt-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-200 dark:border-green-700">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <div className="font-semibold text-green-800 dark:text-green-200">
+                    Best Time for Outdoor Activities
+                  </div>
+                  <div className="text-sm text-green-700 dark:text-green-300">
+                    {statistics.bestTime.hour.toString().padStart(2, "0")}:00 - AQI {statistics.bestTime.value}
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
         {/* Forecast Toggle */}
         {forecastData.length > 0 && (
-          <div className={`${isMobile ? 'mt-3' : 'mt-4'} flex justify-center`}>
+          <div className="mt-4 flex justify-center">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowForecast(!showForecast)}
-              className={`${isMobile ? 'text-xs h-8 px-3' : 'text-xs'}`}
+              className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
             >
               {showForecast ? "Hide Forecast" : "Show Forecast"}
             </Button>

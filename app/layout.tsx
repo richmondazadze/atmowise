@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: "AtmoWise - Air Quality Tracker",
   description: "Track air quality and your health with AI-powered insights",
   icons: {
-    icon: "/icon.svg", // main favicon
+    icon: "/fav.webp", // main favicon
   },
 };
 

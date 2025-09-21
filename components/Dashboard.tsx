@@ -456,7 +456,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3 min-w-0 flex-1">
               <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
-                <img src="/icon.svg" alt="" />
+                <img src="/atmowise.webp" alt="AtmoWise" />
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl font-bold text-[#0A1C40] truncate tracking-tight">
