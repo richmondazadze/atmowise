@@ -172,7 +172,7 @@ export function RunCoach({ currentAqi, currentLocation, savedPlaces, forecastDat
                 </div>
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="text-xl sm:text-2xl font-bold text-[#6200D9]">{rec.score}</div>
+                <div className="text-xl sm:text-2xl font-bold text-[#6200D9]">{Math.round(rec.score)}</div>
                 <div className="text-xs text-gray-500">Score</div>
               </div>
             </div>
