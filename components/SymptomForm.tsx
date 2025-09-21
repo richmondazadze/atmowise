@@ -172,7 +172,7 @@ export function SymptomForm({
               min={1}
               step={1}
               className="w-full [&>span:first-child]:h-2 [&>span:first-child]:bg-gray-200 dark:[&>span:first-child]:bg-gray-700 [&>span:first-child]:rounded-full [&>span:first-child>span]:bg-gradient-to-r [&>span:first-child>span]:from-[#6200D9] [&>span:first-child>span]:to-[#4C00A8] [&>span:first-child>span]:rounded-full [&>span:first-child>span]:shadow-lg"
-              thumbClassName="bg-white border-2 border-[#4C00A8] z-10"
+              thumbClassName="bg-white dark:bg-[#710ced] border-2 border-[#4C00A8] z-10"
               disabled={isLoading}
               data-testid="slider-severity"
             />
