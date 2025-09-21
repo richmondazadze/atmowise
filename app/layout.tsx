@@ -1,24 +1,27 @@
-import type { Metadata } from 'next'
-import { Bricolage_Grotesque } from 'next/font/google'
-import './globals.css'
-import { Providers } from './providers'
-import { GlobalErrorHandler } from '@/components/GlobalErrorHandler'
+import type { Metadata } from "next";
+import { Bricolage_Grotesque } from "next/font/google";
+import "./globals.css";
+import { Providers } from "./providers";
+import { GlobalErrorHandler } from "@/components/GlobalErrorHandler";
 
-const bricolageGrotesque = Bricolage_Grotesque({ 
-  subsets: ['latin'],
-  variable: '--font-bricolage-grotesque',
-  display: 'swap',
-})
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage-grotesque",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: 'AtmoWise - Air Quality Tracker',
-  description: 'Track air quality and your health with AI-powered insights',
-}
+  title: "AtmoWise - Air Quality Tracker",
+  description: "Track air quality and your health with AI-powered insights",
+  icons: {
+    icon: "/icon.svg", // main favicon
+  },
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -41,10 +44,8 @@ export default function RootLayout({
       </head>
       <body className={bricolageGrotesque.className}>
         <GlobalErrorHandler />
-              <Providers>
-                {children}
-              </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }

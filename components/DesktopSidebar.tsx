@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion, AnimatePresence } from "framer-motion";
+import icon from "@assets/icon.svg";
 
 interface DesktopSidebarProps {
   className?: string;
@@ -37,10 +38,10 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
 
   // Fetch profile data
   const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
+    queryKey: ["profile", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      
+
       try {
         const response = await fetch(`/api/profile/${user.id}`);
         if (response.ok) {
@@ -48,7 +49,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
         }
         return null;
       } catch (error) {
-        console.error('Profile fetch error:', error);
+        console.error("Profile fetch error:", error);
         return null;
       }
     },
@@ -116,9 +117,9 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                   initial={{ scaleX: 0, opacity: 0 }}
                   animate={{ scaleX: 1, opacity: 1 }}
                   exit={{ scaleX: 0, opacity: 0 }}
-                  transition={{ 
-                    duration: 0.4, 
-                    ease: [0.25, 0.46, 0.45, 0.94] 
+                  transition={{
+                    duration: 0.4,
+                    ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                   className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"
                 />
@@ -132,10 +133,10 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
               )}
             >
               <motion.div
-                animate={{ 
+                animate={{
                   scale: isActive ? 1.1 : 1,
                   rotate: isActive ? [0, -5, 5, 0] : 0,
-                  y: isActive ? -1 : 0
+                  y: isActive ? -1 : 0,
                 }}
                 transition={{ duration: 0.3 }}
                 className="relative z-10"
@@ -158,11 +159,11 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                 "w-auto opacity-100 ml-4 flex-1"
               )}
             >
-              <motion.div 
+              <motion.div
                 className="font-semibold text-sm leading-tight truncate"
-                animate={{ 
+                animate={{
                   fontWeight: isActive ? 600 : 500,
-                  y: isActive ? -1 : 0
+                  y: isActive ? -1 : 0,
                 }}
                 transition={{ duration: 0.2 }}
               >
@@ -194,9 +195,9 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
             <motion.div
               className="absolute inset-0 bg-[#6200D9]/10 rounded-xl"
               initial={{ scale: 0, opacity: 0 }}
-              whileTap={{ 
-                scale: 1.2, 
-                opacity: [0, 0.3, 0] 
+              whileTap={{
+                scale: 1.2,
+                opacity: [0, 0.3, 0],
               }}
               transition={{ duration: 0.3 }}
             />
@@ -228,9 +229,9 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
     <motion.aside
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ 
-        duration: 0.6, 
-        ease: [0.25, 0.46, 0.45, 0.94] 
+      transition={{
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94],
       }}
       className={cn(
         "fixed left-0 top-0 h-screen bg-white/95 backdrop-blur-sm border-r border-gray-200/80 shadow-xl transition-all duration-300 ease-in-out z-50 flex flex-col w-64",
@@ -238,22 +239,22 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
       )}
     >
       {/* Header */}
-      <motion.div 
+      <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.2 }}
         className="relative p-7 border-b border-gray-200/50 flex-shrink-0"
       >
         <div className="flex items-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="w-8 h-8 bg-gradient-to-br from-[#6200D9] to-[#4C00A8] rounded-lg flex items-center justify-center shadow-md flex-shrink-0"
+            className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md flex-shrink-0"
           >
-            <Wind className="h-4 w-4 text-white" />
+            <img src="/icon.svg" alt="" />
           </motion.div>
-          <motion.div 
+          <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.4 }}
@@ -270,7 +271,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
       </motion.div>
 
       {/* Navigation Content */}
-      <motion.div 
+      <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.3 }}
@@ -283,9 +284,9 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
               key={item.path}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ 
-                duration: 0.4, 
-                delay: 0.4 + (index * 0.1) 
+              transition={{
+                duration: 0.4,
+                delay: 0.4 + index * 0.1,
               }}
             >
               <NavItemComponent
@@ -324,7 +325,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
               </AvatarFallback>
             </Avatar>
           </motion.div>
-          <motion.div 
+          <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.8 }}

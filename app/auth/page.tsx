@@ -19,7 +19,14 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
-  const { user, signIn, signUp, signInWithGoogle, isSigningIn, loading: authLoading } = useAuth();
+  const {
+    user,
+    signIn,
+    signUp,
+    signInWithGoogle,
+    isSigningIn,
+    loading: authLoading,
+  } = useAuth();
   const router = useRouter();
   const hasRedirected = useRef(false);
 
@@ -93,8 +100,8 @@ export default function AuthPage() {
         {/* Header */}
         <div className="text-center">
           <div className="flex justify-center">
-            <div className="w-12 h-12 bg-[#6200D9] rounded-lg flex items-center justify-center">
-              <Shield className="h-6 w-6 text-white" />
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center shadow-md">
+              <img src="/loading.svg" alt="" />
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
@@ -122,7 +129,7 @@ export default function AuthPage() {
               variant="outline"
               className="w-full h-11"
             >
-              {(loading || isSigningIn) ? (
+              {loading || isSigningIn ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -144,7 +151,7 @@ export default function AuthPage() {
                   />
                 </svg>
               )}
-              {isSigningIn ? 'Signing in...' : 'Continue with Google'}
+              {isSigningIn ? "Signing in..." : "Continue with Google"}
             </Button>
 
             <div className="relative">
