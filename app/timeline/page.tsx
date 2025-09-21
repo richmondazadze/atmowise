@@ -1,592 +1,447 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { useLocation } from "@/contexts/LocationContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  TrendingUp,
-  MapPin,
-  Calendar,
-  Activity,
-  RefreshCw,
-  Download,
-  Filter,
-  Wind,
-  AlertCircle,
-} from "lucide-react";
-import { Navigation } from "@/components/Navigation";
-import { PageLayout } from "@/components/PageLayout";
-import { EnhancedTimelineChart } from "@/components/EnhancedTimelineChart";
-import { FloatingSettingsButton } from "@/components/FloatingSettingsButton";
-import { useToast } from "@/hooks/use-toast";
-import { storage } from "@/lib/storage";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { useAuth } from '@/contexts/AuthContext'
+import { PageLayout } from '@/components/PageLayout'
+import { Navigation } from '@/components/Navigation'
+import { FloatingSettingsButton } from '@/components/FloatingSettingsButton'
+import { EnhancedTimelineChart } from '@/components/EnhancedTimelineChart'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { TrendingUp, Calendar, MapPin, RefreshCw, Download, Filter } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
-interface TimelineData {
-  id: string;
-  date: string;
-  time: string;
-  aqi: number;
-  pm25: number;
-  pm10: number;
-  o3: number;
-  no2: number;
-  category: string;
-  location: string;
-  source: string;
-  createdAt: string;
+interface AirQualityReading {
+  id: string
+  aqi: number
+  category: string
+  dominantPollutant: string
+  pm25?: number
+  pm10?: number
+  o3?: number
+  no2?: number
+  timestamp: string
+  location?: string
 }
 
 export default function TimelinePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { selectedLocation } = useLocation();
-  const { toast } = useToast();
-  const [selectedPeriod, setSelectedPeriod] = useState(
-    storage.getTimelinePeriod()
-  );
-  const [selectedMetric, setSelectedMetric] = useState(
-    storage.getTimelineMetric()
-  );
+  const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d'>('7d');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Save preferences when they change
+  // Redirect to auth if not logged in
   useEffect(() => {
-    storage.setTimelinePeriod(selectedPeriod);
-  }, [selectedPeriod]);
-
-  useEffect(() => {
-    storage.setTimelineMetric(selectedMetric);
-  }, [selectedMetric]);
-
-  // Convert period to days
-  const getDaysFromPeriod = (period: string) => {
-    switch (period) {
-      case "1d":
-        return 1;
-      case "7d":
-        return 7;
-      case "30d":
-        return 30;
-      case "90d":
-        return 90;
-      default:
-        return 7;
+    if (!user) {
+      router.push('/auth');
     }
-  };
+  }, [user, router]);
 
-  // Fetch historical air quality data
+  // Fetch air quality history
   const {
-    data: timelineResponse,
-    isLoading,
-    error,
-    refetch,
+    data: airQualityHistory,
+    isLoading: historyLoading,
+    error: historyError,
+    refetch: refetchHistory
   } = useQuery({
-    queryKey: [
-      "timeline-data",
-      user?.id,
-      selectedPeriod,
-      selectedLocation?.lat,
-      selectedLocation?.lon,
-    ],
+    queryKey: ['air-quality-history', selectedPeriod, user?.id],
     queryFn: async () => {
-      if (!user?.id || !selectedLocation) {
-        return { data: [], period: 0, totalReadings: 0, location: null };
-      }
-
-      const days = getDaysFromPeriod(selectedPeriod);
-      const url = `/api/air/history?userId=${user.id}&days=${days}&lat=${selectedLocation.lat}&lon=${selectedLocation.lon}`;
-
-      const response = await fetch(url);
+      if (!user?.id) return [];
+      
+      const response = await fetch(`/api/air/history?period=${selectedPeriod}&userId=${user.id}`);
       if (!response.ok) {
-        throw new Error(
-          `Failed to fetch timeline data: ${response.statusText}`
-        );
+        throw new Error('Failed to fetch air quality history');
       }
-
       return response.json();
     },
-    enabled: !!user?.id && !!selectedLocation,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!user?.id,
     retry: 1,
   });
 
-  const timelineData: TimelineData[] = timelineResponse?.data || [];
-
-  const periods = [
-    { value: "1d", label: "1 Day" },
-    { value: "7d", label: "7 Days" },
-    { value: "30d", label: "30 Days" },
-    { value: "90d", label: "90 Days" },
-  ];
-
-  const metrics = [
-    { value: "aqi", label: "AQI" },
-    { value: "pm25", label: "PM2.5" },
-    { value: "pm10", label: "PM10" },
-    { value: "o3", label: "O₃" },
-    { value: "no2", label: "NO₂" },
-  ];
-
-  const getAQIColor = (aqi: number) => {
-    if (aqi <= 50) return "bg-green-500";
-    if (aqi <= 100) return "bg-yellow-500";
-    if (aqi <= 150) return "bg-orange-500";
-    if (aqi <= 200) return "bg-red-500";
-    if (aqi <= 300) return "bg-purple-500";
-    return "bg-red-800";
-  };
-
-  const getAQILabel = (aqi: number) => {
-    if (aqi <= 50) return "Good";
-    if (aqi <= 100) return "Moderate";
-    if (aqi <= 150) return "Unhealthy for Sensitive Groups";
-    if (aqi <= 200) return "Unhealthy";
-    if (aqi <= 300) return "Very Unhealthy";
-    return "Hazardous";
-  };
-
-  // Calculate stats from real data
-  const stats =
-    timelineData.length > 0
-      ? {
-          averageAQI: Math.round(
-            timelineData.reduce((sum, item) => sum + item.aqi, 0) /
-              timelineData.length
-          ),
-          bestDay: timelineData.reduce(
-            (min, item) => (item.aqi < min.aqi ? item : min),
-            timelineData[0]
-          ),
-          worstDay: timelineData.reduce(
-            (max, item) => (item.aqi > max.aqi ? item : max),
-            timelineData[0]
-          ),
-          totalReadings: timelineData.length,
-        }
-      : {
-          averageAQI: 0,
-          bestDay: { aqi: 0, date: "", time: "" },
-          worstDay: { aqi: 0, date: "", time: "" },
-          totalReadings: 0,
-        };
-
   // Handle refresh
-  const handleRefresh = () => {
-    refetch();
-    toast({
-      title: "Timeline refreshed",
-      description: "Latest air quality data has been loaded.",
-    });
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetchHistory();
+    } catch (error) {
+      console.error('Refresh failed:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   // Handle export
   const handleExport = () => {
-    if (timelineData.length === 0) {
-      toast({
-        title: "No data to export",
-        description: "Please select a location and period with data.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    if (!airQualityHistory || airQualityHistory.length === 0) return;
+    
     const csvContent = [
-      [
-        "Date",
-        "Time",
-        "AQI",
-        "PM2.5",
-        "PM10",
-        "O3",
-        "NO2",
-        "Category",
-        "Source",
-      ],
-      ...timelineData.map((item) => [
-        item.date,
-        item.time,
-        item.aqi,
-        item.pm25,
-        item.pm10,
-        item.o3,
-        item.no2,
-        item.category,
-        item.source,
-      ]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
+      ['Date', 'AQI', 'Category', 'Dominant Pollutant', 'PM2.5', 'PM10', 'O3', 'NO2', 'Location'],
+      ...airQualityHistory.map((reading: AirQualityReading) => [
+        new Date(reading.timestamp).toLocaleDateString(),
+        reading.aqi,
+        reading.category,
+        reading.dominantPollutant,
+        reading.pm25 || '',
+        reading.pm10 || '',
+        reading.o3 || '',
+        reading.no2 || '',
+        reading.location || ''
+      ])
+    ].map(row => row.join(',')).join('\n');
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `atmowise-timeline-${selectedPeriod}-${
-      new Date().toISOString().split("T")[0]
-    }.csv`;
-    a.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `air-quality-timeline-${selectedPeriod}.csv`;
+    link.click();
     window.URL.revokeObjectURL(url);
-
-    toast({
-      title: "Data exported",
-      description: "Timeline data has been downloaded as CSV.",
-    });
   };
 
+  // Show loading state
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center"
+      >
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6200D9] mx-auto mb-4"></div>
-          <p className="text-[#64748B]">Please sign in to view your timeline</p>
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="w-12 h-12 bg-[#6200D9] rounded-lg flex items-center justify-center mx-auto mb-4"
+          >
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          </motion.div>
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="text-gray-600 dark:text-gray-300"
+          >
+            Loading...
+          </motion.p>
         </div>
-      </div>
-    );
-  }
-
-  if (!selectedLocation) {
-    return (
-      <PageLayout>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center max-w-md mx-auto p-6">
-            <MapPin className="h-16 w-16 text-[#64748B] mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-[#0A1C40] mb-2">
-              No Location Selected
-            </h2>
-            <p className="text-[#64748B] mb-6">
-              Please select a location from the Dashboard to view your air
-              quality timeline.
-            </p>
-            <Button
-              onClick={() => router.push("/dashboard")}
-              className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
-            >
-              Go to Dashboard
-            </Button>
-          </div>
-        </div>
-        <Navigation />
-      </PageLayout>
+      </motion.div>
     );
   }
 
   return (
     <PageLayout>
-      {/* Mobile Header - Premium Design */}
-      <header className="lg:hidden sticky top-0 z-40 bg-white/98 backdrop-blur-xl border-b border-gray-100/50 shadow-sm">
-        <div className="px-4 py-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 min-w-0 flex-1">
-              <div className="w-11 h-11 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20 flex-shrink-0">
-                <TrendingUp className="h-5 w-5 text-white drop-shadow-sm" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">
-                  Timeline
-                </h1>
-                <p className="text-xs text-[#64748B] font-medium truncate">
-                  Air Quality History
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Desktop Header */}
-      <header className="hidden lg:block sticky top-0 z-30 header-premium">
-        <div className="px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="heading-1 text-[#0A1C40]">Timeline</h1>
-              <p className="body-large text-[#64748B]">
-                Track your air quality history and trends
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content - Mobile Optimized */}
-      <div className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8">
-        {/* Controls - Mobile Optimized */}
-        <div className="mb-6 lg:mb-8">
-          <div className="flex flex-col gap-4">
-            {/* Period Selection - Mobile First */}
-            <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-              {periods.map((period) => (
-                <button
-                  key={period.value}
-                  onClick={() => setSelectedPeriod(period.value)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap touch-target ${
-                    selectedPeriod === period.value
-                      ? "bg-gradient-to-r from-[#6200D9] to-[#7C3AED] text-white shadow-lg"
-                      : "bg-white dark:bg-gray-800 text-[#64748B] dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600"
-                  }`}
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        {/* Mobile Header */}
+        <motion.header
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="lg:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 py-4 mb-6"
+        >
+          <div className="px-4">
+            <div className="flex items-center justify-between">
+              <motion.div 
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="flex items-center space-x-3 min-w-0 flex-1"
+              >
+                <motion.div 
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="w-11 h-11 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20 flex-shrink-0"
                 >
-                  {period.label}
-                </button>
-              ))}
+                  <TrendingUp className="h-5 w-5 text-white drop-shadow-sm" />
+                </motion.div>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl font-bold text-[#0A1C40] tracking-tight truncate">
+                    Timeline
+                  </h1>
+                  <p className="text-xs text-[#64748B] font-medium truncate">
+                    Air Quality History
+                  </p>
+                </div>
+              </motion.div>
             </div>
+          </div>
+        </motion.header>
 
-            {/* Action Buttons - Mobile Optimized */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
-                <SelectTrigger className="w-28 h-10 border-gray-200 rounded-xl text-sm font-medium">
-                  <SelectValue placeholder="AQI" />
-                </SelectTrigger>
-                <SelectContent>
-                  {metrics.map((metric) => (
-                    <SelectItem key={metric.value} value={metric.value}>
-                      {metric.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefresh}
-                disabled={isLoading}
-                className="h-10 px-3 border-gray-200 hover:bg-gray-50 rounded-xl text-sm font-medium touch-target"
+        {/* Desktop Header */}
+        <motion.header
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="hidden lg:block sticky top-0 z-30 header-premium"
+        >
+          <div className="px-8 py-4">
+            <div className="flex items-center justify-between">
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
               >
-                <RefreshCw
-                  className={`h-4 w-4 mr-1 ${isLoading ? "animate-spin" : ""}`}
-                />
-                {isLoading ? "Loading..." : "Refresh"}
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={timelineData.length === 0}
-                className="h-10 px-3 border-gray-200 hover:bg-gray-50 rounded-xl text-sm font-medium touch-target"
+                <h1 className="heading-1 text-[#0A1C40]">Timeline</h1>
+                <p className="body-large text-[#64748B]">
+                  Track your air quality history and trends
+                </p>
+              </motion.div>
+              <motion.div 
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+                className="flex items-center space-x-4"
               >
-                <Download className="h-4 w-4 mr-1" />
-                Export
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Cards - Mobile Optimized */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-6 lg:mb-8">
-          <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100/50">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#71E07E] to-[#5BCB6B] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
-                <Activity className="h-5 w-5 text-white drop-shadow-sm" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
-                  Average AQI
-                </p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
-                  {stats.averageAQI}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100/50">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#BA5FFF] to-[#A847E6] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
-                <TrendingUp className="h-5 w-5 text-white drop-shadow-sm" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
-                  Best Day
-                </p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
-                  {stats.bestDay.aqi}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100/50">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#EF4444] to-[#DC2626] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
-                <Activity className="h-5 w-5 text-white drop-shadow-sm" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
-                  Worst Day
-                </p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
-                  {stats.worstDay.aqi}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-gray-100/50">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#6200D9] via-[#7C3AED] to-[#4C00A8] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-white/20">
-                <Wind className="h-5 w-5 text-white drop-shadow-sm" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
-                  Total Readings
-                </p>
-                <p className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
-                  {stats.totalReadings}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Loading State */}
-        {isLoading && (
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100/50">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6200D9] mr-3"></div>
-              <p className="text-[#64748B]">Loading timeline data...</p>
-            </div>
-          </div>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-red-100/50">
-            <div className="flex items-center justify-center text-center">
-              <div>
-                <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-[#0A1C40] mb-2">
-                  Failed to Load Data
-                </h3>
-                <p className="text-[#64748B] mb-4">
-                  Unable to fetch timeline data. Please try again.
-                </p>
                 <Button
+                  variant="outline"
                   onClick={handleRefresh}
-                  className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
+                  disabled={isRefreshing}
+                  className="flex items-center gap-2 h-11 px-4 text-sm font-medium rounded-xl transition-all duration-200 hover:scale-105"
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Retry
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  Refresh
                 </Button>
-              </div>
+              </motion.div>
             </div>
           </div>
-        )}
+        </motion.header>
 
-        {/* Empty State */}
-        {!isLoading && !error && timelineData.length === 0 && (
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100/50">
-            <div className="flex items-center justify-center text-center">
-              <div>
-                <TrendingUp className="h-12 w-12 text-[#64748B] mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-[#0A1C40] mb-2">
-                  No Data Available
-                </h3>
-                <p className="text-[#64748B] mb-4">
-                  No air quality data found for the selected period. Data will
-                  appear here as you check air quality from the Dashboard.
-                </p>
-                <Button
-                  onClick={() => window.history.back()}
-                  className="bg-[#6200D9] hover:bg-[#4C00A8] text-white"
-                >
-                  Go to Dashboard
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Interactive Chart */}
-        {!isLoading && !error && timelineData.length > 0 && (
-          <EnhancedTimelineChart
-            airData={timelineData}
-            symptomData={[]} // No symptom data for now
-            selectedMetric={selectedMetric}
-            onMetricChange={setSelectedMetric}
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={setSelectedPeriod}
-            forecastData={[]} // TODO: Add forecast data
-          />
-        )}
-
-        {/* Timeline List - Mobile Optimized */}
-        {!isLoading && !error && timelineData.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 lg:p-8 shadow-sm border border-gray-100/50">
-            <div className="flex items-center justify-between mb-5 lg:mb-6">
-              <h3 className="text-lg lg:text-xl font-bold text-[#0A1C40] tracking-tight">
-                Recent Readings
-              </h3>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs text-[#64748B] font-medium">
-                  {selectedLocation.label}
-                </span>
-                <Badge variant="outline" className="text-xs">
-                  {timelineResponse?.totalReadings || 0} readings
-                </Badge>
-              </div>
-            </div>
-            <div className="space-y-3 lg:space-y-4">
-              {timelineData.slice(0, 10).map((reading) => (
-                <div
-                  key={reading.id}
-                  className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-xl border border-gray-100 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200/50 transition-all duration-200 touch-target"
-                >
-                  <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <div
-                      className={`w-3 h-3 rounded-full ${getAQIColor(
-                        reading.aqi
-                      )} shadow-sm flex-shrink-0`}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm lg:text-base text-[#0A1C40] font-bold truncate">
-                        {new Date(reading.date).toLocaleDateString()} at{" "}
-                        {reading.time}
-                      </p>
-                      <p className="text-xs lg:text-sm text-[#64748B] font-medium truncate">
-                        {reading.location} • {reading.source}
-                      </p>
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8"
+        >
+          <div className="max-w-7xl mx-auto">
+            {/* Controls */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="mb-6"
+            >
+              <Card className="p-4 shadow-sm">
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-5 w-5 text-gray-500" />
+                    <span className="text-sm font-medium text-gray-700">Time Period:</span>
+                    <div className="flex gap-2">
+                      {(['7d', '30d', '90d'] as const).map((period) => (
+                        <Button
+                          key={period}
+                          variant={selectedPeriod === period ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedPeriod(period)}
+                          className="transition-all duration-200 hover:scale-105"
+                        >
+                          {period === '7d' ? '7 Days' : period === '30d' ? '30 Days' : '90 Days'}
+                        </Button>
+                      ))}
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3 flex-shrink-0">
-                    <div className="text-right">
-                      <p className="text-lg lg:text-xl text-[#0A1C40] font-bold tracking-tight">
-                        {reading.aqi}
-                      </p>
-                      <p className="text-xs lg:text-sm text-[#64748B] font-semibold">
-                        {getAQILabel(reading.aqi)}
-                      </p>
-                    </div>
-                    <Badge
-                      className={`${getAQIColor(
-                        reading.aqi
-                      )} text-white text-xs px-2 py-1 rounded-full font-bold shadow-sm`}
+                  
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleExport}
+                      disabled={!airQualityHistory || airQualityHistory.length === 0}
+                      className="flex items-center gap-2 transition-all duration-200 hover:scale-105"
                     >
-                      {reading.category}
-                    </Badge>
+                      <Download className="h-4 w-4" />
+                      Export CSV
+                    </Button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </Card>
+            </motion.div>
+
+            {/* Timeline Chart */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="mb-6"
+            >
+              <Card className="p-6 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5 text-[#6200D9]" />
+                    Air Quality Trends
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {historyLoading ? (
+                    <div className="flex items-center justify-center h-64">
+                      <div className="text-center">
+                        <div className="w-8 h-8 border-2 border-[#6200D9] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                        <p className="text-gray-600">Loading timeline data...</p>
+                      </div>
+                    </div>
+                  ) : historyError ? (
+                    <div className="text-center py-8">
+                      <p className="text-red-600 mb-4">Failed to load timeline data</p>
+                      <Button onClick={handleRefresh} variant="outline">
+                        Try Again
+                      </Button>
+                    </div>
+                  ) : !airQualityHistory || airQualityHistory.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600 mb-2">No data available for this period</p>
+                      <p className="text-sm text-gray-500">Check back later or try a different time period</p>
+                    </div>
+                  ) : (
+                    <EnhancedTimelineChart data={airQualityHistory} />
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Recent Readings */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+            >
+              <Card className="shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-[#6200D9]" />
+                    Recent Readings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {historyLoading ? (
+                    <div className="space-y-3">
+                      {[...Array(3)].map((_, i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="h-16 bg-gray-200 rounded-lg" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : historyError ? (
+                    <div className="text-center py-8">
+                      <p className="text-red-600">Failed to load recent readings</p>
+                    </div>
+                  ) : !airQualityHistory || airQualityHistory.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-600">No recent readings available</p>
+                    </div>
+                  ) : (
+                    <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                      <div className="space-y-3">
+                        {airQualityHistory.slice(0, 20).map((reading: AirQualityReading, index: number) => {
+                          const aqiInfo = getAQIInfo(reading.aqi);
+                          return (
+                            <motion.div
+                              key={reading.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: index * 0.1 }}
+                              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${aqiInfo.bgColor}`}>
+                                  <span className={`text-lg font-bold ${aqiInfo.textColor}`}>
+                                    {reading.aqi}
+                                  </span>
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="font-medium text-gray-900">
+                                      {new Date(reading.timestamp).toLocaleDateString()}
+                                    </span>
+                                    <Badge className={`${aqiInfo.bgColor} ${aqiInfo.textColor} text-xs`}>
+                                      {reading.category}
+                                    </Badge>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <MapPin className="h-3 w-3" />
+                                    <span>{reading.location || 'Unknown Location'}</span>
+                                    <span>•</span>
+                                    <span>{reading.dominantPollutant}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-sm text-gray-500">
+                                  {new Date(reading.timestamp).toLocaleTimeString([], { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit' 
+                                  })}
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-        )}
+        </motion.div>
+
+        {/* Navigation */}
+        <Navigation />
+        
+        {/* Floating Settings Button */}
+        <FloatingSettingsButton />
       </div>
-
-      {/* Navigation */}
-      <Navigation />
-
-      {/* Floating Settings Button */}
-      <FloatingSettingsButton />
     </PageLayout>
   );
+}
+
+// Helper function to get AQI info
+function getAQIInfo(aqi: number) {
+  if (aqi <= 50) {
+    return { 
+      category: 'Good', 
+      color: 'text-green-600', 
+      bgColor: 'bg-green-50',
+      textColor: 'text-green-700'
+    };
+  } else if (aqi <= 100) {
+    return { 
+      category: 'Moderate', 
+      color: 'text-yellow-600', 
+      bgColor: 'bg-yellow-50',
+      textColor: 'text-yellow-700'
+    };
+  } else if (aqi <= 150) {
+    return { 
+      category: 'Unhealthy for Sensitive Groups', 
+      color: 'text-orange-600', 
+      bgColor: 'bg-orange-50',
+      textColor: 'text-orange-700'
+    };
+  } else if (aqi <= 200) {
+    return { 
+      category: 'Unhealthy', 
+      color: 'text-red-600', 
+      bgColor: 'bg-red-50',
+      textColor: 'text-red-700'
+    };
+  } else if (aqi <= 300) {
+    return { 
+      category: 'Very Unhealthy', 
+      color: 'text-purple-600', 
+      bgColor: 'bg-purple-50',
+      textColor: 'text-purple-700'
+    };
+  } else {
+    return { 
+      category: 'Hazardous', 
+      color: 'text-red-800', 
+      bgColor: 'bg-red-100',
+      textColor: 'text-red-900'
+    };
+  }
 }

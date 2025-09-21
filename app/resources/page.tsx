@@ -1,189 +1,433 @@
 'use client'
 
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { LifeBuoy, AlertTriangle, ExternalLink, Star, Shield, Award, CheckCircle } from 'lucide-react';
-import { Navigation } from '@/components/Navigation';
-import { PageLayout } from '@/components/PageLayout';
-import { FloatingSettingsButton } from '@/components/FloatingSettingsButton';
+import { PageLayout } from '@/components/PageLayout'
+import { Navigation } from '@/components/Navigation'
+import { FloatingSettingsButton } from '@/components/FloatingSettingsButton'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { LifeBuoy, ExternalLink, BookOpen, Shield, Heart, Users, Globe, Phone, Mail, MapPin } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export default function ResourcesPage() {
   // Trusted sources - above the fold, visually distinct
   const trustedSources = [
     {
-      title: 'MD Anderson Cancer Center',
-      description: 'Expert advice on air quality and cancer prevention. Learn about lung cancer risk factors and prevention strategies.',
-      url: 'https://www.mdanderson.org',
-      type: 'external',
-      category: 'Cancer Prevention',
-      verified: true,
-      priority: 'high',
-      features: ['Air Pollution & Lung Cancer Risk', 'Patient Resources', 'Expert Research']
+      name: 'World Health Organization (WHO)',
+      description: 'Global air quality guidelines and health recommendations',
+      url: 'https://www.who.int/health-topics/air-pollution',
+      category: 'Official Guidelines',
+      icon: Globe,
+      color: 'bg-blue-50 text-blue-700 border-blue-200'
     },
     {
-      title: 'American Lung Association',
-      description: 'Practical tips for lung health, air pollution advice, and support for people with asthma, COPD, or other respiratory conditions.',
-      url: 'https://www.lung.org',
-      type: 'external',
-      category: 'Lung Health',
-      verified: true,
-      priority: 'high',
-      features: ['Air Quality Guidelines', 'Lung Health Tips', 'Patient Support']
+      name: 'EPA Air Quality Index',
+      description: 'US Environmental Protection Agency air quality standards',
+      url: 'https://www.airnow.gov/aqi/aqi-basics/',
+      category: 'Official Standards',
+      icon: Shield,
+      color: 'bg-green-50 text-green-700 border-green-200'
     },
     {
-      title: 'EPA Air Quality Index',
-      description: 'Real-time air quality data and health recommendations from the Environmental Protection Agency.',
-      url: 'https://www.airnow.gov',
-      type: 'external',
-      category: 'Government',
-      verified: true,
-      priority: 'high',
-      features: ['Real-time Data', 'Health Recommendations', 'Official Standards']
+      name: 'American Lung Association',
+      description: 'Respiratory health and air pollution research',
+      url: 'https://www.lung.org/clean-air',
+      category: 'Health Research',
+      icon: Heart,
+      color: 'bg-red-50 text-red-700 border-red-200'
+    },
+    {
+      name: 'CDC Air Quality & Health',
+      description: 'Centers for Disease Control health guidance',
+      url: 'https://www.cdc.gov/air/',
+      category: 'Health Guidance',
+      icon: Users,
+      color: 'bg-purple-50 text-purple-700 border-purple-200'
     }
   ];
 
+  // Health resources organized by category
+  const healthResources = [
+    {
+      category: 'For People with Asthma',
+      resources: [
+        {
+          title: 'Asthma Action Plan',
+          description: 'Create a personalized plan to manage asthma during poor air quality days',
+          type: 'Guide',
+          icon: BookOpen,
+          color: 'text-blue-600'
+        },
+        {
+          title: 'Medication Management',
+          description: 'When and how to adjust medications based on air quality',
+          type: 'Medical',
+          icon: Heart,
+          color: 'text-red-600'
+        },
+        {
+          title: 'Indoor Air Quality Tips',
+          description: 'How to improve air quality in your home',
+          type: 'Tips',
+          icon: Shield,
+          color: 'text-green-600'
+        }
+      ]
+    },
+    {
+      category: 'For Pregnant Women',
+      resources: [
+        {
+          title: 'Pregnancy Air Quality Guide',
+          description: 'Understanding air pollution risks during pregnancy',
+          type: 'Guide',
+          icon: BookOpen,
+          color: 'text-blue-600'
+        },
+        {
+          title: 'Safe Outdoor Activities',
+          description: 'Guidelines for outdoor exercise and activities',
+          type: 'Lifestyle',
+          icon: Users,
+          color: 'text-purple-600'
+        }
+      ]
+    },
+    {
+      category: 'For Seniors',
+      resources: [
+        {
+          title: 'Senior Health & Air Quality',
+          description: 'Special considerations for older adults',
+          type: 'Guide',
+          icon: BookOpen,
+          color: 'text-blue-600'
+        },
+        {
+          title: 'Indoor Exercise Alternatives',
+          description: 'Safe indoor activities when air quality is poor',
+          type: 'Lifestyle',
+          icon: Users,
+          color: 'text-purple-600'
+        }
+      ]
+    }
+  ];
+
+  // Emergency contacts and support
+  const emergencyContacts = [
+    {
+      name: 'Poison Control Center',
+      phone: '1-800-222-1222',
+      description: '24/7 emergency hotline for poisoning and chemical exposure',
+      icon: Phone,
+      color: 'text-red-600'
+    },
+    {
+      name: 'National Asthma Council',
+      phone: '1-800-7ASTHMA',
+      description: 'Asthma support and emergency guidance',
+      icon: Heart,
+      color: 'text-red-600'
+    },
+    {
+      name: 'EPA Environmental Hotline',
+      phone: '1-800-424-8802',
+      description: 'Report environmental emergencies and get guidance',
+      icon: Shield,
+      color: 'text-green-600'
+    }
+  ];
 
   return (
     <PageLayout>
-      {/* Mobile Header */}
-      <header className="lg:hidden bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <div className="px-4 py-3">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center">
-              <LifeBuoy className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white">Health Resources</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Expert guidance & support</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Desktop Header */}
-      <header className="hidden lg:block bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-        <div className="px-8 py-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center">
-              <LifeBuoy className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Health Resources</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Expert guidance, research, and support for your health journey</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content - Mobile Optimized */}
-      <div className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8">
-        {/* Emergency Contacts */}
-        <div className="mb-8 lg:mb-12">
-          <Card className="bg-white dark:bg-gray-800 border-red-200 dark:border-red-800">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-xl flex items-center justify-center">
-                    <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-red-600 dark:text-red-400">Emergency</h2>
-                    <p className="text-sm text-red-500 dark:text-red-300">Call 911 for medical emergencies</p>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="bg-red-600 hover:bg-red-700 text-white border-0 h-10 px-6 rounded-xl font-medium"
-                  onClick={() => window.open('tel:911')}
-                >
-                  Call 911
-                </Button>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        {/* Mobile Header */}
+        <motion.header
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="lg:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 py-4 mb-6"
+        >
+          <div className="px-4">
+            <div className="flex items-center space-x-3">
+              <motion.div 
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center"
+              >
+                <LifeBuoy className="h-5 w-5 text-white" />
+              </motion.div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 dark:text-white">Health Resources</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Expert guidance & support</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Trusted Sources */}
-        <div className="mb-8 lg:mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-[#6200D9] rounded-xl flex items-center justify-center">
-              <Shield className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Trusted Sources</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Verified medical and government resources</p>
             </div>
           </div>
+        </motion.header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {trustedSources.map((source, index) => (
-              <Card key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center">
-                        <Award className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{source.title}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge className="bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 text-xs px-2 py-1">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Verified
-                          </Badge>
-                          <Badge variant="outline" className="text-xs text-gray-600 dark:text-gray-400 border-gray-300 dark:border-gray-600">
-                            {source.category}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 text-gray-400" />
-                  </div>
+        {/* Desktop Header */}
+        <motion.header
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="hidden lg:block sticky top-0 z-30 header-premium"
+        >
+          <div className="px-8 py-4">
+            <div className="flex items-center space-x-3">
+              <motion.div 
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center"
+              >
+                <LifeBuoy className="h-5 w-5 text-white" />
+              </motion.div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Health Resources</h1>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Expert guidance, research, and support for your health journey</p>
+              </div>
+            </div>
+          </div>
+        </motion.header>
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="px-4 lg:px-8 py-2 lg:py-8 pb-24 lg:pb-8"
+        >
+          <div className="max-w-6xl mx-auto space-y-8">
+            {/* Trusted Sources */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+            >
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-[#6200D9]" />
+                    Trusted Sources
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Official guidelines and research from leading health organizations
+                  </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-                    {source.description}
-                  </p>
-                  
-                  {source.features && (
-                    <div className="mb-4">
-                      <div className="flex flex-wrap gap-2">
-                        {source.features.map((feature, featureIndex) => (
-                          <Badge key={featureIndex} variant="outline" className="text-xs border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 px-2 py-1">
-                            {feature}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-end">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="bg-[#6200D9] hover:bg-[#4C00A8] text-white border-0 h-10 px-6 rounded-xl font-medium"
-                      onClick={() => window.open(source.url, '_blank')}
-                    >
-                      Visit Site
-                      <ExternalLink className="h-4 w-4 ml-2" />
-                    </Button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {trustedSources.map((source, index) => {
+                      const Icon = source.icon;
+                      return (
+                        <motion.div
+                          key={source.name}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.4 + (index * 0.1) }}
+                          className="group"
+                        >
+                          <Card className="hover:shadow-md transition-all duration-300 hover:scale-105">
+                            <CardContent className="p-4">
+                              <div className="flex items-start gap-3">
+                                <div className={`p-2 rounded-lg ${source.color}`}>
+                                  <Icon className="h-5 w-5" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="font-semibold text-gray-900 truncate">{source.name}</h3>
+                                    <Badge variant="outline" className="text-xs">
+                                      {source.category}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-sm text-gray-600 mb-3">{source.description}</p>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="group-hover:bg-[#6200D9] group-hover:text-white transition-all duration-200"
+                                    onClick={() => window.open(source.url, '_blank')}
+                                  >
+                                    <ExternalLink className="h-3 w-3 mr-1" />
+                                    Visit Source
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            </motion.div>
+
+            {/* Health Resources by Category */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+            >
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-[#6200D9]" />
+                    Health Resources by Category
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Personalized guidance based on your health profile
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {healthResources.map((category, categoryIndex) => (
+                      <motion.div
+                        key={category.category}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.6 + (categoryIndex * 0.1) }}
+                      >
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">{category.category}</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {category.resources.map((resource, resourceIndex) => {
+                            const Icon = resource.icon;
+                            return (
+                              <motion.div
+                                key={resource.title}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.3, delay: 0.7 + (categoryIndex * 0.1) + (resourceIndex * 0.05) }}
+                                className="group"
+                              >
+                                <Card className="hover:shadow-md transition-all duration-300 hover:scale-105">
+                                  <CardContent className="p-4">
+                                    <div className="flex items-start gap-3">
+                                      <div className={`p-2 rounded-lg bg-gray-50`}>
+                                        <Icon className={`h-5 w-5 ${resource.color}`} />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <h4 className="font-medium text-gray-900 truncate">{resource.title}</h4>
+                                          <Badge variant="outline" className="text-xs">
+                                            {resource.type}
+                                          </Badge>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{resource.description}</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Emergency Contacts */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.8 }}
+            >
+              <Card className="shadow-sm border-red-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-700">
+                    <Phone className="h-5 w-5" />
+                    Emergency Contacts
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Important phone numbers for air quality emergencies
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {emergencyContacts.map((contact, index) => {
+                      const Icon = contact.icon;
+                      return (
+                        <motion.div
+                          key={contact.name}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: 0.9 + (index * 0.1) }}
+                          className="group"
+                        >
+                          <Card className="hover:shadow-md transition-all duration-300 hover:scale-105 border-red-100">
+                            <CardContent className="p-4">
+                              <div className="flex items-start gap-3">
+                                <div className="p-2 rounded-lg bg-red-50">
+                                  <Icon className={`h-5 w-5 ${contact.color}`} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-gray-900 mb-1">{contact.name}</h4>
+                                  <p className="text-lg font-mono text-red-600 mb-2">{contact.phone}</p>
+                                  <p className="text-sm text-gray-600">{contact.description}</p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Local Resources */}
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4, delay: 1.0 }}
+            >
+              <Card className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-[#6200D9]" />
+                    Local Resources
+                  </CardTitle>
+                  <p className="text-sm text-gray-600">
+                    Find air quality information and health services in your area
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-gray-900">Local Air Quality</h4>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li>• Check your local air quality index daily</li>
+                        <li>• Sign up for air quality alerts</li>
+                        <li>• Find clean air shelters in your area</li>
+                        <li>• Report air quality concerns to local authorities</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-gray-900">Health Services</h4>
+                      <ul className="space-y-2 text-sm text-gray-600">
+                        <li>• Find pulmonologists and allergists</li>
+                        <li>• Locate emergency medical services</li>
+                        <li>• Connect with local health departments</li>
+                        <li>• Access community health programs</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
 
+        {/* Navigation */}
+        <Navigation />
+        
+        {/* Floating Settings Button */}
+        <FloatingSettingsButton />
       </div>
-
-      {/* Navigation */}
-      <Navigation />
-      
-      {/* Floating Settings Button */}
-      <FloatingSettingsButton />
     </PageLayout>
   );
 }

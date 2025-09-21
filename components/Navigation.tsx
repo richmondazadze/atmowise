@@ -63,6 +63,7 @@ export function Navigation({}: NavigationProps) {
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="relative"
               >
                 <Link
                   href={item.path}
@@ -75,24 +76,29 @@ export function Navigation({}: NavigationProps) {
                   data-testid={`nav-${item.label.toLowerCase()}`}
                   aria-label={`Navigate to ${item.label}`}
                 >
-                  {/* Active indicator background */}
-                  <AnimatePresence>
+                  {/* Active indicator background with smooth transition */}
+                  <AnimatePresence mode="wait">
                     {isActive && (
                       <motion.div
+                        key="active-bg"
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        transition={{ 
+                          duration: 0.4, 
+                          ease: [0.25, 0.46, 0.45, 0.94] 
+                        }}
                         className="absolute inset-0 bg-gradient-to-r from-[#6200D9]/10 to-[#4C00A8]/10 rounded-xl"
                       />
                     )}
                   </AnimatePresence>
                   
-                  {/* Icon with smooth transition */}
+                  {/* Icon with smooth transition and bounce effect */}
                   <motion.div
                     animate={{ 
                       scale: isActive ? 1.1 : 1,
-                      rotate: isActive ? [0, -5, 5, 0] : 0
+                      rotate: isActive ? [0, -5, 5, 0] : 0,
+                      y: isActive ? -2 : 0
                     }}
                     transition={{ 
                       duration: 0.3, 
@@ -108,7 +114,8 @@ export function Navigation({}: NavigationProps) {
                     className="text-xs font-medium relative z-10"
                     animate={{ 
                       fontWeight: isActive ? 600 : 500,
-                      color: isActive ? "#6200D9" : undefined
+                      color: isActive ? "#6200D9" : undefined,
+                      y: isActive ? -1 : 0
                     }}
                     transition={{ duration: 0.2 }}
                   >
@@ -125,6 +132,19 @@ export function Navigation({}: NavigationProps) {
                     }}
                     transition={{ duration: 0.3 }}
                   />
+                  
+                  {/* Glow effect for active state */}
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute inset-0 rounded-xl shadow-lg shadow-[#6200D9]/20"
+                      />
+                    )}
+                  </AnimatePresence>
                 </Link>
               </motion.div>
             );

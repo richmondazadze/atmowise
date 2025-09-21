@@ -95,6 +95,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
           whileHover={{ x: 4 }}
           whileTap={{ scale: 0.98 }}
           transition={{ duration: 0.2 }}
+          className="relative"
         >
           <Link
             href={item.path}
@@ -107,14 +108,18 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
                 : "text-[#64748B] hover:bg-gray-50 hover:text-[#0A1C40]"
             )}
           >
-            {/* Active indicator */}
-            <AnimatePresence>
+            {/* Active indicator with smooth slide animation */}
+            <AnimatePresence mode="wait">
               {isActive && (
                 <motion.div
+                  key="active-indicator"
                   initial={{ scaleX: 0, opacity: 0 }}
                   animate={{ scaleX: 1, opacity: 1 }}
                   exit={{ scaleX: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  transition={{ 
+                    duration: 0.4, 
+                    ease: [0.25, 0.46, 0.45, 0.94] 
+                  }}
                   className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"
                 />
               )}
@@ -129,9 +134,11 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
               <motion.div
                 animate={{ 
                   scale: isActive ? 1.1 : 1,
-                  rotate: isActive ? [0, -5, 5, 0] : 0
+                  rotate: isActive ? [0, -5, 5, 0] : 0,
+                  y: isActive ? -1 : 0
                 }}
                 transition={{ duration: 0.3 }}
+                className="relative z-10"
               >
                 <Icon
                   className={cn(
@@ -154,7 +161,8 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
               <motion.div 
                 className="font-semibold text-sm leading-tight truncate"
                 animate={{ 
-                  fontWeight: isActive ? 600 : 500 
+                  fontWeight: isActive ? 600 : 500,
+                  y: isActive ? -1 : 0
                 }}
                 transition={{ duration: 0.2 }}
               >
@@ -172,12 +180,12 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
               </div>
             </div>
 
-            {/* Hover arrow */}
+            {/* Hover arrow with smooth animation */}
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               whileHover={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.2 }}
-              className="ml-auto"
+              className="ml-auto relative z-10"
             >
               <ChevronRight className="h-4 w-4" />
             </motion.div>
@@ -192,6 +200,19 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
               }}
               transition={{ duration: 0.3 }}
             />
+
+            {/* Glow effect for active state */}
+            <AnimatePresence>
+              {isActive && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0 rounded-xl shadow-lg shadow-[#6200D9]/20"
+                />
+              )}
+            </AnimatePresence>
           </Link>
         </motion.div>
       );
