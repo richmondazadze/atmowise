@@ -4,6 +4,7 @@ import { Home, TrendingUp, User, LifeBuoy } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { DesktopSidebar } from "./DesktopSidebar";
 
 interface NavigationProps {}
@@ -26,7 +27,14 @@ export function Navigation({}: NavigationProps) {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav
+      <motion.nav
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ 
+          duration: 0.6, 
+          ease: [0.25, 0.46, 0.45, 0.94],
+          delay: 0.2 
+        }}
         className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl border-t border-gray-100/50 dark:border-gray-700/50 z-[60] shadow-lg safe-area-bottom"
         data-testid="nav-bottom"
         style={{
@@ -39,30 +47,90 @@ export function Navigation({}: NavigationProps) {
         }}
       >
         <div className="flex items-center justify-around px-4 py-3">
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
 
             return (
-              <Link
+              <motion.div
                 key={item.path}
-                href={item.path}
-                className={cn(
-                  "flex flex-col items-center py-2 px-4 transition-all duration-200 ease-out rounded-xl min-h-[48px] min-w-[48px] justify-center focus:outline-none focus:ring-2 focus:ring-[#6200D9] focus:ring-offset-2",
-                  isActive
-                    ? "text-[#6200D9] dark:text-purple-400 bg-[#6200D9]/10 dark:bg-purple-400/10 shadow-sm"
-                    : "text-[#64748B] dark:text-gray-400 hover:text-[#0A1C40] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
-                )}
-                data-testid={`nav-${item.label.toLowerCase()}`}
-                aria-label={`Navigate to ${item.label}`}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ 
+                  duration: 0.4, 
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                  delay: 0.3 + (index * 0.1)
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Icon className="h-5 w-5 mb-1" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </Link>
+                <Link
+                  href={item.path}
+                  className={cn(
+                    "flex flex-col items-center py-2 px-4 transition-all duration-300 ease-out rounded-xl min-h-[48px] min-w-[48px] justify-center focus:outline-none focus:ring-2 focus:ring-[#6200D9] focus:ring-offset-2 relative overflow-hidden group",
+                    isActive
+                      ? "text-[#6200D9] dark:text-purple-400 bg-[#6200D9]/10 dark:bg-purple-400/10 shadow-sm"
+                      : "text-[#64748B] dark:text-gray-400 hover:text-[#0A1C40] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800"
+                  )}
+                  data-testid={`nav-${item.label.toLowerCase()}`}
+                  aria-label={`Navigate to ${item.label}`}
+                >
+                  {/* Active indicator background */}
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="absolute inset-0 bg-gradient-to-r from-[#6200D9]/10 to-[#4C00A8]/10 rounded-xl"
+                      />
+                    )}
+                  </AnimatePresence>
+                  
+                  {/* Icon with smooth transition */}
+                  <motion.div
+                    animate={{ 
+                      scale: isActive ? 1.1 : 1,
+                      rotate: isActive ? [0, -5, 5, 0] : 0
+                    }}
+                    transition={{ 
+                      duration: 0.3, 
+                      ease: [0.25, 0.46, 0.45, 0.94] 
+                    }}
+                    className="relative z-10"
+                  >
+                    <Icon className="h-5 w-5 mb-1" />
+                  </motion.div>
+                  
+                  {/* Label with smooth transition */}
+                  <motion.span 
+                    className="text-xs font-medium relative z-10"
+                    animate={{ 
+                      fontWeight: isActive ? 600 : 500,
+                      color: isActive ? "#6200D9" : undefined
+                    }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {item.label}
+                  </motion.span>
+                  
+                  {/* Ripple effect on tap */}
+                  <motion.div
+                    className="absolute inset-0 bg-[#6200D9]/20 rounded-xl"
+                    initial={{ scale: 0, opacity: 0 }}
+                    whileTap={{ 
+                      scale: 1.2, 
+                      opacity: [0, 0.3, 0] 
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Link>
+              </motion.div>
             );
           })}
         </div>
-      </nav>
+      </motion.nav>
     </>
   );
 }

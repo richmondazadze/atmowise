@@ -226,11 +226,11 @@ export function AIInsightsModal({
 
   const getPriorityIcon = (priority: number) => {
     if (priority >= 4) {
-      return <AlertTriangle className="h-4 w-4 text-red-500" />;
+      return <AlertTriangle className="h-3 w-3 text-red-500" />;
     } else if (priority >= 2) {
-      return <Lightbulb className="h-4 w-4 text-yellow-500" />;
+      return <Lightbulb className="h-3 w-3 text-yellow-500" />;
     } else {
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
+      return <CheckCircle className="h-3 w-3 text-green-500" />;
     }
   };
 
@@ -242,21 +242,21 @@ export function AIInsightsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] mx-auto rounded-2xl flex flex-col p-0">
-        <DialogHeader className="flex-shrink-0 px-6 py-4">
-          <DialogTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-[#6200D9]" />
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] mx-auto rounded-2xl flex flex-col p-0">
+        <DialogHeader className="flex-shrink-0 px-4 py-3">
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <Brain className="h-4 w-4 text-[#6200D9]" />
             AI Health Insights & Tips
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 overflow-hidden flex flex-col px-6 pb-6 space-y-6">
+        <div className="flex-1 overflow-hidden flex flex-col px-4 pb-4 space-y-3">
           {/* Loading State */}
           {isGenerating && !aiResponse && (
-            <div className="flex items-center justify-center py-8">
+            <div className="flex items-center justify-center py-6">
               <div className="text-center">
-                <Loader2 className="h-8 w-8 animate-spin text-[#6200D9] mx-auto mb-3" />
-                <p className="text-gray-600">Analyzing your symptoms and generating personalized insights...</p>
+                <Loader2 className="h-6 w-6 animate-spin text-[#6200D9] mx-auto mb-2" />
+                <p className="text-sm text-gray-600">Analyzing your symptoms and generating personalized insights...</p>
               </div>
             </div>
           )}
@@ -264,55 +264,55 @@ export function AIInsightsModal({
           {/* AI Response */}
           {aiResponse && (
             <>
-              {/* Summary and Action - Fixed Height */}
-              <div className="space-y-4 flex-shrink-0">
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl">
-                  <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-                    <Brain className="h-4 w-4" />
+              {/* Summary and Action - Compact */}
+              <div className="space-y-3 flex-shrink-0">
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                  <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2 text-sm">
+                    <Brain className="h-3 w-3" />
                     AI Analysis
                   </h4>
-                  <div className="text-sm text-blue-800 whitespace-pre-line">
+                  <div className="text-xs text-blue-800 whitespace-pre-line leading-relaxed">
                     {isStreaming ? streamingText : `${aiResponse.summary}\n\n${aiResponse.action}`}
                     {isStreaming && <span className="animate-pulse">|</span>}
                   </div>
                 </div>
 
-                {/* Severity Assessment */}
-                <div className={`p-3 rounded-2xl border ${getSeverityColor(aiResponse.severity)}`}>
+                {/* Severity Assessment - Compact */}
+                <div className={`p-2 rounded-xl border ${getSeverityColor(aiResponse.severity)}`}>
                   <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span className="font-medium">Severity Level: {aiResponse.severity}</span>
+                    <AlertTriangle className="h-3 w-3" />
+                    <span className="font-medium text-sm">Severity Level: {aiResponse.severity}</span>
                   </div>
                 </div>
               </div>
 
               {/* Tips Section - Scrollable */}
-              <div className="flex-1 flex flex-col space-y-4 min-h-0">
-                <h4 className="font-semibold text-gray-900 flex items-center gap-2 flex-shrink-0">
-                  <Lightbulb className="h-4 w-4 text-[#6200D9]" />
+              <div className="flex-1 flex flex-col space-y-2 min-h-0">
+                <h4 className="font-semibold text-gray-900 flex items-center gap-2 flex-shrink-0 text-sm">
+                  <Lightbulb className="h-3 w-3 text-[#6200D9]" />
                   Personalized Health Tips
                 </h4>
                 
-                <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 scroll-smooth overscroll-contain">
+                <div className="flex-1 overflow-y-auto space-y-2 pr-1 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 scroll-smooth overscroll-contain">
                   {aiResponse.tips.map((tip, index) => (
                     <div
                       key={index}
-                      className={`p-4 rounded-2xl border transition-all duration-200 ${
+                      className={`p-3 rounded-xl border transition-all duration-200 ${
                         index === currentTipIndex 
                           ? 'border-[#6200D9] bg-[#6200D9]/5' 
                           : 'border-gray-200 bg-white hover:border-gray-300'
                       }`}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2">
                         <div className="flex-shrink-0 mt-0.5">
                           {getPriorityIcon(tip.priority)}
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wide">
                               {tip.category}
                             </span>
-                            <span className={`text-xs px-2 py-1 rounded-full ${
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                               getPriorityLabel(tip.priority) === 'high' ? 'bg-red-100 text-red-700' :
                               getPriorityLabel(tip.priority) === 'medium' ? 'bg-yellow-100 text-yellow-700' :
                               'bg-green-100 text-green-700'
@@ -320,8 +320,8 @@ export function AIInsightsModal({
                               {getPriorityLabel(tip.priority)}
                             </span>
                           </div>
-                          <h5 className="font-medium text-gray-900 mb-2">{tip.title}</h5>
-                          <p className="text-sm text-gray-800 leading-relaxed">
+                          <h5 className="font-medium text-gray-900 mb-1 text-sm">{tip.title}</h5>
+                          <p className="text-xs text-gray-800 leading-relaxed">
                             {tip.content}
                           </p>
                         </div>
