@@ -143,7 +143,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
 
   if (isLoading) {
     return (
-      <Card className="card-solid rounded-xl lg:rounded-2xl p-4 lg:p-6">
+      <Card className="card-solid rounded-xl lg:rounded-2xl p-3 lg:p-4">
         <div className="flex items-center justify-center h-32">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6200D9]"></div>
         </div>
@@ -152,7 +152,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
   }
 
   return (
-    <Card className="card-solid rounded-xl lg:rounded-2xl p-4 lg:p-6 hover:shadow-xl transition-all duration-300">
+    <Card className="card-solid rounded-xl lg:rounded-2xl p-3 lg:p-4 hover:shadow-xl transition-all duration-300">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg lg:text-xl font-bold text-[#0A1C40] flex items-center gap-2">
@@ -178,7 +178,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="p-4 bg-gray-50 rounded-xl border border-gray-200"
+            className="p-3 bg-gray-50 rounded-xl border border-gray-200"
           >
             <h4 className="font-semibold text-[#0A1C40] mb-3">Add New Place</h4>
             <div className="space-y-3">
@@ -323,7 +323,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                   key={place.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#6200D9]/30 hover:shadow-md transition-all duration-200 cursor-pointer group touch-target"
+                  className="p-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#6200D9]/30 hover:shadow-md transition-all duration-200 cursor-pointer group touch-target"
                   onClick={() => handlePlaceSelect(place)}
                 >
                   <div className="flex items-start justify-between mb-2">

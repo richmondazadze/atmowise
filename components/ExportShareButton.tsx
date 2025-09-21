@@ -132,7 +132,7 @@ Track your air quality with AtmoWise!`;
   };
 
   return (
-    <div className={`fixed bottom-20 right-4 z-50 ${className}`}>
+    <div className={`fixed bottom-34 right-5 z-50 ${className}`}>
       {/* Floating Action Button */}
       <Button
         onClick={() => setShowOptions(!showOptions)}
@@ -144,7 +144,7 @@ Track your air quality with AtmoWise!`;
 
       {/* Options Panel */}
       {showOptions && (
-        <div className="absolute bottom-16 right-0 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 min-w-[200px]">
+        <div className="absolute bottom-14 right-0 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 min-w-[200px]">
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
               Export & Share
