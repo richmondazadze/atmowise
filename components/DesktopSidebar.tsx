@@ -231,40 +231,6 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
             isCollapsed ? "mx-2" : "mx-4"
           )}
         />
-
-        {/* Secondary Navigation */}
-        <nav className={cn("space-y-2", isCollapsed ? "px-2" : "px-4")}>
-          {!isCollapsed && (
-            <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2">
-              Settings
-            </h2>
-          )}
-          {secondaryNavItems.map((item) => (
-            <NavItemComponent
-              key={item.path}
-              item={item}
-              isActive={pathname === item.path}
-            />
-          ))}
-        </nav>
-
-        {/* Crisis Button */}
-        {onCrisis && (
-          <div className={cn("mt-4", isCollapsed ? "px-2" : "px-4")}>
-            <Button
-              onClick={onCrisis}
-              className={cn(
-                "w-full bg-gradient-to-r from-[#EF4444] to-[#DC2626] text-white shadow-md hover:shadow-lg transition-all duration-200 rounded-lg font-semibold",
-                isCollapsed
-                  ? "h-12 w-12 px-0 justify-center"
-                  : "h-11 px-4 justify-start"
-              )}
-            >
-              <LifeBuoy className={cn(isCollapsed ? "h-5 w-5" : "h-4 w-4")} />
-              {!isCollapsed && <span className="ml-2">Emergency Help</span>}
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Footer */}
