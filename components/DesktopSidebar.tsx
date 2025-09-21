@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -29,6 +30,50 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Fetch profile data
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      try {
+        const response = await fetch(`/api/profile/${user.id}`);
+        if (response.ok) {
+          return response.json();
+        }
+        return null;
+      } catch (error) {
+        console.error("Profile fetch error:", error);
+        return null;
+      }
+    },
+    enabled: !!user?.id,
+    retry: 1,
+  });
+
+  // Helper function to get display name
+  const getDisplayName = () => {
+    if (profile?.displayName) {
+      return profile.displayName;
+    }
+    
+    // Extract first name from email as fallback
+    if (user?.email) {
+      const emailName = user.email.split('@')[0];
+      // Convert to title case and remove numbers
+      const firstName = emailName
+        .replace(/[0-9]/g, '') // Remove numbers
+        .replace(/([A-Z])/g, ' $1') // Add space before capitals
+        .trim()
+        .split(' ')[0] // Take first word
+        .toLowerCase()
+        .replace(/^\w/, c => c.toUpperCase()); // Capitalize first letter
+      
+      return firstName || 'User';
+    }
+    
+    return 'User';
+  };
 
   const mainNavItems = [
     {
@@ -145,14 +190,14 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
         {!isCollapsed && (
           <div className="flex items-center space-x-3 mb-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.email || 'User'}`} alt="User Avatar" />
+              <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${getDisplayName()}`} alt="User Avatar" />
               <AvatarFallback className="bg-[#6200D9] text-white font-semibold text-sm">
-                {user?.email?.charAt(0).toUpperCase() || 'U'}
+                {getDisplayName().charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-[#0A1C40] truncate">
-                {user?.email?.split('@')[0] || 'User'}
+                {getDisplayName()}
               </p>
               <p className="text-xs text-[#64748B]">User</p>
             </div>

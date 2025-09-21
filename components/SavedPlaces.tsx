@@ -254,7 +254,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
             <p className="text-sm text-[#64748B] leading-relaxed">Add your frequently visited locations for quick access</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
+          <div className="space-y-3 max-h-80 overflow-y-auto scroll-smooth overscroll-contain">
             {savedPlaces.map((place: any) => {
               const typeInfo = PLACE_TYPES[place.type as keyof typeof PLACE_TYPES] || PLACE_TYPES.custom;
               const TypeIcon = typeInfo.icon;
@@ -264,19 +264,19 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                   key={place.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-white rounded-xl border border-gray-200 hover:border-[#6200D9]/30 hover:shadow-md transition-all duration-200 cursor-pointer group touch-target"
+                  className="p-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#6200D9]/30 hover:shadow-md transition-all duration-200 cursor-pointer group touch-target"
                   onClick={() => handlePlaceSelect(place)}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center space-x-3 min-w-0 flex-1">
                       <div className={`w-10 h-10 ${typeInfo.color} rounded-xl flex items-center justify-center flex-shrink-0`}>
                         <TypeIcon className="h-5 w-5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-semibold text-[#0A1C40] group-hover:text-[#6200D9] transition-colors truncate">
+                        <h4 className="font-semibold text-[#0A1C40] dark:text-white group-hover:text-[#6200D9] transition-colors truncate">
                           {place.name}
                         </h4>
-                        <Badge variant="outline" className="text-xs mt-1">
+                        <Badge variant="outline" className="text-xs mt-1 dark:border-gray-600 dark:text-gray-300">
                           {typeInfo.label}
                         </Badge>
                       </div>
@@ -295,12 +295,12 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
                   </div>
                   
                   {place.address && (
-                    <p className="text-sm text-[#64748B] mb-3 leading-relaxed">{place.address}</p>
+                    <p className="text-sm text-[#64748B] dark:text-gray-400 mb-2 leading-relaxed">{place.address}</p>
                   )}
                   
-                  <div className="flex items-center justify-between text-xs text-[#64748B]">
+                  <div className="flex items-center justify-between text-xs text-[#64748B] dark:text-gray-400">
                     <span className="truncate">{place.lat.toFixed(4)}, {place.lon.toFixed(4)}</span>
-                    <div className="flex items-center space-x-1 text-[#6200D9] flex-shrink-0">
+                    <div className="flex items-center space-x-1 text-[#6200D9] dark:text-purple-400 flex-shrink-0">
                       <Wind className="h-3 w-3" />
                       <span>Check Air Quality</span>
                     </div>
