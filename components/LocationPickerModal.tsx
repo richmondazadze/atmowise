@@ -202,171 +202,171 @@ export function LocationPickerModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[95vw] max-w-md mx-auto rounded-2xl p-0">
-          <DialogHeader className="px-6 py-4">
-            <DialogTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-[#6200D9]" />
-              Select Location
-            </DialogTitle>
-          </DialogHeader>
+      <DialogContent className="w-[95vw] max-w-md mx-auto rounded-2xl p-0">
+        <DialogHeader className="px-6 py-4">
+          <DialogTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-[#6200D9]" />
+            Select Location
+          </DialogTitle>
+        </DialogHeader>
 
-          <div className="px-6 pb-6 space-y-4">
-            {/* Use Current Location Button */}
-            {onUseCurrentLocation && (
-              <div className="flex justify-center">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onUseCurrentLocation}
-                  disabled={isCurrentLocationLoading}
-                  className="flex items-center gap-2 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 h-12 px-6 w-full rounded-2xl"
-                >
-                  <MapPin className="h-4 w-4" />
-                  {isCurrentLocationLoading
-                    ? "Getting Location..."
-                    : "Use Current Location"}
-                </Button>
-              </div>
-            )}
-
-            <form onSubmit={handleSearch} className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Search for a city or address..."
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onFocus={() => setShowSuggestions(true)}
-                  onBlur={() => setShowSuggestions(false)}
-                  className="pl-10 h-12 text-base rounded-2xl"
-                  autoComplete="off"
-                />
-
-                {/* Suggestions Dropdown */}
-                {showSuggestions && suggestions.length > 0 && (
-                  <div
-                    ref={suggestionsRef}
-                    className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto scroll-smooth overscroll-contain"
-                  >
-                    {suggestions.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleSuggestionSelect(suggestion)}
-                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors ${
-                          index === selectedIndex ? "bg-[#6200D9]/10" : ""
-                        }`}
-                      >
-                        <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-gray-900 truncate">
-                            {suggestion.label}
-                          </div>
-                          <div className="text-sm text-gray-500 truncate">
-                            {suggestion.lat.toFixed(4)},{" "}
-                            {suggestion.lon.toFixed(4)}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+        <div className="px-6 pb-6 space-y-4">
+          {/* Use Current Location Button */}
+          {onUseCurrentLocation && (
+            <div className="flex justify-center">
               <Button
-                type="submit"
-                disabled={loading || !address.trim()}
-                className="h-12 px-6 text-white bg-[#6200D9] hover:bg-[#4C00A8] rounded-2xl"
+                type="button"
+                variant="outline"
+                onClick={onUseCurrentLocation}
+                disabled={isCurrentLocationLoading}
+                className="flex items-center gap-2 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 h-12 px-6 w-full rounded-2xl"
               >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Search"
-                )}
+                <MapPin className="h-4 w-4" />
+                {isCurrentLocationLoading
+                  ? "Getting Location..."
+                  : "Use Current Location"}
               </Button>
-            </form>
+            </div>
+          )}
 
-            {/* Error Message */}
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                {error}
-              </div>
-            )}
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder="Search for a city or address..."
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setShowSuggestions(false)}
+                className="pl-10 h-12 text-base rounded-2xl"
+                autoComplete="off"
+              />
 
-            {/* Search Results */}
-            {searchResults.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="font-semibold text-gray-900">Search Results</h3>
-                {searchResults.map((result, index) => {
-                  const aqiInfo = getAQIDisplay(result.airQuality?.aqi);
-                  return (
-                    <div
+              {/* Suggestions Dropdown */}
+              {showSuggestions && suggestions.length > 0 && (
+                <div
+                  ref={suggestionsRef}
+                  className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto scroll-smooth overscroll-contain"
+                >
+                  {suggestions.map((suggestion, index) => (
+                    <button
                       key={index}
-                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      type="button"
+                      onClick={() => handleSuggestionSelect(suggestion)}
+                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors ${
+                        index === selectedIndex ? "bg-[#6200D9]/10" : ""
+                      }`}
                     >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <MapPin className="h-4 w-4 text-gray-400" />
-                            <span className="font-medium text-gray-900">
-                              {result.location.label}
+                      <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 truncate">
+                          {suggestion.label}
+                        </div>
+                        <div className="text-sm text-gray-500 truncate">
+                          {suggestion.lat.toFixed(4)},{" "}
+                          {suggestion.lon.toFixed(4)}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <Button
+              type="submit"
+              disabled={loading || !address.trim()}
+              className="h-12 px-6 bg-[#6200D9] hover:bg-[#4C00A8] rounded-2xl"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Search"
+              )}
+            </Button>
+          </form>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Search Results */}
+          {searchResults.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-semibold text-gray-900">Search Results</h3>
+              {searchResults.map((result, index) => {
+                const aqiInfo = getAQIDisplay(result.airQuality?.aqi);
+                return (
+                  <div
+                    key={index}
+                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin className="h-4 w-4 text-gray-400" />
+                          <span className="font-medium text-gray-900">
+                            {result.location.label}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          {result.location.lat.toFixed(4)},{" "}
+                          {result.location.lon.toFixed(4)}
+                        </div>
+                        {result.airQuality && (
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              className={`text-xs px-2 py-1 ${aqiInfo.color}`}
+                            >
+                              AQI {result.airQuality.aqi}
+                            </Badge>
+                            <span className="text-sm text-gray-600">
+                              {aqiInfo.label}
                             </span>
                           </div>
-                          <div className="text-sm text-gray-600 mb-2">
-                            {result.location.lat.toFixed(4)},{" "}
-                            {result.location.lon.toFixed(4)}
-                          </div>
-                          {result.airQuality && (
-                            <div className="flex items-center gap-2">
-                              <Badge
-                                className={`text-xs px-2 py-1 ${aqiInfo.color}`}
-                              >
-                                AQI {result.airQuality.aqi}
-                              </Badge>
-                              <span className="text-sm text-gray-600">
-                                {aqiInfo.label}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <Check className="h-5 w-5 text-[#6200D9]" />
+                        )}
                       </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleLocationSelect(result)}
-                          className="flex-1 h-10 bg-[#6200D9] hover:bg-[#4C00A8] text-white text-sm rounded-2xl"
-                        >
-                          Select Location
-                        </Button>
-                        <Button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleSaveLocation(result);
-                          }}
-                          variant="outline"
-                          disabled={!userId}
-                          className="h-10 px-3 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 text-sm rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-                          title={
-                            !userId
-                              ? "Sign in to save locations"
-                              : "Save this location"
-                          }
-                        >
-                          <BookmarkPlus className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <Check className="h-5 w-5 text-[#6200D9]" />
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </DialogContent>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleLocationSelect(result)}
+                        className="flex-1 h-10 bg-[#6200D9] hover:bg-[#4C00A8] text-white text-sm rounded-2xl"
+                      >
+                        Select Location
+                      </Button>
+                      <Button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSaveLocation(result);
+                        }}
+                        variant="outline"
+                        disabled={!userId}
+                        className="h-10 px-3 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 text-sm rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={
+                          !userId
+                            ? "Sign in to save locations"
+                            : "Save this location"
+                        }
+                      >
+                        <BookmarkPlus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </DialogContent>
       </Dialog>
 
       {/* Save Location Modal - Outside main dialog to prevent stacking issues */}
