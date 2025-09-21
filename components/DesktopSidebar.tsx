@@ -194,11 +194,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
       <div className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {/* Main Navigation */}
         <nav className={cn("space-y-3 mt-12", isCollapsed ? "px-2" : "px-4")}>
-          {!isCollapsed && (
-            <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2">
-              Navigation
-            </h2>
-          )}
+          
           {mainNavItems.map((item) => (
             <NavItemComponent
               key={item.path}
