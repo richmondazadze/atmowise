@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
+import { ModalActions } from './ui/modal-actions';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { Save, X, Brain, Lightbulb, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
@@ -292,7 +293,7 @@ export function AIInsightsModal({
                   Personalized Health Tips
                 </h4>
                 
-                <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+                <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 scroll-smooth overscroll-contain">
                   {aiResponse.tips.map((tip, index) => (
                     <div
                       key={index}
@@ -333,31 +334,19 @@ export function AIInsightsModal({
           )}
 
           {/* Action Buttons - Fixed at Bottom */}
-          <div className="flex-shrink-0 flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4 border-t border-gray-200">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="px-4 sm:px-6 py-2 sm:py-3 touch-target order-2 sm:order-1 text-sm sm:text-base rounded-2xl"
-            >
-              Close
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!aiResponse || saveInsightsMutation.isPending || isStreaming}
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {saveInsightsMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Insights
-                </>
-              )}
-            </Button>
+          <div className="flex-shrink-0">
+            <ModalActions
+              primaryAction={{
+                label: saveInsightsMutation.isPending ? 'Saving...' : 'Save Insights',
+                onClick: handleSave,
+                disabled: !aiResponse || saveInsightsMutation.isPending || isStreaming,
+                loading: saveInsightsMutation.isPending
+              }}
+              secondaryAction={{
+                label: 'Close',
+                onClick: onClose
+              }}
+            />
           </div>
         </div>
       </DialogContent>

@@ -91,7 +91,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto scroll-smooth overscroll-contain">
         {/* Main Navigation */}
         <nav className="p-4 space-y-2">
           {mainNavItems.map((item) => {

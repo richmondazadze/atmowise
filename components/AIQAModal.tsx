@@ -213,7 +213,7 @@ export function AIQAModal({
           </div>
 
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto space-y-4 min-h-0">
+          <div className="flex-1 overflow-y-auto space-y-4 min-h-0 scroll-smooth overscroll-contain">
             {messages.length === 0 ? (
               <div className="text-center py-8">
                 <Bot className="h-12 w-12 mx-auto mb-4 text-gray-300" />

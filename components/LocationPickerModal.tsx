@@ -192,7 +192,8 @@ export function LocationPickerModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-md mx-auto rounded-2xl p-0">
         <DialogHeader className="px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
@@ -240,7 +241,7 @@ export function LocationPickerModal({
               {showSuggestions && suggestions.length > 0 && (
                 <div
                   ref={suggestionsRef}
-                  className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto"
+                  className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto scroll-smooth overscroll-contain"
                 >
                   {suggestions.map((suggestion, index) => (
                     <button
@@ -312,7 +313,7 @@ export function LocationPickerModal({
                         {result.airQuality && (
                           <div className="flex items-center gap-2">
                             <Badge
-                              className={`text-xs px-2 py-1 ${aqiInfo.color} ${aqiInfo.color}`}
+                              className={`text-xs px-2 py-1 ${aqiInfo.color}`}
                             >
                               AQI {result.airQuality.aqi}
                             </Badge>
@@ -334,7 +335,11 @@ export function LocationPickerModal({
                         Select Location
                       </Button>
                       <Button
-                        onClick={() => handleSaveLocation(result)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSaveLocation(result);
+                        }}
                         variant="outline"
                         disabled={!userId}
                         className="h-10 px-3 border-[#6200D9] text-[#6200D9] hover:bg-[#6200D9]/10 text-sm rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
@@ -354,8 +359,9 @@ export function LocationPickerModal({
           )}
         </div>
       </DialogContent>
+      </Dialog>
 
-      {/* Save Location Modal */}
+      {/* Save Location Modal - Outside main dialog to prevent stacking issues */}
       {selectedLocationForSave && userId && (
         <SaveLocationModal
           isOpen={showSaveModal}
@@ -367,6 +373,6 @@ export function LocationPickerModal({
           userId={userId}
         />
       )}
-    </Dialog>
+    </>
   );
 }

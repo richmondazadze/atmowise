@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ModalActions } from "@/components/ui/modal-actions";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -127,7 +128,7 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile, onP
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 sm:space-y-8 max-h-80 overflow-y-auto px-4 sm:px-6">
+        <div className="space-y-6 sm:space-y-8 max-h-80 overflow-y-auto px-4 sm:px-6 scroll-smooth overscroll-contain">
           {/* Basic Info */}
           <div>
             <label className="block text-sm font-semibold text-[#0A1C40] mb-2">
@@ -240,21 +241,19 @@ export function ProfileSetupModal({ isOpen, onClose, userId, currentProfile, onP
         </div>
         
         {/* Footer with both buttons */}
-        <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-6 pt-4 sm:pt-6 border-t border-gray-200 px-4 sm:px-6">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="px-4 sm:px-6 py-2 sm:py-3 touch-target order-2 sm:order-1 text-sm sm:text-base rounded-xl"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={updateProfileMutation.isPending || !profileData.displayName.trim()}
-            className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold touch-target order-1 sm:order-2 text-sm sm:text-base rounded-xl"
-          >
-            {updateProfileMutation.isPending ? 'Saving...' : 'Save Profile'}
-          </Button>
+        <div className="px-4 sm:px-6">
+          <ModalActions
+            primaryAction={{
+              label: updateProfileMutation.isPending ? 'Saving...' : 'Save Profile',
+              onClick: handleSave,
+              disabled: updateProfileMutation.isPending || !profileData.displayName.trim(),
+              loading: updateProfileMutation.isPending
+            }}
+            secondaryAction={{
+              label: 'Cancel',
+              onClick: onClose
+            }}
+          />
         </div>
         
       </DialogContent>

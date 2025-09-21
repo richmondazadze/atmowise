@@ -720,6 +720,13 @@
     @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
     font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Enhanced scrollbar */
@@ -738,6 +745,22 @@
   
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-500;
+  }
+  
+  /* Smooth scrolling optimizations */
+  * {
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent scroll chaining on mobile */
+  .overscroll-contain {
+    overscroll-behavior: contain;
+  }
+  
+  /* Smooth scrolling for all scrollable containers */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -775,6 +798,26 @@
   /* Mobile Button Enhancement */
   button {
     -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Mobile Scroll Optimization */
+  @media (max-width: 768px) {
+    * {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    
+    /* Prevent horizontal scroll on mobile */
+    body {
+      overflow-x: hidden;
+    }
+    
+    /* Smooth scrolling for mobile containers */
+    .mobile-scroll {
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
   }
   
   /* Mobile Typography */
@@ -1175,6 +1218,65 @@
     z-index: 9997 !important;
   }
   
+  /* Modern Severity Slider Styles */
+  .severity-slider {
+    position: relative;
+  }
+  
+  .severity-slider .slider-track {
+    height: 8px;
+    background: linear-gradient(90deg, #e5e7eb 0%, #e5e7eb 100%);
+    border-radius: 4px;
+    position: relative;
+  }
+  
+  .severity-slider .slider-range {
+    height: 8px;
+    background: linear-gradient(90deg, #6200D9 0%, #4C00A8 100%);
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(98, 0, 217, 0.3);
+    transition: all 0.2s ease-out;
+  }
+  
+  .severity-slider .slider-thumb {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #6200D9 0%, #4C00A8 100%);
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(98, 0, 217, 0.4);
+    transition: all 0.2s ease-out;
+  }
+  
+  .severity-slider .slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(98, 0, 217, 0.5);
+  }
+  
+  .severity-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid;
+    transition: all 0.2s ease-out;
+  }
+  
+  .severity-dot.active {
+    background: linear-gradient(135deg, #6200D9 0%, #4C00A8 100%);
+    border-color: #6200D9;
+    box-shadow: 0 2px 8px rgba(98, 0, 217, 0.3);
+  }
+  
+  .severity-dot.inactive {
+    background: white;
+    border-color: #d1d5db;
+  }
+  
+  .dark .severity-dot.inactive {
+    background: #374151;
+    border-color: #6b7280;
+  }
+
   /* Button System */
   .btn-primary {
     @apply bg-gradient-to-r from-[#6200D9] to-[#4C00A8] text-white font-semibold;

@@ -580,8 +580,9 @@ export default function Dashboard() {
             <LocationPickerModal
               isOpen={showLocationPicker}
               onClose={() => setShowLocationPicker(false)}
-                onLocationSelect={handleLocationSelect}
-                currentLocation={selectedLocation || undefined}
+              onLocationSelect={handleLocationSelect}
+              currentLocation={selectedLocation || undefined}
+              userId={supabaseUser?.id}
               onUseCurrentLocation={async () => {
                 if (currentLat && currentLon) {
                   // Get a readable address for the current location

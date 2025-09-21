@@ -283,7 +283,7 @@ export function TipsCard({
         
         <CardContent className="px-0 pb-2">
           {/* Scrollable Tips Container */}
-          <div className="max-h-96 overflow-y-auto overscroll-contain">
+          <div className="max-h-96 overflow-y-auto overscroll-contain scroll-smooth">
             {filteredAndSortedTips.length === 0 ? (
               <div className="text-center py-8 px-6">
                 <Search className="h-8 w-8 mx-auto mb-3 text-gray-300" />
@@ -425,7 +425,7 @@ export function TipsCard({
           </DialogHeader>
 
           {selectedTip && (
-            <div className="flex-1 overflow-y-auto px-6 py-4">
+            <div className="flex-1 overflow-y-auto px-6 py-4 scroll-smooth overscroll-contain">
               <div className="space-y-4">
                 {/* Tip Header */}
                 <div className="flex flex-wrap items-center gap-2">
