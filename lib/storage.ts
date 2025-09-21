@@ -250,7 +250,7 @@ export const storage = {
     localStorage.set(STORAGE_KEYS.DARK_MODE, isDark),
   
   getDarkMode: (): boolean => 
-    localStorage.get<boolean>(STORAGE_KEYS.DARK_MODE, false),
+    localStorage.get<boolean>(STORAGE_KEYS.DARK_MODE, false) ?? false,
   
   // User preferences
   setUserPreferences: (preferences: Partial<UserPreferences>) => {
@@ -271,20 +271,26 @@ export const storage = {
       refreshInterval: 5,
       defaultView: 'dashboard',
       theme: 'auto',
-    }),
+    }) ?? {
+      notifications: true,
+      autoRefresh: true,
+      refreshInterval: 5,
+      defaultView: 'dashboard',
+      theme: 'auto',
+    },
   
   // Timeline
   setTimelinePeriod: (period: string) => 
     localStorage.set(STORAGE_KEYS.TIMELINE_PERIOD, period),
   
   getTimelinePeriod: (): string => 
-    localStorage.get<string>(STORAGE_KEYS.TIMELINE_PERIOD, '7d'),
+    localStorage.get<string>(STORAGE_KEYS.TIMELINE_PERIOD, '7d') ?? '7d',
   
   setTimelineMetric: (metric: string) => 
     localStorage.set(STORAGE_KEYS.TIMELINE_METRIC, metric),
   
   getTimelineMetric: (): string => 
-    localStorage.get<string>(STORAGE_KEYS.TIMELINE_METRIC, 'aqi'),
+    localStorage.get<string>(STORAGE_KEYS.TIMELINE_METRIC, 'aqi') ?? 'aqi',
   
   // App state
   setAppState: (state: Partial<AppState>) => {
@@ -301,7 +307,11 @@ export const storage = {
       lastActiveTab: 'dashboard',
       sidebarCollapsed: false,
       welcomeShown: false,
-    }),
+    }) ?? {
+      lastActiveTab: 'dashboard',
+      sidebarCollapsed: false,
+      welcomeShown: false,
+    },
   
   // Cache management
   setCachedData: <T>(key: string, data: T, ttl?: number) => 
@@ -318,4 +328,9 @@ export const storage = {
   
   // Cleanup
   clearAll: () => localStorage.clear(),
+  
+  // Cache management utilities
+  getStats: () => localStorage.getStats(),
+  keys: () => localStorage.keys(),
+  remove: (key: string) => localStorage.remove(key),
 };

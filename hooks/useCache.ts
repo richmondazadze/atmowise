@@ -57,7 +57,7 @@ export function useCache<T = any>(key: string, options: CacheOptions = {}) {
   }, []);
 
   const evictExpired = useCallback(() => {
-    for (const [key, item] of cacheRef.current.entries()) {
+    for (const [key, item] of Array.from(cacheRef.current.entries())) {
       if (isExpired(item)) {
         evictItem(key);
       }
