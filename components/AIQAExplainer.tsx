@@ -32,7 +32,7 @@ export function AIQAExplainer({ currentAqi, dominantPollutant, category, userId 
         <CardContent>
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="w-full bg-gradient-to-r from-[#6200D9] to-[#7C3AED] hover:from-[#4C00A8] hover:to-[#6200D9] text-white"
+            className="w-full bg-gradient-to-r from-[#6200D9] to-[#BA5FFF] hover:from-[#4C00A8] hover:to-[#A855F7] text-white"
           >
             <MessageCircle className="h-4 w-4 mr-2" />
             Start AI Chat

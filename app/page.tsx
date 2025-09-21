@@ -88,7 +88,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center space-x-4">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md">
-                <img src="/loading.svg" alt="" />
+                <img src="/atmowise.webp" alt="AtmoWise" />
               </div>
               <span className="text-2xl font-semibold text-gray-900 dark:text-white">
                 AtmoWise
@@ -336,7 +336,7 @@ export default function LandingPage() {
             <div className="col-span-1 sm:col-span-2 lg:col-span-2">
               <div className="flex items-center space-x-3 mb-4 sm:mb-6">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center">
-                  <img src="/icon.svg" alt="" />
+                  <img src="/atmowise.webp" alt="AtmoWise" />
                 </div>
                 <span className="text-xl sm:text-2xl font-semibold">
                   AtmoWise

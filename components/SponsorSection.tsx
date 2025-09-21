@@ -41,7 +41,7 @@ export function SponsorSection({ className = "" }: SponsorSectionProps) {
               {/* Uncomment and use when sponsor logo is available */}
               {/* 
               <Image
-                src="/sponsors/logo.wepb"
+                src="/sponsors/logo.webp"
                 alt="Sponsor Logo"
                 width={200}
                 height={60}

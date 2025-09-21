@@ -136,7 +136,7 @@ Track your air quality with AtmoWise!`;
       {/* Floating Action Button */}
       <Button
         onClick={() => setShowOptions(!showOptions)}
-        className="w-12 h-12 rounded-full bg-gradient-to-r from-[#6200D9] to-[#7C3AED] hover:from-[#4C00A8] hover:to-[#6200D9] text-white shadow-lg hover:shadow-xl transition-all duration-300"
+        className="w-12 h-12 rounded-full bg-gradient-to-r from-[#6200D9] to-[#BA5FFF] hover:from-[#4C00A8] hover:to-[#A855F7] text-white shadow-lg hover:shadow-xl transition-all duration-300"
         aria-label="Export or Share"
       >
         <Share2 className="h-5 w-5" />
