@@ -157,7 +157,7 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
       )}
     >
       {/* Header */}
-      <div className="relative p-4 border-b border-gray-200/50 flex-shrink-0">
+      <div className="relative p-7 border-b border-gray-200/50 flex-shrink-0">
         <div className="flex items-center">
           <div className="w-8 h-8 bg-gradient-to-br from-[#6200D9] to-[#4C00A8] rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
             <Wind className="h-4 w-4 text-white" />

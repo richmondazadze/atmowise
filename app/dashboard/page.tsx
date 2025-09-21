@@ -310,7 +310,7 @@ export default function DashboardPage() {
 
       {/* Desktop Header */}
       <header className="hidden lg:block sticky top-0 z-30 header-premium">
-        <div className="px-8 py-6">
+        <div className="px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="heading-1 text-[#0A1C40]">Dashboard</h1>
@@ -341,7 +341,7 @@ export default function DashboardPage() {
               <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 mb-6 shadow-sm">
                 <button
                   onClick={() => setShowLocationPicker(true)}
-                  className="w-full flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 rounded-xl group"
+                  className="w-full flex items-center justify-between h-12 px-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 rounded-xl group"
                 >
                   <div className="flex items-center space-x-4 min-w-0 flex-1">
                     <div className="w-10 h-10 bg-[#6200D9] rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
