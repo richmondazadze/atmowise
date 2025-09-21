@@ -8,7 +8,6 @@ import {
   TrendingUp,
   User,
   LifeBuoy,
-  Settings,
   LogOut,
   Wind,
 } from "lucide-react";
@@ -67,14 +66,6 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
     },
   ];
 
-  const secondaryNavItems: NavItem[] = [
-    {
-      path: "/settings",
-      icon: Settings,
-      label: "Settings",
-      description: "App preferences",
-    },
-  ];
 
   const NavItemComponent = React.useCallback(
     ({ item, isActive }: { item: NavItem; isActive: boolean }) => {
@@ -207,7 +198,7 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
         <nav className={cn("space-y-2", isCollapsed ? "px-2" : "px-4")}>
           {!isCollapsed && (
             <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2">
-              Navigation
+              
             </h2>
           )}
           {mainNavItems.map((item) => (
@@ -224,28 +215,6 @@ export function DesktopSidebar({ onCrisis, className }: DesktopSidebarProps) {
           ))}
         </nav>
 
-        <div
-          className={cn(
-            "my-4 border-t border-gray-200/60",
-            isCollapsed ? "mx-2" : "mx-4"
-          )}
-        />
-
-        {/* Secondary Navigation */}
-        <nav className={cn("space-y-2", isCollapsed ? "px-2" : "px-4")}>
-          {!isCollapsed && (
-            <h2 className="text-xs font-semibold text-[#64748B] uppercase tracking-wider px-2 mb-2">
-              Settings
-            </h2>
-          )}
-          {secondaryNavItems.map((item) => (
-            <NavItemComponent
-              key={item.path}
-              item={item}
-              isActive={pathname === item.path}
-            />
-          ))}
-        </nav>
 
         {/* Crisis Button */}
         {onCrisis && (

@@ -130,7 +130,7 @@ export function SavedPlaces({ userId, onLocationSelect }: SavedPlacesProps) {
   }
 
   return (
-    <Card className="card-solid rounded-xl lg:rounded-2xl p-3 lg:p-4 hover:shadow-xl transition-all duration-300">
+    <Card className="card-solid rounded-xl lg:rounded-2xl p-1 lg:p-1 hover:shadow-xl transition-all duration-300">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg lg:text-xl font-bold text-[#0A1C40] flex items-center gap-2">
