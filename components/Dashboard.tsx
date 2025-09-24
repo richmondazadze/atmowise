@@ -454,17 +454,9 @@ export default function Dashboard() {
       <header className="lg:hidden sticky top-0 z-40 bg-white/98 backdrop-blur-xl border-b border-gray-100/50 shadow-sm">
         <div className="px-4 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 min-w-0 flex-1">
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
-                <img src="/atmowise.webp" alt="AtmoWise" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h1 className="text-xl font-bold text-[#0A1C40] truncate tracking-tight">
-                  AtmoWise
-                </h1>
-                <p className="text-xs text-[#64748B] truncate font-medium">
-                  Air Quality Dashboard
-                </p>
+            <div className="flex items-center min-w-0 flex-1">
+              <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
+                <img src="/atmowise.webp" alt="AtmoWise" className="w-full h-full object-contain" />
               </div>
             </div>
             <div className="flex items-center space-x-2 flex-shrink-0">

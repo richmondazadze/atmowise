@@ -81,18 +81,15 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md">
-                <img src="/atmowise.webp" alt="AtmoWise" />
+            <div className="flex items-center">
+              <div className="w-24 h-24 flex items-center justify-center">
+                <img src="/atmowise.webp" alt="AtmoWise" className="w-full h-full object-contain" />
               </div>
-              <span className="text-2xl font-semibold text-gray-900 dark:text-white">
-                AtmoWise
-              </span>
             </div>
             <div className="flex items-center space-x-4 sm:space-x-6">
               {!user ? (
@@ -100,13 +97,13 @@ export default function LandingPage() {
                   <Button
                     variant="ghost"
                     onClick={() => router.push("/auth")}
-                    className="text-gray-600 dark:text-gray-300 hover:text-[#6200D9] font-medium text-sm sm:text-base"
+                    className="text-gray-600 dark:text-gray-300 hover:text-teal-600 font-medium text-sm sm:text-base"
                   >
                     Sign In
                   </Button>
                   <Button
                     onClick={handleGetStarted}
-                    className="bg-[#6200D9] hover:bg-[#4C00A8] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base"
+                    className="bg-[#0d9488] hover:bg-[#0f766e] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base"
                   >
                     Get Started
                   </Button>
@@ -114,7 +111,7 @@ export default function LandingPage() {
               ) : (
                 <Button
                   onClick={() => router.push("/dashboard")}
-                  className="bg-[#6200D9] hover:bg-[#4C00A8] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base"
+                  className="bg-[#0d9488] hover:bg-[#0f766e] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base"
                 >
                   Dashboard
                 </Button>
@@ -135,7 +132,7 @@ export default function LandingPage() {
                   : "opacity-0 translate-y-10"
               }`}
             >
-              <Badge className="mt-8 sm:mt-0 mb-6 sm:mb-8 bg-[#6200D9] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium">
+              <Badge className="mt-8 sm:mt-0 mb-6 sm:mb-8 bg-[#0d9488] text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium">
                 <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                 <span className="hidden xs:inline">
                   Clinical-Grade Air Quality Health Platform
@@ -145,7 +142,7 @@ export default function LandingPage() {
 
               <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 leading-tight max-w-5xl mx-auto px-2">
                 Advanced Air Quality Health
-                <span className="text-[#6200D9]"> Monitoring</span>
+                <span className="text-[#0d9488]"> Monitoring</span>
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 sm:mb-10 md:mb-12 max-w-4xl mx-auto leading-relaxed px-4">
@@ -159,7 +156,7 @@ export default function LandingPage() {
                 <Button
                   onClick={handleGetStarted}
                   size="lg"
-                  className="w-full xs:w-auto bg-[#6200D9] hover:bg-[#4C00A8] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-colors duration-200"
+                  className="w-full xs:w-auto bg-[#0d9488] hover:bg-[#0f766e] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-colors duration-200"
                 >
                   Start Free Trial
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -308,7 +305,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="py-16 sm:py-20 md:py-24 bg-gray-50 dark:bg-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-2">
+          <h2 className="text-2xl sm:3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-2">
             Ready to Transform Respiratory Care?
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 sm:mb-10 md:mb-12 max-w-3xl mx-auto px-4">
@@ -320,7 +317,7 @@ export default function LandingPage() {
             <Button
               onClick={handleGetStarted}
               size="lg"
-              className="w-full xs:w-auto bg-[#6200D9] hover:bg-[#4C00A8] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-colors duration-200"
+              className="w-full xs:w-auto bg-[#0d9488] hover:bg-[#0f766e] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-colors duration-200"
             >
               Start Free Trial
               <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -330,94 +327,16 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 sm:py-16">
+      <footer className="bg-gray-900 text-white py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
-            <div className="col-span-1 sm:col-span-2 lg:col-span-2">
-              <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center">
-                  <img src="/atmowise.webp" alt="AtmoWise" />
-                </div>
-                <span className="text-xl sm:text-2xl font-semibold">
-                  AtmoWise
-                </span>
+          <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
+                <img src="/atmowise.webp" alt="AtmoWise" className="w-full h-full object-contain" />
               </div>
-              <p className="text-gray-400 mb-6 sm:mb-8 max-w-md leading-relaxed text-sm sm:text-base">
-                Clinical-grade air quality monitoring platform trusted by
-                healthcare providers and patients worldwide for respiratory
-                health management.
-              </p>
+              <span className="text-sm sm:text-base text-gray-300">Clinical-grade air quality monitoring</span>
             </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
-                Platform
-              </h3>
-              <ul className="space-y-2 sm:space-y-3 text-gray-400 text-sm sm:text-base">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Clinical Dashboard
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    API Documentation
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Healthcare Integration
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Data Analytics
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
-                Support
-              </h3>
-              <ul className="space-y-2 sm:space-y-3 text-gray-400 text-sm sm:text-base">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Clinical Support
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Technical Documentation
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Terms of Service
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 sm:mt-12 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
-            <p className="text-gray-400 text-xs sm:text-sm">
-              &copy; 2024 AtmoWise. All rights reserved.
-            </p>
-            <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
-              <span className="text-gray-400 text-xs sm:text-sm">
-                HIPAA Compliant
-              </span>
-              <span className="text-gray-400 text-xs sm:text-sm">
-                SOC 2 Certified
-              </span>
-              <span className="text-gray-400 text-xs sm:text-sm">
-                ISO 27001
-              </span>
-            </div>
+            <p className="text-gray-400 text-xs sm:text-sm">&copy; 2025 AtmoWise. All rights reserved.</p>
           </div>
         </div>
       </footer>

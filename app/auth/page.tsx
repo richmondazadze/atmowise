@@ -177,8 +177,8 @@ export default function AuthPage() {
             }}
             className="flex justify-center"
           >
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center shadow-md">
-              <img src="/icon.svg" alt="" />
+            <div className="w-24 h-24 flex items-center justify-center">
+              <img src="/atmowise.webp" alt="AtmoWise" className="w-full h-full object-contain" />
             </div>
           </motion.div>
           <motion.h2
@@ -340,7 +340,7 @@ export default function AuthPage() {
                           required={isSignUp}
                           className={`h-11 transition-all duration-200 ${
                             focusedField === "firstName"
-                              ? "ring-2 ring-[#6200D9] border-[#6200D9]"
+                              ? "ring-2 ring-[#0d9488] border-[#0d9488]"
                               : ""
                           }`}
                           placeholder="Enter your first name"
@@ -377,7 +377,7 @@ export default function AuthPage() {
                       required
                       className={`h-11 transition-all duration-200 ${
                         focusedField === "email"
-                          ? "ring-2 ring-[#6200D9] border-[#6200D9]"
+                          ? "ring-2 ring-[#0d9488] border-[#0d9488]"
                           : ""
                       }`}
                       placeholder="Enter your email"
@@ -413,7 +413,7 @@ export default function AuthPage() {
                       required
                       className={`h-11 pr-10 transition-all duration-200 ${
                         focusedField === "password"
-                          ? "ring-2 ring-[#6200D9] border-[#6200D9]"
+                          ? "ring-2 ring-[#0d9488] border-[#0d9488]"
                           : ""
                       }`}
                       placeholder="Enter your password"
@@ -491,7 +491,7 @@ export default function AuthPage() {
                       className={`text-white w-full h-11 transition-all duration-300 ${
                         success
                           ? "bg-green-600 hover:bg-green-700"
-                          : "bg-[#6200D9] hover:bg-[#4C00A8]"
+                          : "bg-[#0d9488] hover:bg-[#0f766e]"
                       }`}
                     >
                       <motion.div
@@ -549,7 +549,7 @@ export default function AuthPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={toggleSignUp}
-                  className="text-sm text-[#6200D9] hover:text-[#4C00A8] font-medium transition-colors duration-200"
+                  className="text-sm text-[#0d9488] hover:text-[#0f766e] font-medium transition-colors duration-200"
                 >
                   <motion.span
                     key={isSignUp ? "signin-link" : "signup-link"}

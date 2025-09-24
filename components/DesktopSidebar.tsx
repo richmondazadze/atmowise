@@ -245,27 +245,14 @@ export function DesktopSidebar({ className }: DesktopSidebarProps) {
         transition={{ duration: 0.4, delay: 0.2 }}
         className="relative p-7 border-b border-gray-200/50 flex-shrink-0"
       >
-        <div className="flex items-center">
+        <div className="flex items-center justify-center">
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md flex-shrink-0"
+            className="w-16 h-16 flex items-center justify-center"
           >
-            <img src="/atmowise.webp" alt="AtmoWise" />
-          </motion.div>
-          <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-            className="ml-3"
-          >
-            <h1 className="text-lg font-bold text-[#0A1C40] whitespace-nowrap">
-              AtmoWise
-            </h1>
-            <p className="text-xs text-[#64748B] -mt-0.5 whitespace-nowrap">
-              Air Quality Tracker
-            </p>
+            <img src="/atmowise.webp" alt="AtmoWise" className="w-full h-full object-contain" />
           </motion.div>
         </div>
       </motion.div>
