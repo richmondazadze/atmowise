@@ -158,7 +158,7 @@ export default function LandingPage() {
                   size="lg"
                   className="w-full xs:w-auto bg-[#0d9488] hover:bg-[#0f766e] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-colors duration-200"
                 >
-                  Start Free Trial
+                  Explore
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </div>
@@ -319,7 +319,7 @@ export default function LandingPage() {
               size="lg"
               className="w-full xs:w-auto bg-[#0d9488] hover:bg-[#0f766e] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-medium transition-colors duration-200"
             >
-              Start Free Trial
+              Explore
               <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </div>
